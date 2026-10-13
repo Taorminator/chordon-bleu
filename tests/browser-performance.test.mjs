@@ -12,7 +12,7 @@ const play=(mode)=>{calls.length=0;vm.runInContext("playVoicing({root:0,quality:
 const arp=play('arp');assert.ok(arp.length>=5&&arp.length<13,'ARP should be a musical 1/8 pattern, not frantic ticks');
 assert.ok(arp.some(n=>n[3]===true),'ARP must anchor the pattern with bass');
 const slice=play('slice');assert.equal(slice.length,13,'4 repeats of 3 voices, plus one initial bass');
-assert.equal(new Set(slice.slice(0,12).map(n=>n[0])).size,3,'SLICE replays full chords, not single melody notes');
+assert.equal(new Set(slice.filter(n=>n[4]===false).map(n=>n[0])).size,3,'SLICE replays full chords, not single melody notes');
 assert.ok(slice[3][2]<.2,'SLICE gate should make short rhythmic hits');
 state.holdLift=true;const melt=play('hold');assert.ok(melt[0][2]>2,'MELT should sustain through changes');
 assert.equal(melt[0][0],60,'MELT must not transpose an octave');
