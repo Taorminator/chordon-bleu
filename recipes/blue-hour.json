@@ -1,0 +1,222 @@
+{
+  "id": "blue-hour",
+  "name": "BLUE HOUR",
+  "caption": "Neo-Soul · Gospel · Jazz-R&B",
+  "description": "Offene maj9-, m11- und 13er-Farben, gospelartige Subdominanten und geschmeidige chromatische Annäherungen. Eigenständige harmonische Stilübung, keine Transkription.",
+  "inspiredBy": "Zeitgenössischer Jazz/Neo-Soul, Gospel-Harmonik und Robert Glaspers allgemeine stilistische Merkmale; keine Melodien oder Musikpassagen übernommen.",
+  "suggestedMode": "major",
+  "suggestedKey": 2,
+  "suggestedTempo": 76,
+  "suggestedSound": 0,
+  "templates": [
+    {
+      "minSpice": 0,
+      "chords": [
+        [
+          0,
+          "maj9"
+        ],
+        [
+          9,
+          "m11"
+        ],
+        [
+          2,
+          "m9"
+        ],
+        [
+          7,
+          "dom13"
+        ]
+      ]
+    },
+    {
+      "minSpice": 0,
+      "chords": [
+        [
+          5,
+          "maj9"
+        ],
+        [
+          4,
+          "m7"
+        ],
+        [
+          9,
+          "m11"
+        ],
+        [
+          7,
+          "sus9"
+        ]
+      ]
+    },
+    {
+      "minSpice": 0,
+      "chords": [
+        [
+          0,
+          "maj7"
+        ],
+        [
+          4,
+          "m7"
+        ],
+        [
+          5,
+          "maj9"
+        ],
+        [
+          7,
+          "dom13"
+        ]
+      ]
+    },
+    {
+      "minSpice": 28,
+      "chords": [
+        [
+          9,
+          "m9"
+        ],
+        [
+          2,
+          "dom13"
+        ],
+        [
+          7,
+          "maj9"
+        ],
+        [
+          0,
+          "maj9"
+        ]
+      ]
+    },
+    {
+      "minSpice": 48,
+      "chords": [
+        [
+          0,
+          "maj9"
+        ],
+        [
+          3,
+          "maj7"
+        ],
+        [
+          2,
+          "m11"
+        ],
+        [
+          7,
+          "dom13"
+        ]
+      ]
+    },
+    {
+      "minSpice": 70,
+      "chords": [
+        [
+          0,
+          "maj9"
+        ],
+        [
+          6,
+          "halfDim"
+        ],
+        [
+          5,
+          "m11"
+        ],
+        [
+          7,
+          "dom13"
+        ]
+      ]
+    }
+  ],
+  "palette": [
+    {
+      "semi": 0,
+      "quality": "maj9",
+      "weight": 3,
+      "minSpice": 0
+    },
+    {
+      "semi": 0,
+      "quality": "maj7",
+      "weight": 2,
+      "minSpice": 0
+    },
+    {
+      "semi": 2,
+      "quality": "m9",
+      "weight": 2.3,
+      "minSpice": 0
+    },
+    {
+      "semi": 2,
+      "quality": "m11",
+      "weight": 2.5,
+      "minSpice": 0
+    },
+    {
+      "semi": 4,
+      "quality": "m7",
+      "weight": 1.7,
+      "minSpice": 0
+    },
+    {
+      "semi": 5,
+      "quality": "maj9",
+      "weight": 3,
+      "minSpice": 0
+    },
+    {
+      "semi": 7,
+      "quality": "dom13",
+      "weight": 2.3,
+      "minSpice": 0
+    },
+    {
+      "semi": 7,
+      "quality": "sus9",
+      "weight": 2.2,
+      "minSpice": 0
+    },
+    {
+      "semi": 9,
+      "quality": "m11",
+      "weight": 3,
+      "minSpice": 0
+    },
+    {
+      "semi": 9,
+      "quality": "m9",
+      "weight": 2.4,
+      "minSpice": 0
+    },
+    {
+      "semi": 3,
+      "quality": "maj7",
+      "weight": 1.6,
+      "minSpice": 48
+    },
+    {
+      "semi": 6,
+      "quality": "halfDim",
+      "weight": 1.2,
+      "minSpice": 70
+    },
+    {
+      "semi": 2,
+      "quality": "dom13",
+      "weight": 1.2,
+      "minSpice": 28
+    }
+  ],
+  "sources": [
+    "https://www.berklee.edu/"
+  ]
+}
