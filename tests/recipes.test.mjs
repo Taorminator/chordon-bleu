@@ -10,8 +10,11 @@ const c=vm.createContext({console,Math,Date,setTimeout,clearTimeout,localStorage
 vm.runInContext(source,c);
 vm.runInContext('render=()=>{};renderSaved=()=>{};audition=()=>{};toast=()=>{};',c);
 const v=x=>vm.runInContext(x,c);
-const recipe=JSON.parse(JSON.stringify(v('RECIPE_CATALOG[0]')));
+const recipe=JSON.parse(JSON.stringify(v("RECIPE_CATALOG.find(r=>r.id==='ghibli-dream')")));
 assert.equal(recipe.id,'ghibli-dream');
+assert.equal(v("RECIPE_CATALOG.find(r=>r.id==='blue-hour').name"),'MANHATTAN');
+assert.equal(v("RECIPE_CATALOG.find(r=>r.id==='moonlit-kingdom').name"),'TOKYO');
+assert.equal(v("RECIPE_CATALOG.find(r=>r.id==='dust-and-echoes').name"),'CAPRESE');
 assert.equal(recipe.templates.length,8);
 assert.ok(recipe.palette.length>=12);
 for(const tpl of recipe.templates)assert.ok(tpl.chords.length===4);
