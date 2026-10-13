@@ -13,6 +13,8 @@ jobs:
           node-version: "22"
       - name: Validate offline recipe bundle
         run: node tools/build-recipes.mjs --check
+      - name: Validate FM1 browser device surface
+        run: node tests/device-view.test.mjs
       - name: Exercise harmonic search and arpeggiator
         run: |
           node tests/harmony.test.mjs
