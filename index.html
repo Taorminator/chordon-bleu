@@ -135,7 +135,6 @@ body.fm1-mode>.app{display:none}
 </style>
 </head>
 <body>
-<script>if(typeof location!=="undefined" && /(?:^|[?&])view=fm1(?:&|$)/.test(location.search||""))document.body.classList.add("fm1-mode");</script>
 
 <!-- Browser-only physical surface: FM-XY chassis design ported with attribution, never load FM-XY at runtime. -->
 <div class="cb-hardware" id="cb-fmxy-device" aria-label="CHORDON BLEU FM1 Browsergerät">
@@ -629,6 +628,7 @@ function setupFM1(){
  document.getElementById('fm1-details').addEventListener('toggle',drawFM1);drawFM1();
 }
 
+if(typeof location!=="undefined" && /(?:^|[?&])view=fm1(?:&|$)/.test(location.search||""))document.body.classList.add("fm1-mode");
 setup();
 setupFM1();
 setupFM1Hardware();
