@@ -26,6 +26,6 @@ assert.match(html,/id="slicegate"/);
 assert.match(html,/id="cb-delay-time"/);
 assert.match(html,/id="wonder"[^>]*type="range"/);
 assert.match(html,/addEventListener\('change',\(\)=>\{if\(harmonicVariation\(\)\)/,'SPICE commit must audibly change harmony');
-for(const quality of ['m11','maj7sharp11','dom13','sus9','mMaj7','dom7b9']) assert.ok(html.includes(quality+':{label:'),'Missing voicing '+quality);
+for(const quality of ['m11','maj7sharp11','dom13','sus9','mMaj7','dom7b9']) assert.ok(html.includes(quality+':{\"label\":'),'Missing voicing '+quality);
 for(const recipe of ['blue-hour','moonlit-kingdom','dust-and-echoes'])assert.ok(html.includes('data-recipe="'+recipe+'"'),'Missing recipe button '+recipe);
 console.log('PASS: chord slicing, arp speed, MELT, chorus/delay gates, spice changes and new harmony palettes.');
