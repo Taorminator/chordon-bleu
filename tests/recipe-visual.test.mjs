@@ -14,7 +14,7 @@ const exec=js=>vm.runInContext(js,context);
 // Spy on the real drawing functions: no duplicate illustration or synthetic pixels.
 const operations=[];
 const canvas={
- beginPath(){},closePath(){},moveTo(){},lineTo(){},bezierCurveTo(){},quadraticCurveTo(){},
+ beginPath(){},closePath(){},moveTo(){},lineTo(){},bezierCurveTo(){},quadraticCurveTo(){},roundRect(){},
  stroke(){operations.push(['stroke',this.strokeStyle]);},
  fill(){operations.push(['fill',this.fillStyle]);},
  fillRect(x,y,w,h){operations.push(['rect',this.fillStyle,x,y,w,h]);},
