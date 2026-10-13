@@ -15,6 +15,9 @@ assert.match(match[1],/data-hw-action="PLAY_STOP" aria-label="PLAY \/ STOP"/);
 const octave=html.match(/<div class="octaves">([\s\S]*?)<\/div>/)?.[1]||'';
 assert.deepEqual([...octave.matchAll(/data-hw-action="([^"]+)"/g)].map(x=>x[1]),['OCT_DOWN','OCT_UP']);
 assert.match(html,/Number\(key\.dataset\.note\)\+12\*hwOctave/,'Octave controls must affect physical keyboard sound');
+assert.match(html,/key\.dataset\.chordPad=String\(i\)/,'Record-mode chord pad tagging is required');
+assert.match(html,/if\(state\.rec && key\.dataset\.chordPad!==undefined\)\{padChord\(Number\(key\.dataset\.chordPad\)\);return;\}/,
+ 'REC should allow four on-device chord pads, not only the hidden browser editor');
 
 // Test the ACTUAL hardware event dispatcher extracted from inline browser script.
 const begin=html.indexOf(' function runAction(name){');
