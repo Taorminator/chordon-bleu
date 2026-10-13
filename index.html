@@ -624,7 +624,7 @@ const SOUNDS=[
  {name:'GLASS',kind:'classic',wave:'sine',second:'triangle',cut:4000,a:.008,dec:.7,sus:.22,rel:.85,detune:2},
  {name:'DUSK',kind:'classic',wave:'sawtooth',second:'triangle',cut:620,a:.09,dec:.42,sus:.42,rel:1.05,detune:3},
  {name:'DX7 EP',kind:'fm',wave:'sine',second:'sine',cut:4900,a:.006,dec:.42,sus:.26,rel:.95,detune:0},
- {name:'GRAND',kind:'grand',wave:'sine',second:'triangle',cut:5500,a:.003,dec:.58,sus:.32,rel:1.0,detune:2},
+ {name:'GRAND',kind:'grand',wave:'sine',second:'triangle',cut:10200,a:.002,dec:.35,sus:.32,rel:1.0,detune:2},
  {name:'90s HOUSE',kind:'house',wave:'sawtooth',second:'triangle',cut:4400,a:.002,dec:.19,sus:.30,rel:.30,detune:4}
 ];
 // All six programs use the same self-contained oscillator engine; no external samples.
@@ -633,7 +633,7 @@ function tone(midi,at,dur,vel=.6,bass=false,pluck=false){
  const sound=SOUNDS[state.sound]||SOUNDS[0],kind=bass?'classic':sound.kind,
        freq=440*Math.pow(2,(midi-69)/12),env=ctx.createGain(),filter=ctx.createBiquadFilter(),
        melt=state.holdLift&&!bass&&!pluck;
- filter.type='lowpass';filter.frequency.setValueAtTime(bass?550:sound.cut,at);
+ filter.type='lowpass';filter.frequency.setValueAtTime(bass?550:Math.min(ctx.sampleRate*.44,sound.cut*(kind==='grand'?.79+vel*.35:1)),at);
  filter.Q.value=bass?.55:.45;
  env.connect(filter);filter.connect(master);
  if(reverb&&!bass)filter.connect(reverb);
@@ -667,9 +667,11 @@ function tone(midi,at,dur,vel=.6,bass=false,pluck=false){
   voice('sine',freq*2,.16,3);
  }else if(kind==='grand'){
   // Acoustic-style partials with mild inharmonicity and a short hammer transient.
-  voice('sine',freq,.9);
-  voice('triangle',freq*2.005,.31);
-  voice('sine',freq*3.012,.13);
+  voice('sine',freq,.85);
+  voice('triangle',freq*2.005,.30);
+  voice('sine',freq*3.012,.16);
+  voice('sine',freq*4.026,.10);
+  voice('triangle',freq*5.065,.045);
  }else if(kind==='house'){
   // Bright transient, brassy chord stabs: original synth approximation of a 90s piano.
   voice('sawtooth',freq,.66);
@@ -684,7 +686,7 @@ function tone(midi,at,dur,vel=.6,bass=false,pluck=false){
   hammer.type='triangle';
   hammer.frequency.setValueAtTime(freq*4.5,at);
   hammer.frequency.exponentialRampToValueAtTime(freq*2.3,at+.022);
-  snap.gain.setValueAtTime(.020*vel,at);
+  snap.gain.setValueAtTime((kind==='grand'?.034:.020)*vel,at);
   snap.gain.exponentialRampToValueAtTime(.0001,at+.035);
   hammer.connect(snap);snap.connect(filter);hammer.start(at);hammer.stop(at+.042);
  }
