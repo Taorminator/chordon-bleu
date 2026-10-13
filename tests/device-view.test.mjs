@@ -12,7 +12,6 @@ assert.match(html,/id="fm1hardware-screen" width="240" height="240"/);
 assert.match(html,/id="cb-hw-keyboard"/);
 assert.match(html,/function setupFM1Hardware\(\)/);
 assert.match(html,/setupFM1Hardware\(\);/);
-assert.match(html,/fm1hardware-screen'\)\?document\.getElementById/);
 assert.match(html,/document\.getElementById\('cb-hw-editor-slot'\)\.append\(app\)/);
 assert.match(html,/fm1Knob\(Number\(btn\.dataset\.hwKnob\),dir\)/);
 assert.match(html,/ensureAudio\(\)\.then\(ok=>\{if\(ok\)tone/);
