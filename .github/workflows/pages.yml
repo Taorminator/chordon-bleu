@@ -29,8 +29,6 @@ jobs:
           if [ -f docs/fm1-four-screens.png ]; then cp docs/fm1-four-screens.png _site/docs/; fi
           touch _site/.nojekyll
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
