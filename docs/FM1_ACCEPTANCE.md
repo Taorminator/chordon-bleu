@@ -28,3 +28,9 @@ Status: PRE-RELEASE / NOT INSTALLABLE. A successful compiler run is necessary bu
 
 Do NOT enable downloads or Web MIDI flashing based merely on a successful CI compile.
 FM-XY remains an independent tool and repo.
+
+## Boot and recovery policy (Melodee 1.3.2 incident)
+
+Required before FM1 flash authorization: leave the bootloader's 360 MHz clock untouched; audit watchdog/CPU1/cache setup and boot-loop fallback on physical hardware; do not add any automatic PLL retune. Keep the bootloader and recovery USB path intact. Prepare a known-good verified stock V15 rollback and full-flash backup, test ROM UBOOT restoration on a dedicated test device, and confirm FLASH + startup + user-data recovery independently. The standalone source guard is not proof of hardware safety.
+
+See [BOOT_RECOVERY_SAFETY.md](BOOT_RECOVERY_SAFETY.md) for the Melodee postmortem, recovery commands, risk matrix and physical acceptance checklist.
