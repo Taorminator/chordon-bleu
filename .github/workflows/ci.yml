@@ -25,6 +25,8 @@ jobs:
         run: node tests/browser-performance.test.mjs
       - name: Safari audio, new instruments and grouped UI
         run: node tests/safari-synth-ui.test.mjs
+      - name: Pencil-sketch UI, BPM, PUNCH, DX7 ROM1A and GRAND regression
+        run: node tests/sketch-controls-dx7.test.mjs
       - name: Exercise harmonic search and arpeggiator
         run: |
           node tests/harmony.test.mjs
