@@ -19,6 +19,8 @@ jobs:
         run: node tests/device-view.test.mjs
       - name: Verify plated Cordon Bleu browser illustration
         run: node tests/recipe-visual.test.mjs
+      - name: Test chord performance controls and octave voicing
+        run: node tests/performance.test.mjs
       - name: Exercise harmonic search and arpeggiator
         run: |
           node tests/harmony.test.mjs
