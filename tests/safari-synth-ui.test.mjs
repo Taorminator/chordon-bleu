@@ -13,7 +13,7 @@ assert.doesNotMatch(performance,/data-motion="slice"/);
 assert.match(performance,/id="slicegate"/);
 const programs=extract('const SOUNDS=[','function arpBaseNotes(');
 for(const name of ['WARM','GLASS','DUSK','DX7 EP','GRAND','90s HOUSE'])assert.ok(programs.includes("name:'"+name+"'"),name);
-const state={recipeId:'classic',play:false,key:4,mode:'major',tempo:126,sound:5,feel:'crispy',flipMode:'all'};
+const state={recipeId:'classic',play:false,key:4,mode:'major',tempo:126,sound:5,feel:'crispy',flipMode:'all',steps:[{}]};
 const scene={state,RECIPE_CATALOG:[{id:'blue-hour'}],pushUndo(){},stopPlayback(){},activeRecipe(){return {name:'MANHATTAN'};},startProgression(){},render(){},startPlayback(){},audition(){},toast(){}};
 vm.createContext(scene);
 vm.runInContext(extract('function selectRecipe(id){','function validSlice('),scene);
