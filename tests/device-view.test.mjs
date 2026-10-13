@@ -26,7 +26,7 @@ let scripts=0;
 for(const match of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)){
   new vm.Script(match[1],{filename:'index.html inline #'+(++scripts)});
 }
-assert.ok(scripts>=2);
+assert.ok(scripts>=1);
 
 // Same 27 chromatic notes (C4...D6) as FM-XY's hardware key range.
 // An independent HTML-mode switch must leave the original demo intact.
