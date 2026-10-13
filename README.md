@@ -49,7 +49,7 @@ python3 tests/stress_test.py   # optional: Python Playwright and Chromium
 
 ## Interactive FM1 Screen Lab — v0.6
 
-Open **FM1 SCREEN LAB** near the bottom of the browser instrument. It renders an actual **240 × 240 Canvas** with four original design states: **HOME** (four chromatic chord objects and a miniature saucepan), **RECIPES** (a colorful bowl), **CHORD** (orbital tone geometry), **ARP** (note orbit). These are an original homage to playful instrument design, not a copy of Felucca or OP-1 screens.
+Open **FM1 SCREEN LAB** near the bottom of the browser instrument. It renders an actual **240 × 240 Canvas** with four original design states: **HOME** (four chromatic chord objects and a miniature saucepan), **RECIPES** (a plated Cordon Bleu that releases cheese when FEEL is CHEESY), **CHORD** (orbital tone geometry), **ARP** (note orbit). These are an original homage to playful instrument design, not a copy of Felucca or OP-1 screens.
 
 The virtual **KNOB 1–4** controls are wired to the same sound-state as the app; HOME gives SPICE/FEEL/MOTION/BPM, ARP gives RATE/GATE/DIRECTION/ORDER. PLAY/FLIP/SAVE are wired too. This is a visual **concept simulator**, not WASM-compiled FM1 firmware.
 
