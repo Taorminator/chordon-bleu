@@ -19,11 +19,31 @@ int main(void){
   cb_fm1_button(&d,CB_B_HOME,&h);cb_fm1_knob(&d,0,1);cb_fm1_knob(&d,1,1);
   CbChord keep=d.loop.steps[d.selected];cb_fm1_button(&d,CB_B_FLIP,&h);
   assert(!memcmp(&keep,&d.loop.steps[d.selected],sizeof(keep)));
-  cb_fm1_button(&d,CB_B_KEEP_ALL,&h);cb_fm1_button(&d,CB_B_FLIP,&h);
+  cb_fm1_button(&d,CB_B_KEEP_ALL,&h);
+  CbChord prev[4];memcpy(prev,d.loop.steps,sizeof(prev));
+  cb_fm1_button(&d,CB_B_FLIP,&h);
+  for(int k=0;k<4;k++){
+   assert(prev[k].root!=d.loop.steps[k].root||prev[k].quality!=d.loop.steps[k].quality);
+   assert(!d.loop.steps[k].lock_root&&!d.loop.steps[k].lock_type);
+  }
   assert(cb_valid(&d.loop));cb_fm1_button(&d,CB_B_UNDO,&h);assert(cb_valid(&d.loop));
   cb_fm1_button(&d,CB_B_SAVE,&h);cb_fm1_button(&d,CB_B_PLAY,&h);
   for(int t=0;t<18;t++)cb_fm1_tick(&d,500,&h);
   cb_fm1_button(&d,CB_B_PLAY,&h);assert(!d.playing);
+ }
+ /* Full regeneration + all three emotional palettes over many seeds.
+  * Compare each slot's pitch/quality, never just the random generator seed. */
+ for(unsigned feel=0;feel<3;feel++){
+  for(unsigned seed=1;seed<=64;seed++){
+   cb_fm1_init(&d,seed);d.feel=(uint8_t)feel;d.all_four=1;
+   for(unsigned iteration=0;iteration<8;iteration++){
+    CbChord before[4];memcpy(before,d.loop.steps,sizeof(before));
+    cb_fm1_button(&d,CB_B_FLIP,&h);
+    assert(cb_valid(&d.loop));
+    for(int k=0;k<4;k++)
+     assert(before[k].root!=d.loop.steps[k].root||before[k].quality!=d.loop.steps[k].quality);
+   }
+  }
  }
  assert(draw_count>8000&&notes_count>500&&save_count==256&&panic_count==256);
  printf("PASS: 256 device-state, 240x240 bounded render, event and scheduling scenarios (%d notes, %d render ops)\n",notes_count,draw_count);
