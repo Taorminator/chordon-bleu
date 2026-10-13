@@ -85,6 +85,7 @@ static void mutate(CbFM1 *m){
    if(best_changes==4u)break;
   }
   m->loop=best;
+  season(m,255u);
   for(unsigned i=0;i<4u;i++){
    CbChord *c=&m->loop.steps[i];
    c->lock_root=c->lock_type=0;
@@ -105,7 +106,7 @@ static void mutate(CbFM1 *m){
     else if(q==CB_MINOR)m->loop.steps[i].quality=CB_M9;
    }
   }
-  season(m,m->all_four?255u:m->selected);
+  if(!m->all_four)season(m,m->selected);
  }
 }
 /* Host emits at note boundaries. The control task should call tick every 1-10 ms.
