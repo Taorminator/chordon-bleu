@@ -1,19 +1,53 @@
 #!/usr/bin/env python3
 """Experimental opt-in CHORDON BLEU overlay on a pinned Felucca checkout.
 It does not create a releasable firmware. Install/release is DISABLED.
-Usage: python3 firmware/felucca-overlay/apply.py /path/to/Felucca
+Usage: python3 firmware/felucca-overlay/apply.py /path/to/Felucca [--check-only]
 """
 from pathlib import Path
 import sys
 import shutil
+import subprocess
+
+# Refuse a different upstream commit or a locally edited target before writing
+# ANYTHING. A matching source anchor alone is not enough to trust the boot path.
+def require_pinned_upstream(path):
+    def git(*args):
+        try:
+            return subprocess.check_output(
+                ["git", "-C", str(path), *args],
+                text=True, stderr=subprocess.DEVNULL,
+            ).strip()
+        except (OSError, subprocess.CalledProcessError) as error:
+            raise SystemExit("Felucca revision preflight failed; original checkout required") from error
+
+    root = Path(git("rev-parse", "--show-toplevel")).resolve()
+    if root != path:
+        raise SystemExit("Felucca checkout must be its own Git repository root")
+    head = git("rev-parse", "HEAD")
+    if head != PIN:
+        raise SystemExit(f"Wrong Felucca revision: {head}; required {PIN}; no changes made")
+    for name in ("firmware/src/felucca.c", "firmware/src/main.c"):
+        git("ls-files", "--error-unmatch", "--", name)
+        try:
+            subprocess.run(
+                ["git", "-C", str(path), "diff", "--quiet", "HEAD", "--", name],
+                check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            )
+        except (OSError, subprocess.CalledProcessError) as error:
+            raise SystemExit(f"Modified upstream boot file: {name}; no changes made") from error
+
 
 PIN = "9f6a8858afd71b4faed9dfea3a5f94d3ecfdf002"
-if len(sys.argv) != 2:
-    raise SystemExit("usage: apply.py FELUCCA_CHECKOUT")
+if len(sys.argv) not in (2, 3) or (len(sys.argv) == 3 and sys.argv[2] != "--check-only"):
+    raise SystemExit("usage: apply.py FELUCCA_CHECKOUT [--check-only]")
 repo = Path(__file__).resolve().parents[2]
 upstream = Path(sys.argv[1]).resolve()
 if not (upstream / "firmware/src/felucca.c").is_file():
     raise SystemExit("not a Felucca checkout")
+require_pinned_upstream(upstream)
+if len(sys.argv) == 3:
+    print(f"PREFLIGHT OK: Felucca {PIN}; two boot source files unmodified. No changes made.")
+    raise SystemExit(0)
 ch = upstream / "firmware/src/chordon"
 if ch.exists():
     raise SystemExit("already patched")
