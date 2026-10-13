@@ -111,7 +111,7 @@ static void cb_emit(CbFM1 *m,const CbFM1Host *host,uint8_t hit){
 }
 void cb_fm1_button(CbFM1 *m,CbButton button,const CbFM1Host *host){
  switch(button){
- case CB_B_PLAY:m->playing=!m->playing;m->clock16=0;if(m->playing){m->active=0;cb_emit(m,host,0);}break;
+ case CB_B_PLAY:m->playing=!m->playing;m->clock16=0;if(m->playing){m->active=0;cb_emit(m,host,0);}else if(host&&host->panic)host->panic(host->user);break;
  case CB_B_FLIP:mutate(m);break;
  case CB_B_SAVE:if(host&&host->save)host->save(host->user,m);m->saved_count++;break;
  case CB_B_HOME:m->view=CB_VIEW_HOME;break;
