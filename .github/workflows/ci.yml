@@ -23,6 +23,8 @@ jobs:
         run: node tests/performance.test.mjs
       - name: Browser performance controls and expanded recipes
         run: node tests/browser-performance.test.mjs
+      - name: Safari audio, new instruments and grouped UI
+        run: node tests/safari-synth-ui.test.mjs
       - name: Exercise harmonic search and arpeggiator
         run: |
           node tests/harmony.test.mjs
