@@ -34,10 +34,10 @@ jobs:
       - name: Compile CHORDON BLEU native core with JieLi target compiler
         run: |
           mkdir -p /tmp/chordon-pi32
-          "$HOME/.jieli/toolchain/pi32v2/bin/clang" -target pi32v2 -std=c99 -Os -ffreestanding -Wall -Wextra -Werror -Icore -c core/chordon_harmony.c -o /tmp/chordon-pi32/harmony.o
-          "$HOME/.jieli/toolchain/pi32v2/bin/clang" -target pi32v2 -std=c99 -Os -ffreestanding -Wall -Wextra -Werror -Icore -Ifirmware -c firmware/cb_fm1.c -o /tmp/chordon-pi32/controller.o
-          "$HOME/.jieli/toolchain/pi32v2/bin/clang" -target pi32v2 -std=c99 -Os -ffreestanding -Wall -Wextra -Werror -Ifirmware -c firmware/cb_voice.c -o /tmp/chordon-pi32/voice.o
-          "$HOME/.jieli/toolchain/pi32v2/bin/clang" -target pi32v2 -std=c99 -Os -ffreestanding -Wall -Wextra -Werror -Ifirmware -c firmware/cb_store.c -o /tmp/chordon-pi32/store.o
+          "$HOME/.jieli/toolchain/pi32v2/bin/clang" -target pi32v2 -DCB_FREESTANDING -std=c99 -Os -ffreestanding -Wall -Wextra -Werror -Icore -c core/chordon_harmony.c -o /tmp/chordon-pi32/harmony.o
+          "$HOME/.jieli/toolchain/pi32v2/bin/clang" -target pi32v2 -DCB_FREESTANDING -std=c99 -Os -ffreestanding -Wall -Wextra -Werror -Icore -Ifirmware -c firmware/cb_fm1.c -o /tmp/chordon-pi32/controller.o
+          "$HOME/.jieli/toolchain/pi32v2/bin/clang" -target pi32v2 -DCB_FREESTANDING -std=c99 -Os -ffreestanding -Wall -Wextra -Werror -Ifirmware -c firmware/cb_voice.c -o /tmp/chordon-pi32/voice.o
+          "$HOME/.jieli/toolchain/pi32v2/bin/clang" -target pi32v2 -DCB_FREESTANDING -std=c99 -Os -ffreestanding -Wall -Wextra -Werror -Ifirmware -c firmware/cb_store.c -o /tmp/chordon-pi32/store.o
       - name: Compile original Felucca firmware reference
         run: |
           cd upstream
