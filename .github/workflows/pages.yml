@@ -1,0 +1,36 @@
+name: Publish CHORDON BLEU browser demo
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate bundled recipes
+        run: node tools/build-recipes.mjs --check
+      - name: Assemble standalone HTML site
+        run: |
+          mkdir -p _site/install _site/docs
+          cp index.html _site/index.html
+          cp install/index.html _site/install/index.html
+          if [ -f install/release-manifest.json ]; then cp install/release-manifest.json _site/install/; fi
+          if [ -f docs/fm1-four-screens.png ]; then cp docs/fm1-four-screens.png _site/docs/; fi
+          touch _site/.nojekyll
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4
