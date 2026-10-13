@@ -10,7 +10,7 @@ const c=vm.createContext({console,Math,Date,setTimeout,clearTimeout,localStorage
 vm.runInContext(source,c);
 vm.runInContext('render=()=>{};renderSaved=()=>{};audition=()=>{};toast=()=>{};',c);
 const v=x=>vm.runInContext(x,c);
-const recipe=JSON.parse(JSON.stringify(v('RECIPE_CATALOG.find(r=>r.id==='ghibli-dream')')));
+const recipe=JSON.parse(JSON.stringify(v("RECIPE_CATALOG.find(r=>r.id==='ghibli-dream')")));
 assert.equal(recipe.id,'ghibli-dream');
 assert.equal(v("RECIPE_CATALOG.find(r=>r.id==='blue-hour').name"),'MANHATTAN');
 assert.equal(v("RECIPE_CATALOG.find(r=>r.id==='moonlit-kingdom').name"),'TOKYO');
