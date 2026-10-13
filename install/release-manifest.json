@@ -1,0 +1,16 @@
+{
+  "project": "chordon-bleu",
+  "manufacturer": "Middle Age Engineering",
+  "browserVersion": "0.6",
+  "firmwareStatus": "development",
+  "flashable": false,
+  "firmwareVersion": null,
+  "firmwarePackage": null,
+  "firmwareSha256": null,
+  "requirementsBeforeRelease": [
+    "native Felucca build with JieLi pi32v2 toolchain",
+    "Felucca host and firmware regression tests",
+    "FM1 physical audio, screen, controls and CPU tests",
+    "flash backup and recovery test on actual hardware"
+  ]
+}
