@@ -37,6 +37,16 @@ The recipes are standalone JSON modules in `recipes/`, bundled into offline `ind
 - `docs/` - identity, FM1 roadmap, hardware knob mapping, design previews
 - `.github/workflows/ci.yml` - independent repository checks
 
+## The 240 × 240 FM1 Screen Lab
+
+The playable [browser demo](index.html) now includes an expandable **FM1 SCREEN LAB**: four playful 240 × 240 display concepts (**LOOP**, **RECIPE**, **CHORD**, **ARP**) with four virtual knobs and direct PLAY / FLIP / SAVE controls. These screens render from the *same browser music state*. No Felucca skin or OP-1 artwork is copied.
+
+There is an [FM1 installation status page](install/index.html), **deliberately non-flashable** until a real and safely tested `.fwsc` build exists.
+
+New portable, native-ready C application sources live at `firmware/cb_fm1.c` and `firmware/cb_fm1.h`. They implement the small state machine, recipe selection, chord controls, RGB565 240 × 240 drawing operations, a nonblocking note event scheduler and four-encoder mapping, using callback hooks that a future Felucca hardware integration can implement. `tests/device_test.c` exercises this layer on a desktop C compiler.
+
+**Status separation:** Browser audio/demo ✅ · native C99 host simulation ✅ · Felucca HAL adapter / JieLi firmware build ❌ · real FM1 flashing/hardware tests ❌. The portable C source is **not** a flashable FM1 firmware image and does not yet replicate all JS FEEL/recipe behaviors exactly.
+
 ## Test
 
 ```sh
@@ -45,6 +55,8 @@ cc -std=c99 -Wall -Wextra -Werror -pedantic core/chordon_harmony.c tests/core_te
 /tmp/chordon-harmony-test
 python3 tests/browser_test.py  # optional: Python Playwright and Chromium
 python3 tests/stress_test.py   # optional: Python Playwright and Chromium
+cc -std=c99 -O2 -Wall -Wextra -Werror -pedantic core/chordon_harmony.c firmware/cb_fm1.c tests/device_test.c -o /tmp/chordon-device-test
+/tmp/chordon-device-test
 ```
 
 ## Real M-VAVE FM1
