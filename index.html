@@ -141,6 +141,68 @@ body.fm1-mode>.app{display:none}
 @media(max-width:620px){.cb-hardware{padding:18px 12px 42px}.cb-hw-header{align-items:flex-start}.cb-hw-area{display:flex;flex-direction:column}.cb-hw-inspector{order:-1}.cb-hw-chords{grid-template-columns:repeat(2,1fr)}.cb-hw-chords button{min-height:58px}.cb-hw-scroll{width:100%;margin-right:-12px;padding-right:12px}.cb-hw-helper{max-width:34rem}.cb-hw-quick button{min-height:48px!important}}
 @media(prefers-reduced-motion:reduce){.cb-hardware *{scroll-behavior:auto;transition:none!important}}
 
+
+/* A single control belongs to exactly one musical task: harmony, transport or performance. */
+.content{display:flex;flex-direction:column;align-items:stretch;gap:0}
+.content>.topbar{order:0}
+.content>.stage{order:1}
+.content>.maincontrols{order:2}
+.content>.belowstage{order:3}
+.content>.harmony-station{order:4}
+.content>.performance-station{order:5}
+.content>.playpanel{order:6}
+.content>.editor{order:7}
+.content>.extrapanel{order:8}
+.harmony-station,.performance-station{
+ background:#141b30;border:1px solid #354462;border-radius:13px;
+ padding:15px 15px 16px;margin:15px 0 0;min-width:0;
+}
+.station-heading{display:flex;gap:5px 12px;justify-content:space-between;align-items:baseline;flex-wrap:wrap;margin-bottom:14px}
+.station-heading .micro{color:#ced8ff;font-size:11px;font-weight:800}
+.station-sub,.sound-help{font-size:11px;color:#adb8d4;line-height:1.4}
+.harmony-station .recipe-strip{display:block;order:initial;margin:0 0 17px}
+.harmony-station .recipechoices{display:flex;justify-content:flex-start;gap:6px;flex-wrap:wrap;margin-top:8px}
+.harmony-station .recipe-chip{min-width:0;flex:1 0 auto}
+.harmony-station .wonder-wrap{margin:0 0 10px;padding:0 0 15px;border-bottom:1px solid #374563}
+.harmony-station .feelbar{margin-top:11px}
+.harmony-station .flipbar{margin-top:13px}
+.harmony-station .quickactions{margin:10px 0 0}
+.harmony-station .quickactions .undo{padding:11px 8px;color:#d4dbf5}
+.performance-station .minitools{margin:0 0 12px;display:block}
+.performance-station .motionbuttons{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.performance-station .motionbuttons button{flex:1 1 76px;min-height:44px;color:#e9eeff;border-color:#45577a}
+.performance-station .motionbuttons button.active{color:#fff;background:#4657ff;border-color:#8795ff}
+.performance-station .arpdeck{margin:12px 0 0}
+.sound-picker{display:flex;flex-direction:column;align-items:stretch;gap:8px;margin:0 0 15px;padding-bottom:14px;border-bottom:1px solid #354462}
+.sound-picker .soundbutton{
+ display:block;appearance:auto;width:100%;height:46px;min-height:46px;
+ color:#f9fbff;background:#202b49;border:1px solid #6476a9;
+ border-radius:9px;padding:0 13px;font-size:14px;font-weight:750;
+}
+.sound-picker .soundbutton option{background:#202b49;color:#fff}
+@media(min-width:790px){
+ .content{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(295px,.85fr);
+  grid-template-areas:"top harmony" "stage harmony" "stage performance" "control performance"
+  "below performance" "play editor" "extra extra";
+  gap:12px 22px;align-items:start}
+ .content>.topbar{grid-area:top;align-self:center}
+ .content>.harmony-station{grid-area:harmony;margin:0}
+ .content>.stage{grid-area:stage}
+ .content>.maincontrols{grid-area:control;margin:0}
+ .content>.belowstage{grid-area:below}
+ .content>.performance-station{grid-area:performance;margin:0}
+ .content>.playpanel{grid-area:play;margin:10px 0 0}
+ .content>.editor{grid-area:editor;margin:10px 0 0}
+ .content>.extrapanel{grid-area:extra;max-width:none;width:100%}
+}
+@media(max-width:440px){
+ .harmony-station,.performance-station{padding:13px 12px}
+ .harmony-station .feelchoices{width:100%}
+ .harmony-station .flipmodes{width:100%;justify-content:stretch}
+ .harmony-station .flipmode{flex:1}
+ .station-heading{margin-bottom:12px}
+}
+
 </style>
 </head>
 <body>
@@ -174,16 +236,26 @@ body.fm1-mode>.app{display:none}
 <div class="app">
 <header class="mast"><div><div class="brand">CHORDON<span class="brandblue"> BLEU</span><span class="branddot">.</span></div><p class="tagline">COOK UP SOMETHING BEAUTIFUL.</p><p class="manufacturer">BY MIDDLE AGE ENGINEERING</p></div><div class="headright"><a class="fm1-open-link" href="?view=fm1" style="color:#4657ff;font-size:11px;font-weight:800;text-decoration:underline">FM1 DEVICE VIEW ↗</a><span class="micro">PLAY<br>FLIP<br>SAVE</span><button class="helpbutton" id="help" aria-label="So funktioniert CHORDON BLEU" title="Hilfe">?</button></div></header>
 <main class="content" id="main">
-<div class="topbar"><span class="micro">01 — YOUR LITTLE LOOP</span><div class="topright"><label class="visuallyhidden" for="key">Tonart</label><select class="pillselect" id="key" aria-label="Tonart wählen"></select><button id="sound" class="soundbutton" title="Klang wechseln" aria-label="Klang wechseln">◉ WARM</button></div></div>
-<div class="recipe-strip" aria-label="Musikalische Recipes"><span class="micro">RECIPES</span><div id="recipechoices" class="recipechoices" role="group" aria-label="Musikalische Klangwelt wählen"><button data-recipe="classic" class="recipe-chip active" type="button" aria-pressed="true">CLASSIC</button><button data-recipe="ghibli-dream" class="recipe-chip" type="button" aria-pressed="false">✦ GHIBLI DREAM</button><button data-recipe="blue-hour" class="recipe-chip" type="button" aria-pressed="false">MANHATTAN</button><button data-recipe="moonlit-kingdom" class="recipe-chip" type="button" aria-pressed="false">TOKYO</button><button data-recipe="dust-and-echoes" class="recipe-chip" type="button" aria-pressed="false">CAPRESE</button></div></div>
-<div class="stage" aria-label="Vier Akkorde deiner Progression"><div class="stage-top"><span><span class="led" id="led"></span> <span id="runlabel">READY TO PLAY</span></span><span class="right"><span id="stagebpm">92 BPM</span><span>01 — 04</span></span></div><div class="stages" id="steps"></div><div class="stagefooter"><span id="status" aria-live="polite">TIPP: DRÜCK PLAY.</span><span class="thermal-label">◉ <span id="heatname">COZY</span></span><span id="loopindicator">LOOP / 001</span></div><div id="audiohealth" class="audiohealth" role="status" aria-live="polite" hidden><span id="audionote">Ton ist noch nicht aktiv.</span><button id="audionudge" type="button" aria-label="Ton einschalten">TON AKTIVIEREN ↗</button></div></div>
-<div class="maincontrols"><button id="play" class="bigbtn primary" aria-label="Loop abspielen"><b aria-hidden="true">▶</b><span>PLAY</span></button><button id="mutate" class="bigbtn surprise" aria-label="Neue passende Akkordvariante erzeugen"><b aria-hidden="true"><svg width="23" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h3c5 0 7 12 12 12h3"/><path d="m18 15 3 3-3 3"/><path d="M3 18h3c5 0 7-12 12-12h3"/><path d="m18 3 3 3-3 3"/></svg></b><span>FLIP</span><small>NEW IDEA</small></button><button id="keep" class="bigbtn keep" aria-label="Aktuellen Loop speichern"><b aria-hidden="true">↓</b><span>SAVE</span></button></div>
-<div class="flipbar" aria-label="FLIP-MODUS"><span class="micro">CHANGE</span><div class="flipmodes" role="group" aria-label="Akkorde beim FLIP behalten"><button id="keepone" class="flipmode active" type="button" aria-pressed="true">◈ KEEP 1</button><button id="allfour" class="flipmode" type="button" aria-pressed="false">⤨ ALL 4</button></div><span class="flipcaption" id="flipcaption">CHORD 01 BLEIBT</span></div>
-<div class="feelbar"><span class="micro">FEEL</span><div class="feelchoices" id="feelchoices" role="group" aria-label="Gefühl für Akkordvorschläge"><button type="button" data-feel="warm" class="feelbutton active" aria-pressed="true">◒ WARM</button><button type="button" data-feel="crispy" class="feelbutton" aria-pressed="false">✳ CRISPY</button><button type="button" data-feel="cheesy" class="feelbutton" aria-pressed="false">♡ CHEESY</button></div></div>
+<div class="topbar"><span class="micro">01 — YOUR LITTLE LOOP</span><div class="topright"><label class="visuallyhidden" for="key">Tonart</label><select class="pillselect" id="key" aria-label="Tonart wählen"></select></div></div>
+<section class="harmony-station" aria-label="Akkordgenerator: Rezepte, Spice, Feel und Flip">
+ <div class="station-heading"><span class="micro">HARMONY / YOUR INGREDIENTS</span><span class="station-sub">Akkorde formen und variieren</span></div>
+ <div class="recipe-strip" aria-label="Musikalische Recipes"><span class="micro">RECIPES</span><div id="recipechoices" class="recipechoices" role="group" aria-label="Musikalische Klangwelt wählen"><button data-recipe="classic" class="recipe-chip active" type="button" aria-pressed="true">CLASSIC</button><button data-recipe="ghibli-dream" class="recipe-chip" type="button" aria-pressed="false">✦ GHIBLI DREAM</button><button data-recipe="blue-hour" class="recipe-chip" type="button" aria-pressed="false">MANHATTAN</button><button data-recipe="moonlit-kingdom" class="recipe-chip" type="button" aria-pressed="false">TOKYO</button><button data-recipe="dust-and-echoes" class="recipe-chip" type="button" aria-pressed="false">CAPRESE</button></div></div>
 <div class="wonder-wrap"><div class="wondertop"><strong>SPICE <span id="wonderval">38</span>%</strong><span class="wonderright" id="wonderlevel">MEDIUM</span></div><label class="visuallyhidden" for="wonder">SPICE: Wie mutig dürfen die harmonischen Überraschungen sein?</label><input class="range" id="wonder" type="range" min="0" max="100" value="38"><div class="rangetips"><span>MILD</span><span>EXTRA HOT</span></div><div class="micro" style="margin-top:9px">Beim Loslassen würzt SPICE deine Akkorde neu · UNDO macht es rückgängig</div></div>
-<div class="minitools"><div><span class="micro" style="display:block;margin-bottom:7px">MOTION / BEWEGUNG</span><div class="motionbuttons" id="motion" role="group" aria-label="Akkorde rhythmisch spielen"><button data-motion="hold" class="active">HOLD</button><button data-motion="pulse">PULSE</button><button data-motion="arp">ARP</button><button data-motion="slice">SLICE</button></div></div><div class="quickactions"><button id="newloop" class="undo" aria-label="Neue Akkordfolge vorschlagen und direkt abspielen" title="Neue Akkordfolge">✳ NEW</button><button id="undo" class="undo" aria-label="Letzte Änderung rückgängig machen" disabled>↶ UNDO</button></div></div>
-<div class="arpdeck" id="slicedeck" hidden aria-label="Slice: Akkord wiederholt anschlagen"><div class="arphead"><span class="micro">SLICE / CHORD REPEATER</span><span class="micro">FULL CHORD · NOT SINGLE NOTES</span></div><div class="arpgrid"><label class="arpcell"><span>HITS</span><select id="slicehits"><option value="2">2×</option><option value="4">4×</option><option value="8">8×</option></select></label><label class="arpcell"><span>SPEED</span><select id="slicerate"><option value="4">1/4</option><option value="8">1/8</option><option value="16">1/16</option><option value="32">1/32</option></select></label><label class="arpcell"><span>GATE <output id="slicegatevalue">40%</output></span><input id="slicegate" type="range" min="10" max="95" step="5" value="40"></label><span class="arpcell"><span>RHYTHM</span><span style="color:#c8d3f3;font-size:12px">Tempo-synced</span></span></div></div>
+<div class="feelbar"><span class="micro">FEEL</span><div class="feelchoices" id="feelchoices" role="group" aria-label="Gefühl für Akkordvorschläge"><button type="button" data-feel="warm" class="feelbutton active" aria-pressed="true">◒ WARM</button><button type="button" data-feel="crispy" class="feelbutton" aria-pressed="false">✳ CRISPY</button><button type="button" data-feel="cheesy" class="feelbutton" aria-pressed="false">♡ CHEESY</button></div></div>
+<div class="flipbar" aria-label="FLIP-MODUS"><span class="micro">CHANGE</span><div class="flipmodes" role="group" aria-label="Akkorde beim FLIP behalten"><button id="keepone" class="flipmode active" type="button" aria-pressed="true">◈ KEEP 1</button><button id="allfour" class="flipmode" type="button" aria-pressed="false">⤨ ALL 4</button></div><span class="flipcaption" id="flipcaption">CHORD 01 BLEIBT</span></div>
+
+ <div class="quickactions"><button id="newloop" class="undo" aria-label="Neue Akkordfolge vorschlagen und direkt abspielen" title="Neue Akkordfolge">✳ NEW</button><button id="undo" class="undo" aria-label="Letzte Änderung rückgängig machen" disabled>↶ UNDO</button></div>
+</section>
+<div class="stage" aria-label="Vier Akkorde deiner Progression"><div class="stage-top"><span><span class="led" id="led"></span> <span id="runlabel">READY TO PLAY</span></span><span class="right"><span id="stagebpm">92 BPM</span><span>01 — 04</span></span></div><div class="stages" id="steps"></div><div class="stagefooter"><span id="status" aria-live="polite">TIPP: DRÜCK PLAY.</span><span class="thermal-label">◉ <span id="heatname">COZY</span></span><span id="loopindicator">LOOP / 001</span></div><div id="audiohealth" class="audiohealth" role="status" aria-live="polite" hidden><span id="audionote">Ton ist noch nicht aktiv.</span><button id="audionudge" type="button" aria-label="Audiokontext neu starten">TON NEU STARTEN ↻</button></div></div>
+<div class="maincontrols"><button id="play" class="bigbtn primary" aria-label="Loop abspielen"><b aria-hidden="true">▶</b><span>PLAY</span></button><button id="mutate" class="bigbtn surprise" aria-label="Neue passende Akkordvariante erzeugen"><b aria-hidden="true"><svg width="23" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h3c5 0 7 12 12 12h3"/><path d="m18 15 3 3-3 3"/><path d="M3 18h3c5 0 7-12 12-12h3"/><path d="m18 3 3 3-3 3"/></svg></b><span>FLIP</span><small>NEW IDEA</small></button><button id="keep" class="bigbtn keep" aria-label="Aktuellen Loop speichern"><b aria-hidden="true">↓</b><span>SAVE</span></button></div>
+<section class="performance-station" aria-label="Instrument und Spielweise">
+ <div class="station-heading"><span class="micro">PERFORM / HOW IT SOUNDS</span><span class="station-sub">Instrument und Rhythmus</span></div>
+ <div class="sound-picker"><label class="micro" for="sound">INSTRUMENT / KLANG</label><select id="sound" class="soundbutton" aria-label="Instrument wählen"></select><span class="sound-help">Sechs eigenständige Synth-Klänge · keine Samples</span></div>
+ <div class="minitools"><div><span class="micro" style="display:block;margin-bottom:7px">MOTION / BEWEGUNG</span><div class="motionbuttons" id="motion" role="group" aria-label="Akkorde rhythmisch spielen"><button data-motion="hold" class="active">HOLD</button><button data-motion="pulse">PULSE</button><button data-motion="arp">ARP</button></div></div></div>
+<div class="arpdeck" id="slicedeck" hidden aria-label="Pulse: Akkord rhythmisch wiederholen"><div class="arphead"><span class="micro">PULSE / CHORD REPEATS</span><span class="micro">REPEAT THE WHOLE CHORD</span></div><div class="arpgrid"><label class="arpcell"><span>HITS</span><select id="slicehits"><option value="2">2×</option><option value="4">4×</option><option value="8">8×</option></select></label><label class="arpcell"><span>SPEED</span><select id="slicerate"><option value="4">1/4</option><option value="8">1/8</option><option value="16">1/16</option><option value="32">1/32</option></select></label><label class="arpcell"><span>GATE <output id="slicegatevalue">40%</output></span><input id="slicegate" type="range" min="10" max="95" step="5" value="40"></label><span class="arpcell"><span>RHYTHM</span><span style="color:#c8d3f3;font-size:12px">Tempo-synced</span></span></div></div>
 <div class="arpdeck" id="arpdeck" hidden aria-label="Vier Regler für den Arpeggiator"><div class="arphead"><span class="micro">ARP / FOUR KNOBS</span><span class="micro">FM1 · K1—K4</span></div><div class="arpgrid"><label class="arpcell"><span>K1 · SPEED</span><select id="arprate"><option value="4">1/4</option><option value="8">1/8</option><option value="16">1/16</option><option value="32">1/32</option></select></label><label class="arpcell"><span>K2 · GATE <output id="gatevalue">62%</output></span><input id="arpgate" type="range" min="15" max="100" step="5" value="62"></label><label class="arpcell"><span>K3 · DIR</span><select id="arpdirection"><option value="up">↑ UP</option><option value="down">↓ DOWN</option><option value="updown">↕ UP/DOWN</option><option value="random">⤨ RANDOM</option></select></label><label class="arpcell"><span>K4 · ORDER</span><select id="arporder"><option value="pitch">PITCH</option><option value="root">ROOT 1ST</option><option value="outside">OUT / IN</option><option value="fifth">FIFTH 1ST</option></select></label></div></div>
+
+</section>
 <div class="belowstage"><span class="micro" id="selection">CHORD 01 SELECTED</span><div class="tempo"><button id="tempodown" aria-label="Tempo um 4 BPM langsamer">−</button><span id="tempotext">92 BPM</span><button id="tempoup" aria-label="Tempo um 4 BPM schneller">+</button></div></div>
 <section class="section playpanel" aria-labelledby="padtitle"><div class="sectiontop"><h2 id="padtitle">Pick a chord.</h2><span class="micro">JUST TAP</span></div><p class="sectionnote">Antippen: hören. REC: vier Akkorde zum Loop machen.</p><div class="padrow" id="pads"></div><div class="recordbar"><button class="recbtn" id="rec">● REC 4 CHORDS</button><span class="recordhint" id="rechint">Vier Akkorde tippen → dein neuer Loop spielt automatisch.</span></div></section>
 <div class="editor" aria-labelledby="editheading"><div class="editorhead"><strong id="editheading">Shape this chord.</strong><span class="editorhint" id="editcount">01 / 04</span></div><div class="editgrid"><div class="edititem"><label for="root">ROOT / GRUNDTON</label><select id="root" aria-label="Grundton für ausgewählten Akkord"></select></div><div class="edititem"><label for="quality">TYPE / AKKORDFORM</label><select id="quality" aria-label="Akkordform für ausgewählten Akkord"></select></div></div><div class="editfoot" id="edithint">AUTO bedeutet: CHORDON BLEU darf entscheiden. Ein fester Wert bleibt bei KEEP 1 erhalten. ALL 4 setzt Fixierungen zurück.</div></div>
@@ -235,10 +307,13 @@ function recipeScore(c){const r=activeRecipe();if(!r)return 0;const rel=mod(c.ro
  // The theme prefers gentle motion even if SPICE is high; dramatic changes must justify their context.
  return score;
 }
-function selectRecipe(id){if(id!=='classic'&&!RECIPE_CATALOG.some(r=>r.id===id)||id===state.recipeId)return;
+function selectRecipe(id){if((id!=='classic'&&!RECIPE_CATALOG.some(r=>r.id===id))||id===state.recipeId)return;
  pushUndo();const was=state.play;if(was)stopPlayback();state.recipeId=id;
- const r=activeRecipe();if(r){state.key=r.suggestedKey;state.mode=r.suggestedMode;state.tempo=r.suggestedTempo;state.sound=r.suggestedSound;state.feel='warm';}
- startProgression(0);state.selected=0;state.flipMode='keep';render();startPlayback();toast((r?r.name:'CLASSIC')+' · FLIP und los!');
+ // A recipe changes HARMONY only: preserve key, tempo, instrument, FEEL and chosen FLIP behavior.
+ const r=activeRecipe();
+ startProgression(0);state.selected=0;render();
+ if(was)startPlayback();else audition(state.steps[0]);
+ toast((r?r.name:'CLASSIC')+' · Akkorde neu gewürzt.');
 }
 function validSlice(a){return a&&[2,4,8].includes(a.hits)&&[4,8,16,32].includes(a.rate)&&Number.isInteger(a.gate)&&a.gate>=10&&a.gate<=95;}
 function validArp(a){return a&&[4,8,16,32].includes(a.rate)&&Number.isInteger(a.gate)&&a.gate>=15&&a.gate<=100&&ARP_DIRECTIONS.includes(a.direction)&&ARP_ORDERS.includes(a.order);}
@@ -368,7 +443,7 @@ function harmonicVariation({editing=false,forceIndex=-1,skipUndo=false}={}){
   if(!editing)toast(all?'Vier frische Akkorde. ✳':`Akkord ${held+1} bleibt. Neuer FLIP!`);
   return true;
 }
-function pushUndo(){state.undo.push({recipeId:state.recipeId,steps:clone(state.steps),key:state.key,mode:state.mode,motion:state.motion,sound:state.sound,feel:state.feel,flipMode:state.flipMode,arp:clone(state.arp)});if(state.undo.length>30)state.undo.shift();}
+function pushUndo(){state.undo.push({recipeId:state.recipeId,steps:clone(state.steps),key:state.key,mode:state.mode,motion:state.motion,sound:state.sound,feel:state.feel,flipMode:state.flipMode,arp:clone(state.arp),slice:clone(state.slice),delayBeats:state.delayBeats});if(state.undo.length>30)state.undo.shift();}
 function undo(){if(!state.undo.length)return;const u=state.undo.pop();Object.assign(state,{recipeId:RECIPE_CATALOG.some(r=>r.id===u.recipeId)?u.recipeId:'classic',steps:u.steps,key:u.key,mode:u.mode,motion:u.motion,sound:u.sound,feel:u.feel||'warm',flipMode:u.flipMode||'keep',arp:validArp(u.arp)?u.arp:{...ARP_DEFAULT}});render();toast('Zurück zur letzten Idee.');}
 function noteToMidi(c){return 48+c.root;}
 function voiceNotes(c,previous=null){let tones=Q[c.quality].notes.map(n=>noteToMidi(c)+n);tones=tones.map(n=>{while(n<53)n+=12;while(n>78)n-=12;return n;}).sort((a,b)=>a-b);
@@ -387,55 +462,151 @@ function audioFeedback(ok,message=''){
   $('audionote').textContent=message;
   $('audioinfo').textContent=ok?' Audio: bereit.':message?' Audio: nicht freigegeben.':'';
 }
-async function ensureAudio(){
-  try{
-    // Must happen synchronously inside the user gesture on iOS.
-    configureAudioSession();
-    if(!ctx){
-      const Context=window.AudioContext||window.webkitAudioContext;
-      if(!Context){audioFeedback(false,'Dieser Browser unterstützt leider kein Web Audio. Bitte in Safari öffnen.');return false;}
-      ctx=new Context();
-      master=ctx.createGain();master.gain.value=.72;
-      const comp=ctx.createDynamicsCompressor();comp.threshold.value=-18;comp.knee.value=14;comp.ratio.value=3;comp.attack.value=.005;comp.release.value=.24;
-      master.connect(comp);comp.connect(ctx.destination);
-      reverb=ctx.createConvolver();const len=Math.round(ctx.sampleRate*1.25),imp=ctx.createBuffer(2,len,ctx.sampleRate);
-      for(let ch=0;ch<2;ch++){const data=imp.getChannelData(ch);for(let i=0;i<len;i++)data[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.9)*.7;}
-      reverb.buffer=imp;const wet=ctx.createGain();wet.gain.value=.12;reverb.connect(wet);wet.connect(comp);
-      const chorus=ctx.createDelay(.05);chorus.delayTime.value=.021;chorusWet=ctx.createGain();chorusWet.gain.value=0;master.connect(chorus);chorus.connect(chorusWet);chorusWet.connect(comp);
-      const lfo=ctx.createOscillator(),depth=ctx.createGain();lfo.frequency.value=.72;depth.gain.value=.005;lfo.connect(depth);depth.connect(chorus.delayTime);lfo.start();
-      delayNode=ctx.createDelay(2);delayNode.delayTime.value=60/state.tempo*state.delayBeats;const feedback=ctx.createGain();feedback.gain.value=.29;delayWet=ctx.createGain();delayWet.gain.value=0;
-      master.connect(delayNode);delayNode.connect(feedback);feedback.connect(delayNode);delayNode.connect(delayWet);delayWet.connect(comp);
-      ctx.onstatechange=()=>{
-        if(ctx.state==='interrupted'||ctx.state==='suspended'){
-          if(state.play)stopPlayback();
-          audioFeedback(false,'Audio wurde pausiert. Zum Fortsetzen TON AKTIVIEREN tippen.');
-        }else if(ctx.state==='running')audioFeedback(true);
-      };
-    }
-    if(ctx.state!=='running'){
-      const promise=ctx.resume();
-      // In some embedded iOS browsers resume() remains pending. Keep the UI responsive.
-      if(promise&&typeof promise.then==='function')await Promise.race([promise,new Promise(resolve=>setTimeout(resolve,2200))]);
-    }
-    if(ctx.state!=='running'){
-      audioFeedback(false,'iPhone blockiert den Ton. Öffne CHORDON BLEU als Webseite direkt in Safari und tippe PLAY.');
-      return false;
-    }
-    audioFeedback(true);
-    return true;
-  }catch(e){
-    audioFeedback(false,'Ton konnte nicht aktiviert werden. Bitte direkt in Safari öffnen.');
-    if(!audioWarned){console.warn('CHORDON BLEU Audio:',e);audioWarned=true;}
-    return false;
-  }
+// Build a minimal dry output first: Safari must not depend on optional effects.
+let fxReady=false;
+function releaseAudio(){
+ if(state.play)stopPlayback();
+ const previous=ctx;
+ ctx=null;master=null;reverb=null;chorusWet=null;delayWet=null;delayNode=null;fxReady=false;
+ if(previous&&previous.state!=='closed')try{const p=previous.close();if(p?.catch)p.catch(()=>{});}catch(_){}
 }
-const SOUNDS=[{name:'WARM',wave:'triangle',second:'sine',cut:1250,a:.027,dec:.45,sus:.43,rel:.65,detune:5},{name:'GLASS',wave:'sine',second:'triangle',cut:4000,a:.008,dec:.7,sus:.22,rel:.85,detune:2},{name:'DUSK',wave:'sawtooth',second:'triangle',cut:620,a:.09,dec:.42,sus:.42,rel:1.05,detune:3}];
-function tone(midi,at,dur,vel=.6,bass=false,pluck=false){if(!ctx||!master)return;const sound=SOUNDS[state.sound],freq=440*Math.pow(2,(midi-69)/12),env=ctx.createGain(),filter=ctx.createBiquadFilter();filter.type='lowpass';filter.frequency.setValueAtTime(bass?550:sound.cut,at);filter.Q.value=bass?.55:.45;env.connect(filter);filter.connect(master);if(reverb&&!bass)filter.connect(reverb);
-  const melt=state.holdLift&&!bass&&!pluck,attack=melt?.24:pluck?Math.min(.008,dur*.16):(bass?.013:sound.a),release=melt?2.7:pluck?Math.min(.15,.055+dur*.24):(bass?.22:sound.rel),decay=melt?.75:pluck?Math.min(.09,dur*.22):(bass?.13:sound.dec),sustain=melt?.79:pluck?.58:(bass?.43:sound.sus);
-  const level=(bass?.13:.105)*vel;
-  env.gain.setValueAtTime(.0001,at);env.gain.exponentialRampToValueAtTime(Math.max(.0002,level),at+Math.max(.005,attack));env.gain.exponentialRampToValueAtTime(Math.max(.0002,level*sustain),at+attack+decay);env.gain.setValueAtTime(Math.max(.0002,level*sustain),at+Math.max(attack+decay,dur));env.gain.exponentialRampToValueAtTime(.0001,at+Math.max(attack+decay,dur)+release);
-  const osc=ctx.createOscillator();osc.type=bass?'sine':sound.wave;osc.frequency.setValueAtTime(freq,at);osc.connect(env);osc.start(at);osc.stop(at+Math.max(attack+decay,dur)+release+.04);
-  if(!bass){const osc2=ctx.createOscillator(),g2=ctx.createGain();g2.gain.value=.22;osc2.type=sound.second;osc2.frequency.setValueAtTime(freq,at);osc2.detune.value=sound.detune;osc2.connect(g2);g2.connect(env);osc2.start(at);osc2.stop(at+Math.max(attack+decay,dur)+release+.04);}
+function initializeAudio(){
+ const Context=window.AudioContext||window.webkitAudioContext;
+ if(!Context)throw Error('Web Audio unavailable');
+ ctx=new Context();
+ master=ctx.createGain();master.gain.value=.62;
+ master.connect(ctx.destination); // Direct fallback, never through the effects chain.
+ ctx.onstatechange=()=>{
+  if(!ctx)return;
+  if(ctx.state==='interrupted'||ctx.state==='suspended'){
+   if(state.play)stopPlayback();
+   audioFeedback(false,'Audio: '+ctx.state+'. Tippe TON NEU STARTEN, falls kein Ton kommt.');
+  }else if(ctx.state==='running')audioFeedback(true);
+ };
+ // Start a barely audible unlock signal during the originating tap/click.
+ try{
+  const osc=ctx.createOscillator(),quiet=ctx.createGain();
+  quiet.gain.value=.000001;osc.connect(quiet);quiet.connect(ctx.destination);
+  osc.start();osc.stop(ctx.currentTime+.035);
+ }catch(e){console.warn('WebAudio unlock signal:',e);}
+}
+function setupOptionalEffects(){
+ if(!ctx||ctx.state!=='running'||fxReady)return;
+ fxReady=true;
+ try{
+  const conv=ctx.createConvolver(),len=Math.round(ctx.sampleRate*.8),imp=ctx.createBuffer(2,len,ctx.sampleRate);
+  for(let ch=0;ch<2;ch++){const d=imp.getChannelData(ch);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,3.2)*.55;}
+  conv.buffer=imp;const wet=ctx.createGain();wet.gain.value=.095;
+  conv.connect(wet);wet.connect(ctx.destination);reverb=conv;
+ }catch(e){reverb=null;console.warn('Optional reverb:',e);}
+ try{
+  const chorus=ctx.createDelay(.05),wet=ctx.createGain();
+  chorus.delayTime.value=.021;wet.gain.value=state.holdRush?.32:0;
+  master.connect(chorus);chorus.connect(wet);wet.connect(ctx.destination);
+  const lfo=ctx.createOscillator(),depth=ctx.createGain();
+  lfo.frequency.value=.72;depth.gain.value=.005;
+  lfo.connect(depth);depth.connect(chorus.delayTime);lfo.start();chorusWet=wet;
+ }catch(e){chorusWet=null;console.warn('Optional chorus:',e);}
+ try{
+  const delay=ctx.createDelay(2),feedback=ctx.createGain(),wet=ctx.createGain();
+  delay.delayTime.value=Math.min(1.9,60/state.tempo*state.delayBeats);
+  feedback.gain.value=.29;wet.gain.value=state.holdDelay?.32:0;
+  master.connect(delay);delay.connect(feedback);feedback.connect(delay);
+  delay.connect(wet);wet.connect(ctx.destination);delayNode=delay;delayWet=wet;
+ }catch(e){delayWet=null;delayNode=null;console.warn('Optional delay:',e);}
+}
+async function ensureAudio(){
+ try{
+  configureAudioSession();
+  if(!ctx)initializeAudio();
+  const current=ctx;
+  // Resume is initiated in the original user gesture, before the first await.
+  if(current.state!=='running'){
+   const pending=current.resume();
+   if(pending&&typeof pending.then==='function')
+    await Promise.race([pending.catch(()=>{}),new Promise(resolve=>setTimeout(resolve,1200))]);
+  }
+  if(current!==ctx||current.state!=='running'){
+   audioFeedback(false,'Safari / Web Audio: '+current.state+'. Tippe TON NEU STARTEN und prüfe deine Audioausgabe.');
+   return false;
+  }
+  setupOptionalEffects();
+  audioFeedback(true);return true;
+ }catch(e){
+  audioFeedback(false,'Audio-Start fehlgeschlagen. Tippe TON NEU STARTEN.');
+  if(!audioWarned){console.warn('CHORDON BLEU Audio:',e);audioWarned=true;}
+  return false;
+ }
+}
+const SOUNDS=[
+ {name:'WARM',kind:'classic',wave:'triangle',second:'sine',cut:1250,a:.027,dec:.45,sus:.43,rel:.65,detune:5},
+ {name:'GLASS',kind:'classic',wave:'sine',second:'triangle',cut:4000,a:.008,dec:.7,sus:.22,rel:.85,detune:2},
+ {name:'DUSK',kind:'classic',wave:'sawtooth',second:'triangle',cut:620,a:.09,dec:.42,sus:.42,rel:1.05,detune:3},
+ {name:'DX7 EP',kind:'fm',wave:'sine',second:'sine',cut:4900,a:.006,dec:.42,sus:.26,rel:.95,detune:0},
+ {name:'GRAND',kind:'grand',wave:'sine',second:'triangle',cut:5500,a:.003,dec:.58,sus:.32,rel:1.0,detune:2},
+ {name:'90s HOUSE',kind:'house',wave:'sawtooth',second:'triangle',cut:4400,a:.002,dec:.19,sus:.30,rel:.30,detune:4}
+];
+// All six programs use the same self-contained oscillator engine; no external samples.
+function tone(midi,at,dur,vel=.6,bass=false,pluck=false){
+ if(!ctx||!master)return;
+ const sound=SOUNDS[state.sound]||SOUNDS[0],kind=bass?'classic':sound.kind,
+       freq=440*Math.pow(2,(midi-69)/12),env=ctx.createGain(),filter=ctx.createBiquadFilter(),
+       melt=state.holdLift&&!bass&&!pluck;
+ filter.type='lowpass';filter.frequency.setValueAtTime(bass?550:sound.cut,at);
+ filter.Q.value=bass?.55:.45;
+ env.connect(filter);filter.connect(master);
+ if(reverb&&!bass)filter.connect(reverb);
+ const attack=melt?.24:pluck?Math.min(.008,dur*.16):(bass?.013:sound.a),
+       decay=melt?.75:pluck?Math.min(.09,dur*.22):(bass?.13:sound.dec),
+       sustain=melt?.79:pluck?.58:(bass?.43:sound.sus),
+       release=melt?2.7:pluck?Math.min(.15,.055+dur*.24):(bass?.22:sound.rel),
+       level=(bass?.13:kind==='house'?.080:kind==='grand'?.11:kind==='fm'?.108:.105)*vel,
+       bodyEnd=at+Math.max(attack+decay,dur),end=bodyEnd+release+.05;
+ env.gain.setValueAtTime(.0001,at);
+ env.gain.exponentialRampToValueAtTime(Math.max(.0002,level),at+Math.max(.005,attack));
+ env.gain.exponentialRampToValueAtTime(Math.max(.0002,level*sustain),at+Math.max(attack+decay,.006));
+ env.gain.setValueAtTime(Math.max(.0002,level*sustain),bodyEnd);
+ env.gain.exponentialRampToValueAtTime(.0001,bodyEnd+release);
+ function voice(type,hz,volume=1,detune=0){
+  const osc=ctx.createOscillator();
+  osc.type=type;osc.frequency.setValueAtTime(hz,at);osc.detune.value=detune;
+  if(volume===1)osc.connect(env);
+  else{const mix=ctx.createGain();mix.gain.value=volume;osc.connect(mix);mix.connect(env);}
+  osc.start(at);osc.stop(end);return osc;
+ }
+ if(kind==='fm'){
+  // Two-operator frequency modulation: DX7-inspired E-piano attack (not a DX7 SysEx patch).
+  const carrier=voice('sine',freq,.92);
+  const modulator=ctx.createOscillator(),index=ctx.createGain();
+  modulator.type='sine';modulator.frequency.setValueAtTime(freq*3,at);
+  index.gain.setValueAtTime(freq*2.2,at);
+  index.gain.exponentialRampToValueAtTime(Math.max(1,freq*.035),at+.42);
+  modulator.connect(index);index.connect(carrier.frequency);
+  modulator.start(at);modulator.stop(end);
+  voice('sine',freq*2,.16,3);
+ }else if(kind==='grand'){
+  // Acoustic-style partials with mild inharmonicity and a short hammer transient.
+  voice('sine',freq,.9);
+  voice('triangle',freq*2.005,.31);
+  voice('sine',freq*3.012,.13);
+ }else if(kind==='house'){
+  // Bright transient, brassy chord stabs: original synth approximation of a 90s piano.
+  voice('sawtooth',freq,.66);
+  voice('triangle',freq*2,.31,4);
+  voice('sine',freq*3,.15);
+ }else{
+  voice(bass?'sine':sound.wave,freq,1);
+  if(!bass)voice(sound.second,freq,.22,sound.detune);
+ }
+ if(kind==='grand'||kind==='house'){
+  const hammer=ctx.createOscillator(),snap=ctx.createGain();
+  hammer.type='triangle';
+  hammer.frequency.setValueAtTime(freq*4.5,at);
+  hammer.frequency.exponentialRampToValueAtTime(freq*2.3,at+.022);
+  snap.gain.setValueAtTime(.020*vel,at);
+  snap.gain.exponentialRampToValueAtTime(.0001,at+.035);
+  hammer.connect(snap);snap.connect(filter);hammer.start(at);hammer.stop(at+.042);
+ }
 }
 function arpBaseNotes(notes,c){
  const sorted=notes.slice().sort((a,b)=>a-b);const order=state.arp.order;
@@ -455,8 +626,7 @@ function arpNote(pattern,hit){const dir=state.arp.direction;
 function playVoicing(c,time,duration,variant=state.motion,explicitNotes=null,octaveShift=0){const root=36+c.root+12*octaveShift;const prev=state.steps[(state.selected+3)%4]||null;let notes=(explicitNotes||voiceNotes(c,prev?voiceNotes(prev):null)).map(n=>n+12*octaveShift);const lift=state.holdLift;const dur=Math.max(.13,duration);
   // MELT stretches the envelope rather than transposing by an octave.
   if(variant==='arp'){const step=60/state.tempo*4/state.arp.rate,hits=Math.min(48,Math.max(1,Math.ceil((dur-.005)/step))),pattern=arpBaseNotes(notes,c);for(let j=0;j<hits;j++){const swing=j%2?step*.13:0,at=time+j*step+swing;if(at>=time+dur)break;const accent=j%4===0?1:j%2===0?.77:.66;tone(arpNote(pattern,j),at,Math.max(.025,step*state.arp.gate/100),accent,false,true);if(j===0)tone(root,time,Math.min(dur,.34),.53,true);}}
-  else if(variant==='slice'){const step=60/state.tempo*4/state.slice.rate,hits=Math.min(state.slice.hits,Math.ceil((dur-.005)/step));for(let j=0;j<hits;j++){const at=time+j*step;if(at>=time+dur)break;const gate=Math.max(.025,step*state.slice.gate/100),accent=j===0?.9:j%2===0?.73:.6;for(const [i,n] of notes.entries())tone(n,at+i*.002,gate,accent,false,true);if(j===0)tone(root,at,gate,.42,true);}}
-  else if(variant==='pulse'){for(let j=0;j<2;j++){for(const [i,n] of notes.entries())tone(n,time+j*dur/2+i*.007,dur*.38,.82);if(j===0)tone(root,time,.28,.7,true);}}
+  else if(variant==='pulse'||variant==='slice'){const step=60/state.tempo*4/state.slice.rate,hits=Math.min(state.slice.hits,Math.ceil((dur-.005)/step));for(let j=0;j<hits;j++){const at=time+j*step;if(at>=time+dur)break;const gate=Math.max(.025,step*state.slice.gate/100),accent=j===0?.9:j%2===0?.73:.6;for(const [i,n] of notes.entries())tone(n,at+i*.002,gate,accent,false,true);if(j===0)tone(root,at,gate,.42,true);}}
   else{notes.forEach((n,i)=>tone(n,time+i*.016,lift?dur*1.18:dur*.77,.75));tone(root,time,Math.max(.2,dur*.49),.58,true);}
 }
 async function audition(c){if(await ensureAudio())playVoicing(c,ctx.currentTime+.015,.84,'hold');}
@@ -467,8 +637,8 @@ function stopPlayback(){++playLaunchToken;$('play').classList.remove('starting')
 function togglePlayback(){if(state.play||$('play').classList.contains('starting'))stopPlayback();else startPlayback();}
 function updateTempo(delta){state.tempo=clamp(state.tempo+delta,48,160);if(delayNode&&ctx)delayNode.delayTime.setTargetAtTime(60/state.tempo*state.delayBeats,ctx.currentTime,.025);renderMeta();sessionSave();}
 function changeKey(value){const [m,k]=value.split(':');if(m===state.mode&&Number(k)===state.key)return;pushUndo();state.mode=m;state.key=Number(k);const was=state.play;if(was)stopPlayback();startProgression();render();if(was)startPlayback();toast('Neue Tonart. Neue Möglichkeiten.');}
-function setSound(){state.sound=(state.sound+1)%SOUNDS.length;renderMeta();sessionSave();audition(state.steps[state.selected]);}
-function setMotion(m){if(!['hold','pulse','arp','slice'].includes(m))return;state.motion=m;renderMeta();sessionSave();if(!state.play)audition(state.steps[state.selected]);}
+function setSound(value){const next=value===undefined?(state.sound+1)%SOUNDS.length:Number(value);if(!Number.isInteger(next)||next<0||next>=SOUNDS.length)return;state.sound=next;renderMeta();sessionSave();if(!state.play)audition(state.steps[state.selected]);}
+function setMotion(m){if(!['hold','pulse','arp','slice'].includes(m))return;state.motion=m==='slice'?'pulse':m;renderMeta();sessionSave();if(!state.play)audition(state.steps[state.selected]);}
 function setFeel(feel){if(!FEELS.includes(feel)||feel===state.feel)return;state.feel=feel;renderMeta();sessionSave();drawFM1();toast('FEEL: '+feel.toUpperCase()+' · FLIP für neue Vorschläge.');}
 function setFlipMode(mode){if(!['keep','all'].includes(mode))return;state.flipMode=mode;renderMeta();sessionSave();}
 function setSlice(which,value){const next={...state.slice,[which]:Number(value)};if(!validSlice(next))return;state.slice=next;renderMeta();sessionSave();}
@@ -484,8 +654,8 @@ function changeEditor(which,value){pushUndo();const c=state.steps[state.selected
   harmonicVariation({editing:true,forceIndex:state.selected,skipUndo:true});
   render();audition(state.steps[state.selected]);
 }
-function saveIdea(){const item={recipeId:state.recipeId,feel:state.feel,arp:clone(state.arp),wonder:state.wonder,id:Date.now()+'-'+Math.floor(Math.random()*999),date:new Date().toISOString(),key:state.key,mode:state.mode,motion:state.motion,sound:state.sound,tempo:state.tempo,steps:clone(state.steps)};state.saved.unshift(item);state.saved=state.saved.slice(0,16);store();renderSaved();toast('Saved! ♡');}
-function loadIdea(id){const entry=state.saved.find(s=>s.id===id);if(!entry)return;pushUndo();const was=state.play;if(was)stopPlayback();Object.assign(state,{recipeId:RECIPE_CATALOG.some(r=>r.id===entry.recipeId)?entry.recipeId:'classic',key:entry.key,mode:entry.mode,motion:entry.motion,sound:entry.sound,tempo:entry.tempo,feel:FEELS.includes(entry.feel)?entry.feel:'warm',arp:validArp(entry.arp)?entry.arp:{...ARP_DEFAULT},wonder:entry.wonder??state.wonder,steps:clone(entry.steps),selected:0});render();if(was)startPlayback();else audition(state.steps[0]);toast('Lieblingsidee geladen.');}
+function saveIdea(){const item={recipeId:state.recipeId,feel:state.feel,arp:clone(state.arp),wonder:state.wonder,id:Date.now()+'-'+Math.floor(Math.random()*999),date:new Date().toISOString(),key:state.key,mode:state.mode,motion:state.motion,sound:state.sound,tempo:state.tempo,slice:clone(state.slice),delayBeats:state.delayBeats,steps:clone(state.steps)};state.saved.unshift(item);state.saved=state.saved.slice(0,16);store();renderSaved();toast('Saved! ♡');}
+function loadIdea(id){const entry=state.saved.find(s=>s.id===id);if(!entry)return;pushUndo();const was=state.play;if(was)stopPlayback();Object.assign(state,{recipeId:RECIPE_CATALOG.some(r=>r.id===entry.recipeId)?entry.recipeId:'classic',key:entry.key,mode:entry.mode,motion:entry.motion==='slice'?'pulse':entry.motion,sound:entry.sound,tempo:entry.tempo,feel:FEELS.includes(entry.feel)?entry.feel:'warm',arp:validArp(entry.arp)?entry.arp:{...ARP_DEFAULT},slice:validSlice(entry.slice)?entry.slice:{...SLICE_DEFAULT},delayBeats:[.25,.5,.75,1].includes(entry.delayBeats)?entry.delayBeats:.75,wonder:entry.wonder??state.wonder,steps:clone(entry.steps),selected:0});render();if(was)startPlayback();else audition(state.steps[0]);toast('Lieblingsidee geladen.');}
 function store(){try{localStorage.setItem('chordon-bleu.recipes.v1',JSON.stringify(state.saved));}catch(e){toast('Speicher ist voll oder blockiert. Bitte exportieren.');}}
 function loadSaved(){try{const obj=JSON.parse(localStorage.getItem('chordon-bleu.recipes.v1')||localStorage.getItem('elsewhere.souvenirs.v1')||'[]');if(Array.isArray(obj))state.saved=obj.filter(i=>i&&Number.isInteger(i.key)&&MODES[i.mode]&&Array.isArray(i.steps)&&i.steps.length===4&&i.steps.every(c=>c&&Q[c.quality]&&Number.isInteger(c.root))).slice(0,16);}catch(e){state.saved=[];}}
 function exportIdeas(){const data={name:'CHORDON BLEU recipes',version:1,ideas:state.saved};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const link=document.createElement('a');link.href=url;link.download='chordon-bleu-recipes.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),2000);toast('Deine Ideen sind exportiert.');}
@@ -501,25 +671,25 @@ function renderEditor(){const c=state.steps[state.selected];$('editcount').textC
   $('edithint').textContent=r&&t?'Beide Werte sind fixiert. FLIP verändert die anderen Akkorde.':r?'Root bleibt fest, Akkordform darf sich ändern.':t?'Akkordform bleibt fest, Root darf sich ändern.':'Beides auf AUTO: CHORDON BLEU darf diesen Akkord verändern.';
 }
 function renderMeta(){renderRecipe();$('play').innerHTML=state.play?'<b aria-hidden="true">Ⅱ</b><span>PAUSE</span>':'<b aria-hidden="true">▶</b><span>PLAY</span>';$('play').setAttribute('aria-label',state.play?'Loop pausieren':'Loop abspielen');
- $('wonderval').textContent=state.wonder;$('wonderlevel').textContent=state.wonder<22?'MILD':state.wonder<57?'MEDIUM':state.wonder<81?'SPICY':'EXTRA HOT';$('wonder').value=state.wonder;$('tempotext').textContent=state.tempo+' BPM';$('stagebpm').textContent=state.tempo+' BPM';$('sound').textContent='◉ '+SOUNDS[state.sound].name;$('key').value=state.mode+':'+state.key;
+ $('wonderval').textContent=state.wonder;$('wonderlevel').textContent=state.wonder<22?'MILD':state.wonder<57?'MEDIUM':state.wonder<81?'SPICY':'EXTRA HOT';$('wonder').value=state.wonder;$('tempotext').textContent=state.tempo+' BPM';$('stagebpm').textContent=state.tempo+' BPM';$('sound').value=String(state.sound);$('key').value=state.mode+':'+state.key;
  document.querySelectorAll('[data-motion]').forEach(b=>{b.classList.toggle('active',b.dataset.motion===state.motion);b.setAttribute('aria-pressed',String(b.dataset.motion===state.motion));});$('undo').disabled=!state.undo.length;
  $('keepone').classList.toggle('active',state.flipMode==='keep');$('allfour').classList.toggle('active',state.flipMode==='all');$('keepone').setAttribute('aria-pressed',String(state.flipMode==='keep'));$('allfour').setAttribute('aria-pressed',String(state.flipMode==='all'));
  document.querySelectorAll('[data-feel]').forEach(b=>{b.classList.toggle('active',b.dataset.feel===state.feel);b.setAttribute('aria-pressed',String(b.dataset.feel===state.feel));});
- $('slicedeck').hidden=state.motion!=='slice';$('slicehits').value=String(state.slice.hits);$('slicerate').value=String(state.slice.rate);$('slicegate').value=state.slice.gate;$('slicegatevalue').textContent=state.slice.gate+'%';$('cb-delay-time').value=String(state.delayBeats);
+ $('slicedeck').hidden=state.motion!=='pulse';$('slicehits').value=String(state.slice.hits);$('slicerate').value=String(state.slice.rate);$('slicegate').value=state.slice.gate;$('slicegatevalue').textContent=state.slice.gate+'%';$('cb-delay-time').value=String(state.delayBeats);
  $('arpdeck').hidden=state.motion!=='arp';$('arprate').value=String(state.arp.rate);$('arpgate').value=state.arp.gate;$('gatevalue').textContent=state.arp.gate+'%';$('arpdirection').value=state.arp.direction;$('arporder').value=state.arp.order;
  $('rec').textContent=state.rec?'■ STOP RECORDING':'● REC 4 CHORDS';$('rec').classList.toggle('recording',state.rec);$('rechint').textContent=state.rec?`Akkord ${state.recIdx+1} von 4: unten antippen.`:'Vier Akkorde tippen → dein neuer Loop spielt automatisch.';
 }
 function renderPads(){$('pads').replaceChildren();const M=MODES[state.mode];for(let i=0;i<7;i++){const c=baseChord(i,false),btn=document.createElement('button');btn.className='pad';btn.type='button';btn.setAttribute('aria-label',`${label(c)} spielen`);btn.innerHTML=`<span class="roman">${M.roman[i]}</span><span class="padchord">${label(c)}</span>`;btn.addEventListener('click',()=>padChord(i));$('pads').appendChild(btn);}}
 function renderSaved(){const wrap=$('saved');wrap.replaceChildren();if(state.saved.length===0){const empty=document.createElement('span');empty.className='empty';empty.textContent='Hier landen deine Lieblingsloops.';wrap.appendChild(empty);return;}state.saved.forEach((item,i)=>{const b=document.createElement('button');b.type='button';b.className='savedbtn';const name=Array.isArray(item.steps)?item.steps.map(label).join(' · '):'Idea';const recipe=RECIPE_CATALOG.find(r=>r.id===item.recipeId);b.textContent='♡ '+(recipe?'✦ ':'')+(state.saved.length-i)+'  '+name;b.title='Gesicherte Idee laden';b.addEventListener('click',()=>loadIdea(item.id));wrap.appendChild(b);});}
 function sessionSave(){try{localStorage.setItem('chordon-bleu.session.v1',JSON.stringify({recipeId:state.recipeId,key:state.key,mode:state.mode,wonder:state.wonder,tempo:state.tempo,motion:state.motion,sound:state.sound,feel:state.feel,flipMode:state.flipMode,arp:state.arp,slice:state.slice,delayBeats:state.delayBeats,steps:state.steps}));}catch(_){}}
-function sessionLoad(){try{const x=JSON.parse(localStorage.getItem('chordon-bleu.session.v1')||localStorage.getItem('elsewhere.session.v2')||'null');if(!x||!MODES[x.mode]||!Number.isInteger(x.key)||x.key<0||x.key>11||!Number.isInteger(x.tempo)||x.tempo<48||x.tempo>160||!Number.isInteger(x.wonder)||x.wonder<0||x.wonder>100||!['hold','pulse','arp','slice'].includes(x.motion)||!Number.isInteger(x.sound)||x.sound<0||x.sound>=SOUNDS.length||!Array.isArray(x.steps)||x.steps.length!==4||!x.steps.every(c=>Number.isInteger(c.root)&&c.root>=0&&c.root<12&&Q[c.quality]&&(c.manualRoot===null||(Number.isInteger(c.manualRoot)&&c.manualRoot>=0&&c.manualRoot<12))&&(c.manualQuality===null||Q[c.manualQuality])))return false;Object.assign(state,{recipeId:RECIPE_CATALOG.some(r=>r.id===x.recipeId)?x.recipeId:'classic',key:x.key,mode:x.mode,wonder:x.wonder,tempo:x.tempo,motion:x.motion,sound:x.sound,feel:FEELS.includes(x.feel)?x.feel:'warm',flipMode:['keep','all'].includes(x.flipMode)?x.flipMode:'keep',arp:validArp(x.arp)?x.arp:{...ARP_DEFAULT},slice:validSlice(x.slice)?x.slice:{...SLICE_DEFAULT},delayBeats:[.25,.5,.75,1].includes(x.delayBeats)?x.delayBeats:.75,steps:x.steps});return true;}catch(_){return false;}}
+function sessionLoad(){try{const x=JSON.parse(localStorage.getItem('chordon-bleu.session.v1')||localStorage.getItem('elsewhere.session.v2')||'null');if(!x||!MODES[x.mode]||!Number.isInteger(x.key)||x.key<0||x.key>11||!Number.isInteger(x.tempo)||x.tempo<48||x.tempo>160||!Number.isInteger(x.wonder)||x.wonder<0||x.wonder>100||!['hold','pulse','arp','slice'].includes(x.motion)||!Number.isInteger(x.sound)||x.sound<0||x.sound>=SOUNDS.length||!Array.isArray(x.steps)||x.steps.length!==4||!x.steps.every(c=>Number.isInteger(c.root)&&c.root>=0&&c.root<12&&Q[c.quality]&&(c.manualRoot===null||(Number.isInteger(c.manualRoot)&&c.manualRoot>=0&&c.manualRoot<12))&&(c.manualQuality===null||Q[c.manualQuality])))return false;Object.assign(state,{recipeId:RECIPE_CATALOG.some(r=>r.id===x.recipeId)?x.recipeId:'classic',key:x.key,mode:x.mode,wonder:x.wonder,tempo:x.tempo,motion:x.motion==='slice'?'pulse':x.motion,sound:x.sound,feel:FEELS.includes(x.feel)?x.feel:'warm',flipMode:['keep','all'].includes(x.flipMode)?x.flipMode:'keep',arp:validArp(x.arp)?x.arp:{...ARP_DEFAULT},slice:validSlice(x.slice)?x.slice:{...SLICE_DEFAULT},delayBeats:[.25,.5,.75,1].includes(x.delayBeats)?x.delayBeats:.75,steps:x.steps});return true;}catch(_){return false;}}
 function render(){renderStage();renderEditor();renderMeta();renderPads();renderSaved();sessionSave();drawFM1();}
 function renderRecipe(){document.querySelectorAll('[data-recipe]').forEach(b=>{const active=b.dataset.recipe===state.recipeId;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});}
 
 function toast(msg){const box=$('toast');box.textContent=msg;box.classList.add('shown');clearTimeout(toastTimer);toastTimer=setTimeout(()=>box.classList.remove('shown'),2400);}
 function holdButton(id,name){const b=$(id);let held=false;const set=v=>{held=v;state[name]=v;b.classList.toggle('pressed',v);if(ctx){const fx=name==='holdRush'?chorusWet:name==='holdDelay'?delayWet:null;if(fx)fx.gain.setTargetAtTime(v?.35:0,ctx.currentTime,.035);}};b.addEventListener('pointerdown',e=>{if(e.button!==0)return;set(true);b.setPointerCapture(e.pointerId);ensureAudio().then(ok=>{if(!ok||!held)return;set(true);const c=state.steps[state.play&&state.current>=0?state.current:state.selected];playVoicing(c,ctx.currentTime+.012,.72,'hold');});});for(const event of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(event,()=>{if(held)set(false);});b.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){set(true);}});b.addEventListener('keyup',()=>set(false));}
-function setup(){for(let key=0;key<12;key++)for(const mode of ['major','minor']){const opt=document.createElement('option');opt.value=mode+':'+key;opt.textContent=rootName(key)+' '+(mode==='major'?'MAJOR':'MINOR');$('key').appendChild(opt);}let auto=document.createElement('option');auto.value='auto';auto.textContent='AUTO';$('root').appendChild(auto);for(let i=0;i<12;i++){const opt=document.createElement('option');opt.value=String(i);opt.textContent=rootName(i);$('root').appendChild(opt);}auto=document.createElement('option');auto.value='auto';auto.textContent='AUTO';$('quality').appendChild(auto);for(const [id,q] of Object.entries(Q)){const opt=document.createElement('option');opt.value=id;opt.textContent=q.label;$('quality').appendChild(opt);}
-  loadSaved();if(!sessionLoad())startProgression();render();$('play').addEventListener('click',togglePlayback);$('audionudge').addEventListener('click',async()=>{if(await ensureAudio()){toast('Ton aktiviert. ▶');if(!state.play)startPlayback();}});$('mutate').addEventListener('click',()=>{if(harmonicVariation()&&!state.play)startPlayback();});$('recipechoices').addEventListener('click',e=>{const b=e.target.closest('[data-recipe]');if(b)selectRecipe(b.dataset.recipe);});$('keepone').addEventListener('click',()=>setFlipMode('keep'));$('allfour').addEventListener('click',()=>setFlipMode('all'));$('feelchoices').addEventListener('click',e=>{const b=e.target.closest('[data-feel]');if(b)setFeel(b.dataset.feel);});$('slicehits').addEventListener('change',e=>setSlice('hits',e.target.value));$('slicerate').addEventListener('change',e=>setSlice('rate',e.target.value));$('slicegate').addEventListener('input',e=>setSlice('gate',e.target.value));$('cb-delay-time').addEventListener('change',e=>{state.delayBeats=Number(e.target.value);if(delayNode&&ctx)delayNode.delayTime.setTargetAtTime(60/state.tempo*state.delayBeats,ctx.currentTime,.02);sessionSave();});$('arprate').addEventListener('change',e=>setArp('rate',e.target.value));$('arpgate').addEventListener('input',e=>setArp('gate',e.target.value));$('arpdirection').addEventListener('change',e=>setArp('direction',e.target.value));$('arporder').addEventListener('change',e=>setArp('order',e.target.value));$('keep').addEventListener('click',saveIdea);$('undo').addEventListener('click',undo);$('newloop').addEventListener('click',newLoop);$('key').addEventListener('change',e=>changeKey(e.target.value));$('root').addEventListener('change',e=>changeEditor('root',e.target.value));$('quality').addEventListener('change',e=>changeEditor('quality',e.target.value));$('wonder').addEventListener('input',e=>{state.wonder=Number(e.target.value);renderMeta();drawFM1();sessionSave();});$('wonder').addEventListener('change',()=>{if(harmonicVariation()){const i=state.flipMode==='keep'?(state.selected+1)%4:state.selected;if(!state.play)audition(state.steps[i]);}});$('sound').addEventListener('click',setSound);$('tempodown').addEventListener('click',()=>updateTempo(-4));$('tempoup').addEventListener('click',()=>updateTempo(4));$('motion').addEventListener('click',e=>{const b=e.target.closest('[data-motion]');if(b)setMotion(b.dataset.motion);});$('rec').addEventListener('click',recToggle);$('export').addEventListener('click',exportIdeas);$('import').addEventListener('change',e=>{importIdeas(e.target.files?.[0]);e.target.value='';});$('help').addEventListener('click',()=>{$('dialogoverlay').classList.add('open');$('closedialog').focus();});$('closedialog').addEventListener('click',()=>{$('dialogoverlay').classList.remove('open');$('help').focus();});$('dialogoverlay').addEventListener('click',e=>{if(e.target===$('dialogoverlay'))$('dialogoverlay').classList.remove('open');});holdButton('lift','holdLift');holdButton('rush','holdRush');holdButton('cb-delay','holdDelay');
+function setup(){for(let key=0;key<12;key++)for(const mode of ['major','minor']){const opt=document.createElement('option');opt.value=mode+':'+key;opt.textContent=rootName(key)+' '+(mode==='major'?'MAJOR':'MINOR');$('key').appendChild(opt);}let auto=document.createElement('option');auto.value='auto';auto.textContent='AUTO';$('root').appendChild(auto);for(let i=0;i<12;i++){const opt=document.createElement('option');opt.value=String(i);opt.textContent=rootName(i);$('root').appendChild(opt);}auto=document.createElement('option');auto.value='auto';auto.textContent='AUTO';$('quality').appendChild(auto);for(const [id,q] of Object.entries(Q)){const opt=document.createElement('option');opt.value=id;opt.textContent=q.label;$('quality').appendChild(opt);}for(const [i,preset] of SOUNDS.entries()){const opt=document.createElement('option');opt.value=String(i);opt.textContent=preset.name;$('sound').appendChild(opt);}
+  loadSaved();if(!sessionLoad())startProgression();render();$('play').addEventListener('click',togglePlayback);$('audionudge').addEventListener('click',async()=>{releaseAudio();if(await ensureAudio()){toast('Audio neu gestartet. ▶');if(!state.play)startPlayback();}});$('mutate').addEventListener('click',()=>{if(harmonicVariation()&&!state.play)startPlayback();});$('recipechoices').addEventListener('click',e=>{const b=e.target.closest('[data-recipe]');if(b)selectRecipe(b.dataset.recipe);});$('keepone').addEventListener('click',()=>setFlipMode('keep'));$('allfour').addEventListener('click',()=>setFlipMode('all'));$('feelchoices').addEventListener('click',e=>{const b=e.target.closest('[data-feel]');if(b)setFeel(b.dataset.feel);});$('slicehits').addEventListener('change',e=>setSlice('hits',e.target.value));$('slicerate').addEventListener('change',e=>setSlice('rate',e.target.value));$('slicegate').addEventListener('input',e=>setSlice('gate',e.target.value));$('cb-delay-time').addEventListener('change',e=>{state.delayBeats=Number(e.target.value);if(delayNode&&ctx)delayNode.delayTime.setTargetAtTime(60/state.tempo*state.delayBeats,ctx.currentTime,.02);sessionSave();});$('arprate').addEventListener('change',e=>setArp('rate',e.target.value));$('arpgate').addEventListener('input',e=>setArp('gate',e.target.value));$('arpdirection').addEventListener('change',e=>setArp('direction',e.target.value));$('arporder').addEventListener('change',e=>setArp('order',e.target.value));$('keep').addEventListener('click',saveIdea);$('undo').addEventListener('click',undo);$('newloop').addEventListener('click',newLoop);$('key').addEventListener('change',e=>changeKey(e.target.value));$('root').addEventListener('change',e=>changeEditor('root',e.target.value));$('quality').addEventListener('change',e=>changeEditor('quality',e.target.value));$('wonder').addEventListener('input',e=>{state.wonder=Number(e.target.value);renderMeta();drawFM1();sessionSave();});$('wonder').addEventListener('change',()=>{if(harmonicVariation()){const i=state.flipMode==='keep'?(state.selected+1)%4:state.selected;if(!state.play)audition(state.steps[i]);}});$('sound').addEventListener('change',e=>setSound(e.target.value));$('tempodown').addEventListener('click',()=>updateTempo(-4));$('tempoup').addEventListener('click',()=>updateTempo(4));$('motion').addEventListener('click',e=>{const b=e.target.closest('[data-motion]');if(b)setMotion(b.dataset.motion);});$('rec').addEventListener('click',recToggle);$('export').addEventListener('click',exportIdeas);$('import').addEventListener('change',e=>{importIdeas(e.target.files?.[0]);e.target.value='';});$('help').addEventListener('click',()=>{$('dialogoverlay').classList.add('open');$('closedialog').focus();});$('closedialog').addEventListener('click',()=>{$('dialogoverlay').classList.remove('open');$('help').focus();});$('dialogoverlay').addEventListener('click',e=>{if(e.target===$('dialogoverlay'))$('dialogoverlay').classList.remove('open');});holdButton('lift','holdLift');holdButton('rush','holdRush');holdButton('cb-delay','holdDelay');
   window.addEventListener('keydown',e=>{if(e.target.matches('input,select,textarea')||e.ctrlKey||e.altKey||e.metaKey)return;if(e.key==='Escape'){$('dialogoverlay').classList.remove('open');return;}const key=e.key.toLowerCase();if(key===' '){e.preventDefault();if(!e.repeat)togglePlayback();}if(key==='w'&&!e.repeat)harmonicVariation();if(key==='k'&&!e.repeat)saveIdea();if(key==='z'&&!e.repeat)undo();if('1234'.includes(key)){state.selected=Number(key)-1;renderStage();renderEditor();audition(state.steps[state.selected]);}const p='asdfghj'.indexOf(key);if(p!==-1&&!e.repeat)padChord(p);});
   document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.play)stopPlayback();});
 }
