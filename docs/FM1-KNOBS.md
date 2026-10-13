@@ -1,4 +1,4 @@
-# FM1 controls — concept (not implemented hardware mapping)
+# FM1 controls — hardware contract (native partial mapping)
 
 In the ARP view, the four physical rotary encoders would control:
 
@@ -14,3 +14,6 @@ The browser's four controls already change note scheduling. Physical binding, OL
 **RECIPES** should require **one gesture** only: choose CLASSIC or GHIBLI DREAM, then immediately play. Future recipes can appear as a sideways-scrolling single-row strip, not a hierarchy of menus. Preserving a loop when switching recipes is an alternative to test; the current browser version starts a new progression automatically with undo.
 
 Product principle: no extra feature without an instant, discoverable use on the hardware.
+
+
+See [FM1-BUTTONS.md](FM1-BUTTONS.md) for the authoritative physical 12-button order and the OCT−/OCT+ mapping. These labels must not be replaced with virtual feature names in the hardware illustration.
