@@ -28,14 +28,20 @@
 | `KNOB 3` | MOTION | chord slot | SPICE | DIRECTION |
 | `KNOB 4` | BPM | KEEP1/ALL4 | SOUND | ORDER |
 | `HOME` | home screen | home | home | home |
-| `SCL` | edit selected chord | current | chord | chord |
+| `SEL` (Felucca `B_SCL`) | edit selected chord | current | chord | chord |
 | `ARP` | ARP view | ARP | ARP | ARP |
 | `GLO` | RECIPES | RECIPES | RECIPES | RECIPES |
 | `SEQ` | FLIP | FLIP | FLIP | FLIP |
 | `SAVE` | SAVE | SAVE | SAVE | SAVE |
 | `PLAY` | toggle | toggle | toggle | toggle |
 | `SELECT` | choose chord | choose chord | choose chord | choose chord |
-| `REC` | 4-chord capture (not yet ported) | | | |
+| `REC` | 4-chord capture (**browser only**, native pending) | | | |
+
+## Physical FM1 button contract
+
+See [docs/FM1-BUTTONS.md](../docs/FM1-BUTTONS.md) for the verified **6-column / 2-row panel**: top FX, SEL, ENV, LFO, EDIT, GLO; bottom HOME, SAVE, ARP, SEQ, PLAY / STOP, REC. To the left are OCT− / OCT+. Felucca calls printed SEL `B_SCL` (distinct from rotary EN_SELECT). Browser controls are now drawn in that exact order.
+
+ENV cycles FEEL and LFO cycles MOTION in the browser and portable native controller. FX sound bank selection, REC capture and OCT− / OCT+ transpose have not yet been ported into the native adapter; they must **not** be mapped to unrelated actions. The native SAVE callback remains RAM-only.
 
 ## Required remaining work before firmware
 
