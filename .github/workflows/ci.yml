@@ -13,6 +13,8 @@ jobs:
           node-version: "22"
       - name: Validate offline recipe bundle
         run: node tools/build-recipes.mjs --check
+      - name: Verify physical FM1 button grid and control dispatch
+        run: node tests/fm1-panel.test.mjs
       - name: Validate FM1 browser device surface
         run: node tests/device-view.test.mjs
       - name: Verify plated Cordon Bleu browser illustration
