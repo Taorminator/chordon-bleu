@@ -25,6 +25,14 @@ jobs:
         run: |
           cc -std=c99 -O2 -Wall -Wextra -Werror -pedantic core/chordon_harmony.c firmware/cb_fm1.c tests/device_test.c -o /tmp/chordon-device-test
           /tmp/chordon-device-test
+      - name: Crash-safe snapshot power-cut fault injection (ASan / UBSan)
+        run: |
+          cc -std=c99 -O1 -g -Wall -Wextra -Werror -pedantic -fsanitize=address,undefined -fno-omit-frame-pointer core/chordon_harmony.c firmware/cb_fm1.c firmware/cb_store.c tests/store_test.c -o /tmp/chordon-store
+          ASAN_OPTIONS=detect_leaks=1 /tmp/chordon-store
+      - name: Four-voice gate and stuck-note stress (ASan / UBSan)
+        run: |
+          cc -std=c99 -O1 -g -Wall -Wextra -Werror -pedantic -fsanitize=address,undefined -fno-omit-frame-pointer firmware/cb_voice.c tests/voice_test.c -o /tmp/chordon-voice
+          ASAN_OPTIONS=detect_leaks=1 /tmp/chordon-voice
       - name: Install status safety
         run: |
           test -s install/index.html
