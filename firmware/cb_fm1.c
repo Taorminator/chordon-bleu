@@ -71,14 +71,26 @@ static void season(CbFM1 *m,uint8_t keep){
 static void mutate(CbFM1 *m){
  save_undo(m);
  if(m->all_four){
-  /* ALL 4 explicitly overrides root/type locks, as in the browser. */
+  /* Try whole progressions rather than random isolated notes: ALL 4 must
+   * change every slot but the substitute should remain a coherent loop. */
   CbChord old[4];memcpy(old,m->loop.steps,sizeof(old));
-  for(int i=0;i<4;i++)m->loop.steps[i].lock_root=m->loop.steps[i].lock_type=0;
-  if(m->recipe==CB_RECIPE_GHIBLI){seed_recipe(m);}else{cb_new(&m->loop);}
-  for(int i=0;i<4;i++)if(old[i].root==m->loop.steps[i].root&&old[i].quality==m->loop.steps[i].quality)
-    {CbLoop temp=m->loop;temp.steps[i].lock_root=temp.steps[i].lock_type=0;
-     /* Try another musical candidate. */
-     cb_mutate(&temp);if(temp.steps[i].root!=old[i].root||temp.steps[i].quality!=old[i].quality)m->loop.steps[i]=temp.steps[i];}
+  CbLoop best=m->loop;
+  unsigned best_changes=0;
+  for(unsigned trial=0;trial<16u;trial++){
+   if(m->recipe==CB_RECIPE_GHIBLI)seed_recipe(m);else cb_new(&m->loop);
+   unsigned changes=0;
+   for(unsigned i=0;i<4u;i++)changes+=old[i].root!=m->loop.steps[i].root ||
+                                             old[i].quality!=m->loop.steps[i].quality;
+   if(changes>best_changes){best=m->loop;best_changes=changes;}
+   if(best_changes==4u)break;
+  }
+  m->loop=best;
+  for(unsigned i=0;i<4u;i++){
+   CbChord *c=&m->loop.steps[i];
+   c->lock_root=c->lock_type=0;
+   if(c->root==old[i].root&&c->quality==old[i].quality)
+    c->root=(uint8_t)((c->root+5u)%12u); /* final guaranteed change */
+  }
  }else{
   /* KEEP 1 means the actual selected chord is protected, even if AUTO. */
   CbChord keep=m->loop.steps[m->selected];
