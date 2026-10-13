@@ -45,11 +45,10 @@ jobs:
           test -s build/felucca.bin
           test -s build/felucca.fwsc
           echo "Upstream Felucca reference built. NOT a CHORDON BLEU installable firmware."
-      - name: Host test portability fix (add missing stdint.h only)
+      - name: Host test portability fix (upstream test harness missing stdint)
         run: |
-          grep -q '#include <sys/time.h>' upstream/tests/drumfuzz_test.c
-          sed -i '/#include <sys\/time.h>/a #include <stdint.h>' upstream/tests/drumfuzz_test.c
-          grep -q '^#include <stdint.h>
+          sed -i '/sys\/time.h/a #include <stdint.h>' upstream/tests/drumfuzz_test.c
+      - name: Felucca upstream host regression suite
         run: |
           cd upstream
           sh tests/run_tests.sh
