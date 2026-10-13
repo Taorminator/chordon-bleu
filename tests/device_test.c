@@ -17,6 +17,12 @@ int main(void){
   cb_fm1_button(&d,CB_B_ARP,&h);for(int j=0;j<4;j++)cb_fm1_knob(&d,j,1);cb_fm1_draw(&d,&g);
   cb_fm1_button(&d,CB_B_RECIPE,&h);cb_fm1_knob(&d,0,1);assert(d.recipe==CB_RECIPE_GHIBLI);cb_fm1_draw(&d,&g);
   cb_fm1_button(&d,CB_B_HOME,&h);cb_fm1_knob(&d,0,1);cb_fm1_knob(&d,1,1);
+  /* Real FM1 ENV and LFO buttons cycle FEEL and MOTION without menu depth. */
+  uint8_t feel_before=d.feel,motion_before=d.motion;
+  for(int n=0;n<3;n++){cb_fm1_button(&d,CB_B_FEEL,&h);cb_fm1_button(&d,CB_B_MOTION,&h);}
+  assert(d.feel==feel_before&&d.motion==motion_before);
+  cb_fm1_button(&d,CB_B_FEEL,&h);assert(d.feel==(uint8_t)((feel_before+1u)%3u));
+  cb_fm1_button(&d,CB_B_MOTION,&h);assert(d.motion==(uint8_t)((motion_before+1u)%3u));
   CbChord keep=d.loop.steps[d.selected];cb_fm1_button(&d,CB_B_FLIP,&h);
   assert(!memcmp(&keep,&d.loop.steps[d.selected],sizeof(keep)));
   cb_fm1_button(&d,CB_B_KEEP_ALL,&h);

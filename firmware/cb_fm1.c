@@ -152,6 +152,8 @@ void cb_fm1_button(CbFM1 *m,CbButton button,const CbFM1Host *host){
  case CB_B_ARP:m->view=CB_VIEW_ARP;m->motion=CB_MOTION_ARP;break;
  case CB_B_SELECT:m->selected=(uint8_t)((m->selected+1)%4);break;
  case CB_B_KEEP_ALL:m->all_four=!m->all_four;break;
+ case CB_B_FEEL:m->feel=(uint8_t)imod(m->feel+1,3);break; /* printed ENV */
+ case CB_B_MOTION:m->motion=(uint8_t)imod(m->motion+1,3);break; /* printed LFO */
  case CB_B_UNDO:if(m->undo_valid){m->loop=m->undo;m->undo_valid=0;}break;
  }
 }

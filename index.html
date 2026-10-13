@@ -103,6 +103,11 @@ body.fm1-mode>.app{display:none}
 .cb-hardware .device-frame{min-width:820px}
 .cb-hardware .display-bezel canvas{image-rendering:auto}
 .cb-hardware .hardware-buttons .hardware-button{font-size:9px;letter-spacing:0;padding:4px}
+.cb-hardware .hardware-buttons{grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:repeat(2,43px)}
+.cb-hardware .hardware-buttons .hardware-button{display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:850}
+.cb-hardware .hardware-buttons .hardware-button small{display:block;font-size:7px;font-weight:750;line-height:1.1}
+.cb-hardware .hardware-buttons [data-hw-action="REC"].is-active{color:#ffa4ad;border-color:#ed626b}
+.cb-hardware .hardware-buttons [data-hw-action="PLAY_STOP"].is-active{color:#9fecb7;border-color:#56b783}
 .cb-hardware .hardware-button.is-active{background:#39496a;color:#fff;border-color:#bfc5ff}
 .cb-hardware .right-knob-grid{gap:8px}
 .cb-hardware .knob-face{color:transparent;touch-action:none}
@@ -143,11 +148,11 @@ body.fm1-mode>.app{display:none}
     <section class="instrument-section" aria-label="Virtuelles M-VAVE FM1 Gerät">
       <div class="device-frame">
         <div class="device-top">
-          <div class="left-controls"><div class="brand-mark">M·VAVE <span>FM1</span></div><div class="left-knob-grid"><div class="knob-control left" style="--knob-color:#c3c7cb"><span class="knob-label">SPICE</span><button type="button" class="knob-face" data-hw-global="spice" aria-label="SPICE: drehen mit Pfeiltasten, Scrollen oder Ziehen" title="SPICE: ziehen / scrollen / Pfeiltasten"></button><span class="knob-value" id="hw-left-0">—</span></div><div class="knob-control left" style="--knob-color:#c3c7cb"><span class="knob-label">FEEL</span><button type="button" class="knob-face" data-hw-global="feel" aria-label="FEEL: drehen mit Pfeiltasten, Scrollen oder Ziehen" title="FEEL: ziehen / scrollen / Pfeiltasten"></button><span class="knob-value" id="hw-left-1">—</span></div><div class="knob-control left" style="--knob-color:#c3c7cb"><span class="knob-label">MOTION</span><button type="button" class="knob-face" data-hw-global="motion" aria-label="MOTION: drehen mit Pfeiltasten, Scrollen oder Ziehen" title="MOTION: ziehen / scrollen / Pfeiltasten"></button><span class="knob-value" id="hw-left-2">—</span></div><div class="knob-control left" style="--knob-color:#c3c7cb"><span class="knob-label">TEMPO</span><button type="button" class="knob-face" data-hw-global="tempo" aria-label="TEMPO: drehen mit Pfeiltasten, Scrollen oder Ziehen" title="TEMPO: ziehen / scrollen / Pfeiltasten"></button><span class="knob-value" id="hw-left-3">—</span></div></div><div class="octaves"><button type="button" class="hardware-button" data-hw-action="REC">● REC</button><button type="button" class="hardware-button" data-hw-action="SOUND">◉ SOUND</button></div></div>
+          <div class="left-controls"><div class="brand-mark">M·VAVE <span>FM1</span></div><div class="left-knob-grid"><div class="knob-control left" style="--knob-color:#c3c7cb"><span class="knob-label">SPICE</span><button type="button" class="knob-face" data-hw-global="spice" aria-label="SPICE: drehen mit Pfeiltasten, Scrollen oder Ziehen" title="SPICE: ziehen / scrollen / Pfeiltasten"></button><span class="knob-value" id="hw-left-0">—</span></div><div class="knob-control left" style="--knob-color:#c3c7cb"><span class="knob-label">FEEL</span><button type="button" class="knob-face" data-hw-global="feel" aria-label="FEEL: drehen mit Pfeiltasten, Scrollen oder Ziehen" title="FEEL: ziehen / scrollen / Pfeiltasten"></button><span class="knob-value" id="hw-left-1">—</span></div><div class="knob-control left" style="--knob-color:#c3c7cb"><span class="knob-label">MOTION</span><button type="button" class="knob-face" data-hw-global="motion" aria-label="MOTION: drehen mit Pfeiltasten, Scrollen oder Ziehen" title="MOTION: ziehen / scrollen / Pfeiltasten"></button><span class="knob-value" id="hw-left-2">—</span></div><div class="knob-control left" style="--knob-color:#c3c7cb"><span class="knob-label">TEMPO</span><button type="button" class="knob-face" data-hw-global="tempo" aria-label="TEMPO: drehen mit Pfeiltasten, Scrollen oder Ziehen" title="TEMPO: ziehen / scrollen / Pfeiltasten"></button><span class="knob-value" id="hw-left-3">—</span></div></div><div class="octaves"><button type="button" class="hardware-button" data-hw-action="OCT_DOWN" aria-label="Octave minus">OCT −</button><button type="button" class="hardware-button" data-hw-action="OCT_UP" aria-label="Octave plus">OCT +</button></div></div>
           <div class="display-assembly"><div class="display-bezel"><canvas id="fm1hardware-screen" width="240" height="240" aria-label="CHORDON BLEU Display, 240 mal 240 Pixel, vier musikalische Screens" role="img"></canvas></div><div class="display-under"><span>240 × 240 PX</span><span id="hw-on-device">READY</span></div></div>
-          <div class="right-controls"><div class="right-knob-grid"><div class="knob-control right" style="--knob-color:#bfc5ff"><span class="knob-label">K1</span><button type="button" class="knob-face" data-hw-knob="0" aria-label="K1: drehen mit Pfeiltasten, Scrollen oder Ziehen" title="K1: ziehen / scrollen / Pfeiltasten"></button><span class="knob-value" id="hw-right-0">—</span></div><div class="knob-control right" style="--knob-color:#bfc5ff"><span class="knob-label">K2</span><button type="button" class="knob-face" data-hw-knob="1" aria-label="K2: drehen mit Pfeiltasten, Scrollen oder Ziehen" title="K2: ziehen / scrollen / Pfeiltasten"></button><span class="knob-value" id="hw-right-1">—</span></div><div class="knob-control right" style="--knob-color:#bfc5ff"><span class="knob-label">K3</span><button type="button" class="knob-face" data-hw-knob="2" aria-label="K3: drehen mit Pfeiltasten, Scrollen oder Ziehen" title="K3: ziehen / scrollen / Pfeiltasten"></button><span class="knob-value" id="hw-right-2">—</span></div><div class="knob-control right" style="--knob-color:#bfc5ff"><span class="knob-label">K4</span><button type="button" class="knob-face" data-hw-knob="3" aria-label="K4: drehen mit Pfeiltasten, Scrollen oder Ziehen" title="K4: ziehen / scrollen / Pfeiltasten"></button><span class="knob-value" id="hw-right-3">—</span></div></div><div class="hardware-buttons"><button type="button" class="hardware-button" data-hw-action="HOME">HOME</button><button type="button" class="hardware-button" data-hw-action="RECIPES">RECIPES</button><button type="button" class="hardware-button" data-hw-action="CHORD">CHORD</button><button type="button" class="hardware-button" data-hw-action="ARP">ARP</button><button type="button" class="hardware-button" data-hw-action="SELECT ◀">SELECT ◀</button><button type="button" class="hardware-button" data-hw-action="SELECT ▶">SELECT ▶</button><button type="button" class="hardware-button" data-hw-action="PLAY">PLAY</button><button type="button" class="hardware-button" data-hw-action="FLIP">FLIP</button><button type="button" class="hardware-button" data-hw-action="SAVE">SAVE</button><button type="button" class="hardware-button" data-hw-action="KEEP 1">KEEP 1</button><button type="button" class="hardware-button" data-hw-action="ALL 4">ALL 4</button><button type="button" class="hardware-button" data-hw-action="UNDO">UNDO</button></div><div class="right-meta"><span>FOUR CONTEXT ENCODERS</span><span>12 FUNCTION KEYS</span></div></div>
+          <div class="right-controls"><div class="right-knob-grid"><div class="knob-control right" style="--knob-color:#bfc5ff"><span class="knob-label">K1</span><button type="button" class="knob-face" data-hw-knob="0" aria-label="K1: drehen mit Pfeiltasten, Scrollen oder Ziehen" title="K1: ziehen / scrollen / Pfeiltasten"></button><span class="knob-value" id="hw-right-0">—</span></div><div class="knob-control right" style="--knob-color:#bfc5ff"><span class="knob-label">K2</span><button type="button" class="knob-face" data-hw-knob="1" aria-label="K2: drehen mit Pfeiltasten, Scrollen oder Ziehen" title="K2: ziehen / scrollen / Pfeiltasten"></button><span class="knob-value" id="hw-right-1">—</span></div><div class="knob-control right" style="--knob-color:#bfc5ff"><span class="knob-label">K3</span><button type="button" class="knob-face" data-hw-knob="2" aria-label="K3: drehen mit Pfeiltasten, Scrollen oder Ziehen" title="K3: ziehen / scrollen / Pfeiltasten"></button><span class="knob-value" id="hw-right-2">—</span></div><div class="knob-control right" style="--knob-color:#bfc5ff"><span class="knob-label">K4</span><button type="button" class="knob-face" data-hw-knob="3" aria-label="K4: drehen mit Pfeiltasten, Scrollen oder Ziehen" title="K4: ziehen / scrollen / Pfeiltasten"></button><span class="knob-value" id="hw-right-3">—</span></div></div><div class="hardware-buttons" aria-label="FM1 physical function keys · two rows, six columns"><button type="button" class="hardware-button" data-hw-action="FX" aria-label="FX" title="Sound wählen">FX</button><button type="button" class="hardware-button" data-hw-action="SEL" aria-label="SEL" title="Akkord bearbeiten">SEL</button><button type="button" class="hardware-button" data-hw-action="ENV" aria-label="ENV" title="FEEL wählen">ENV</button><button type="button" class="hardware-button" data-hw-action="LFO" aria-label="LFO" title="MOTION wählen">LFO</button><button type="button" class="hardware-button" data-hw-action="EDIT" aria-label="EDIT" title="KEEP 1 / ALL 4">EDIT</button><button type="button" class="hardware-button" data-hw-action="GLO" aria-label="GLO" title="RECIPES">GLO</button><button type="button" class="hardware-button" data-hw-action="HOME" aria-label="HOME" title="HOME">HOME</button><button type="button" class="hardware-button" data-hw-action="SAVE" aria-label="SAVE" title="Idee sichern (Browser)">SAVE</button><button type="button" class="hardware-button" data-hw-action="ARP" aria-label="ARP" title="Arpeggiator">ARP</button><button type="button" class="hardware-button" data-hw-action="SEQ" aria-label="SEQ" title="FLIP">SEQ</button><button type="button" class="hardware-button" data-hw-action="PLAY_STOP" aria-label="PLAY / STOP" title="Loop starten oder stoppen">PLAY<small>STOP</small></button><button type="button" class="hardware-button" data-hw-action="REC" aria-label="REC" title="Vier-Akkord-Aufnahme (Browser)">REC</button></div><div class="right-meta"><span>FOUR CONTEXT ENCODERS</span><span>12 FUNCTION KEYS</span></div></div>
         </div>
-        <div class="keyboard-deck"><div class="deck-head"><span>PERFORMANCE KEYS</span><span>27 PLAYABLE NOTES · C4–D6</span></div><div class="piano-keys" id="cb-hw-keyboard" aria-label="27 spielbare chromatische Tasten"></div></div>
+        <div class="keyboard-deck"><div class="deck-head"><span>PERFORMANCE KEYS</span><span>27 PLAYABLE NOTES · OCTAVE <span id="cb-hw-octave">+0</span></span></div><div class="piano-keys" id="cb-hw-keyboard" aria-label="27 spielbare chromatische Tasten"></div></div>
         <div class="device-bottom"><span>CHORDON BLEU <i></i> MIDDLE AGE ENGINEERING</span><span>WEB AUDIO · NOT FM1 FIRMWARE</span></div>
       </div>
     </section>
@@ -712,6 +717,7 @@ function setupFM1Hardware(){
  const app=document.querySelector('body>.app');
  document.getElementById('cb-hw-editor-slot').append(app);
  const kbd=document.getElementById('cb-hw-keyboard');
+ let hwOctave=0; // Browser-key octave offset, not a flash-persisted FM1 controller feature.
  const whitePitch=[0,2,4,5,7,9,11];
  const whiteNotes=[],blackNotes=[];
  for(let midi=60;midi<87;midi++){(whitePitch.includes(midi%12)?whiteNotes:blackNotes).push(midi);}
@@ -722,7 +728,9 @@ function setupFM1Hardware(){
   key.style.width='calc('+(100/whiteNotes.length)+'% - 4px)';
   key.textContent=i<7?String(i+1):'';
   key.title='Note '+NAMES[midi%12];key.setAttribute('aria-label','Note '+NAMES[midi%12]);
-  key.dataset.note=midi;kbd.append(key);
+  key.dataset.note=midi;
+  if(i<4){key.dataset.chordPad=String(i);key.title+=' · REC: chord pad '+(i+1);}
+  kbd.append(key);
  }
  for(const midi of blackNotes){
   const previous=whiteNotes.filter(n=>n<midi).length;
@@ -731,29 +739,43 @@ function setupFM1Hardware(){
   key.style.width='4.9%';key.dataset.note=midi;key.title='Note '+NAMES[midi%12];
   key.setAttribute('aria-label','Note '+NAMES[midi%12]);kbd.append(key);
  }
+ function playPhysicalKey(key){
+  // The first four white keys are chord pads while REC is armed.
+  if(state.rec && key.dataset.chordPad!==undefined){padChord(Number(key.dataset.chordPad));return;}
+  ensureAudio().then(ok=>{if(ok)tone(Number(key.dataset.note)+12*hwOctave,ctx.currentTime+.01,.42,.85,false,true);});
+ }
  for(const key of kbd.querySelectorAll('[data-note]')){
   key.addEventListener('pointerdown',e=>{
    if(e.pointerType==='mouse'&&e.button!==0)return;
    e.preventDefault();key.setPointerCapture(e.pointerId);key.classList.add('active');
-   ensureAudio().then(ok=>{if(ok)tone(Number(key.dataset.note),ctx.currentTime+.01,.42,.85,false,true);});
+   playPhysicalKey(key);
   });
   for(const event of ['pointerup','pointercancel','lostpointercapture'])key.addEventListener(event,()=>key.classList.remove('active'));
-  key.addEventListener('keydown',e=>{if(e.repeat)return;if(e.key==='Enter'||e.key===' '){e.preventDefault();key.classList.add('active');ensureAudio().then(ok=>{if(ok)tone(Number(key.dataset.note),ctx.currentTime+.01,.42,.85,false,true);});}});
+  key.addEventListener('keydown',e=>{if(e.repeat)return;if(e.key==='Enter'||e.key===' '){e.preventDefault();key.classList.add('active');playPhysicalKey(key);}});
   key.addEventListener('keyup',()=>key.classList.remove('active'));
  }
  const setScreen=screen=>{fm1Screen=screen;drawFM1();syncFM1Hardware();};
+ // SEL is the printed button; Felucca's B_SCL is its legacy internal name.
  function runAction(name){
-  if(['HOME','RECIPES','CHORD','ARP'].includes(name))setScreen(name.toLowerCase());
-  else if(name==='PLAY')togglePlayback();
-  else if(name==='FLIP'){if(harmonicVariation()&&!state.play)startPlayback();}
+  if(name==='HOME')setScreen('home');
+  else if(name==='SEL')setScreen('chord');
+  else if(name==='GLO')setScreen('recipes');
+  else if(name==='ARP')setScreen('arp');
+  else if(name==='FX')setSound(); // Browser-only sound cycling; no native bank selector yet.
+  else if(name==='ENV'){const v=['warm','crispy','cheesy'];setFeel(v[(v.indexOf(state.feel)+1)%v.length]);}
+  else if(name==='LFO'){const v=['hold','pulse','arp'];setMotion(v[(v.indexOf(state.motion)+1)%v.length]);}
+  else if(name==='EDIT')setFlipMode(state.flipMode==='keep'?'all':'keep');
+  else if(name==='SEQ'||name==='FLIP'){if(harmonicVariation()&&!state.play)startPlayback();}
+  else if(name==='PLAY_STOP'||name==='PLAY')togglePlayback();
   else if(name==='SAVE')saveIdea();
-  else if(name==='KEEP 1'){setFlipMode('keep');render();}
-  else if(name==='ALL 4'){setFlipMode('all');render();}
+  else if(name==='REC')recToggle(); // Browser capture: native REC remains pending.
+  else if(name==='OCT_DOWN'||name==='OCT_UP')hwOctave=Math.max(-2,Math.min(2,hwOctave+(name==='OCT_UP'?1:-1)));
+  else if(name==='KEEP 1')setFlipMode('keep'); // Sidebar shortcuts only.
+  else if(name==='ALL 4')setFlipMode('all');
   else if(name==='UNDO')undo();
-  else if(name==='REC')recToggle();
-  else if(name==='SOUND')setSound();
-  else if(name==='SELECT ◀'||name==='SELECT ▶'){state.selected=(state.selected+(name==='SELECT ▶'?1:3))%4;render();audition(state.steps[state.selected]);}
-  syncFM1Hardware();
+  else if(name==='CHORD')setScreen('chord'); // Sidebar screen tabs.
+  else if(name==='RECIPES')setScreen('recipes');
+  drawFM1();syncFM1Hardware();
  }
  for(const btn of document.querySelectorAll('[data-hw-action]'))btn.addEventListener('click',()=>runAction(btn.dataset.hwAction));
  const globalChange=(name,dir)=>{
@@ -799,14 +821,19 @@ function setupFM1Hardware(){
    $('hw-left-'+i).textContent=String(globals[i]).toUpperCase();
    $('hw-right-'+i).textContent=String(vals[i]).toUpperCase();
   }
+  const physicalPages={HOME:'home',SEL:'chord',GLO:'recipes',ARP:'arp'};
   for(const b of document.querySelectorAll('[data-hw-action]')){
-   const active=screens.includes(b.dataset.hwAction.toLowerCase())&&b.dataset.hwAction.toLowerCase()===fm1Screen ||
-    b.dataset.hwAction==='PLAY'&&state.play ||
-    b.dataset.hwAction==='KEEP 1'&&state.flipMode==='keep' ||
-    b.dataset.hwAction==='ALL 4'&&state.flipMode==='all' ||
-    b.dataset.hwAction==='REC'&&state.rec;
+   const name=b.dataset.hwAction;
+   const active=(Object.hasOwn(physicalPages,name)&&physicalPages[name]===fm1Screen)
+     || (['CHORD','RECIPES'].includes(name)&&name.toLowerCase()===fm1Screen)
+     || (name==='PLAY'||name==='PLAY_STOP')&&state.play
+     || name==='REC'&&state.rec
+     || name==='KEEP 1'&&state.flipMode==='keep'
+     || name==='ALL 4'&&state.flipMode==='all'
+     || name==='EDIT'&&state.flipMode==='all';
    b.classList.toggle('is-active',Boolean(active));b.setAttribute('aria-pressed',String(Boolean(active)));
   }
+  $('cb-hw-octave').textContent=(hwOctave>=0?'+':'')+hwOctave;
   for(const b of document.querySelectorAll('#cb-hw-chords button')){
    const i=Number(b.dataset.slot),c=state.steps[i];
    b.innerHTML='<small>0'+(i+1)+'</small><strong>'+label(c)+'</strong>';
@@ -814,8 +841,7 @@ function setupFM1Hardware(){
   }
   $('hw-on-device').textContent=state.play?'PLAYING':'READY';
   $('cb-hw-play').textContent=state.play?'Ⅱ PAUSE':'▶ PLAY';
-  $('cb-hw-status').textContent=state.play?'Playing '+state.tempo+' BPM · '+state.recipeId.toUpperCase():
-   'Ready · '+state.tempo+' BPM · '+state.recipeId.toUpperCase()+' · '+state.flipMode.toUpperCase();
+  $('cb-hw-status').textContent=(state.rec?'Recording four chords · ':state.play?'Playing · ':'Ready · ')+state.tempo+' BPM · '+state.recipeId.toUpperCase()+' · '+state.flipMode.toUpperCase()+' · OCT '+(hwOctave>=0?'+':'')+hwOctave;
  }
  const previousRender=drawFM1;
  // Periodic read-only sync also catches the sequencer cursor while playing.
