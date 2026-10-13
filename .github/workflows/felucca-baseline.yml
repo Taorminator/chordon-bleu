@@ -45,6 +45,32 @@ jobs:
           test -s build/felucca.bin
           test -s build/felucca.fwsc
           echo "Upstream Felucca reference built. NOT a CHORDON BLEU installable firmware."
+      - name: Host test portability fix (add missing stdint.h only)
+        run: |
+          grep -q '#include <sys/time.h>' upstream/tests/drumfuzz_test.c
+          sed -i '/#include <sys\/time.h>/a #include <stdint.h>' upstream/tests/drumfuzz_test.c
+          grep -q '^#include <stdint.h>
+        run: |
+          cd upstream
+          sh tests/run_tests.sh
+      - name: Patch pinned Felucca checkout with experimental CHORDON app
+        run: |
+          python3 firmware/felucca-overlay/apply.py upstream
+          grep -q 'chordon/platform.c' upstream/firmware/src/felucca.c
+      - name: Link native CHORDON screens, inputs and voices against Felucca
+        run: |
+          cd upstream
+          ./build.sh
+          test -s build/felucca.bin
+          echo "EXPERIMENTAL ONLY: binary has not passed device/flash validation. DO NOT INSTALL."
+      - name: Felucca host regression after CHORDON integration
+        run: |
+          cd upstream
+          sh tests/run_tests.sh
+      - name: 'Security - never upload upstream test firmware'
+        run: |
+          echo "No .bin or .fwsc release artifacts are published by this workflow."
+ upstream/tests/drumfuzz_test.c
       - name: Felucca upstream host regression suite
         run: |
           cd upstream
