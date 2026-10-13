@@ -5,7 +5,7 @@ import vm from 'node:vm';
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
 let src=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 assert.ok(src,'Missing inline script');
-src=src.replace(/\nsetup\(\);\s*$/,'');
+src=src.replace(/\nsetup\(\);[\s\S]*$/,'');
 new vm.Script(src);
 const cx=vm.createContext({console,Math,Date,setTimeout,clearTimeout});
 vm.runInContext(src,cx);
