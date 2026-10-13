@@ -3,7 +3,7 @@
  * No heap, floating point, OS calls, or hardware assumptions in this layer.
  */
 #include "cb_fm1.h"
-#include <string.h>
+#include "cb_libc.h"
 
 #define RGB(r,g,b) ((uint16_t)((((r)&248)<<8)|(((g)&252)<<3)|((b)>>3)))
 #define C_BG RGB(9,14,32)
