@@ -16,17 +16,18 @@ const chords=between('<section class="chord-workspace"','</section>');
 const live=between('<aside class="live-workspace"','</aside>');
 const harmony=between('<section class="harmony-station"','</section>');
 const season=between('<section class="section season-station"','</section>');
-assert.ok(chords.indexOf('class="stage"') < chords.indexOf('id="play"'),
-  'PLAY / FLIP / SAVE must sit immediately under the chord stage');
+assert.ok(chords.indexOf('id="play"') < chords.indexOf('class="stage"'),
+  'PLAY / FLIP / SAVE must sit immediately above the chord stage');
 assert.match(chords,/id="mutate"/);
 assert.match(chords,/id="keep"/);
 assert.match(live,/id="tempoSlider"/);
 assert.match(live,/id="tempotext"/);
 assert.match(live,/class="performance-station"/);
-assert.ok(['id="recipechoices"','id="wonder"','id="feelchoices"','id="keepone"'].every(x=>harmony.includes(x)));
+assert.ok(['id="key"','id="recipechoices"','id="wonder"','id="feelchoices"','id="keepone"'].every(x=>harmony.includes(x)));
+assert.ok(harmony.indexOf('id="key"') < harmony.indexOf('id="recipechoices"'),'Key belongs at the top of Harmony');
 assert.ok(['id="lift"','id="rush"','id="cb-delay"'].every(x=>season.includes(x)));
 assert.ok(body.indexOf('class="section playpanel"') < body.indexOf('class="editor"'),'PICK next to SHAPE');
-assert.match(html,/grid-template-areas:"head head" "chords live" "harmony season" "pick shape"/);
+assert.match(html,/grid-template-areas:"chords live" "harmony season" "pick shape"/);
 for(const id of ['play','mutate','keep','tempoSlider','tempotext','pads','root','quality','dx7file','saved'])
  assert.equal((body.match(new RegExp('id="'+id+'"','g'))||[]).length,1,'Unique '+id);
 
