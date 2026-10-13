@@ -49,6 +49,6 @@ jobs:
         run: |
           cd upstream
           sh tests/run_tests.sh
-      - name: Security: never upload upstream test firmware
+      - name: 'Security - never upload upstream test firmware'
         run: |
           echo "No .bin or .fwsc release artifacts are published by this workflow."
