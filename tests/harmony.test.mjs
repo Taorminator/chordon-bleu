@@ -3,7 +3,7 @@ import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 // Exercise the actual browser harmony and ARP functions, without running setup() or Web Audio.
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
-let src=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
+let src=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].at(-1)?.[1];
 assert.ok(src,'Missing inline script');
 src=src.replace(/\nsetup\(\);[\s\S]*$/,'');
 new vm.Script(src);
