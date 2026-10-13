@@ -1,5 +1,5 @@
-name: Felucca native build and regression reference
-# Diagnostic only. Never publishes or installs a firmware image.
+name: Felucca native reference and experimental CHORDON build
+# Diagnostic. No images or firmware packages are published by this workflow.
 on:
   workflow_dispatch:
   push:
@@ -10,84 +10,61 @@ permissions:
 jobs:
   upstream-reference:
     runs-on: ubuntu-24.04
-    timeout-minutes: 50
+    timeout-minutes: 55
     steps:
       - uses: actions/checkout@v4
-      - name: Fetch pinned upstream Felucca
+      - name: Fetch pinned Felucca
         uses: actions/checkout@v4
         with:
           repository: hugelton/Felucca
           ref: 9f6a8858afd71b4faed9dfea3a5f94d3ecfdf002
           path: upstream
           persist-credentials: false
-      - name: Python build dependencies
+      - name: Python dependencies
         run: python3 -m pip install --break-system-packages Pillow fonttools
-      - name: Fetch JieLi toolchain
+      - name: JieLi toolchain
         run: |
           cd upstream
           sh tools/get_toolchain.sh
           test -x "$HOME/.jieli/toolchain/pi32v2/bin/clang"
-      - name: Fetch upstream SDK assets
+      - name: JieLi AC79 SDK
         run: |
           git clone --depth 1 --branch AC79NN_SDK_V1.2.1_2023-12-13 https://gitee.com/Jieli-Tech/fw-AC79_AIoT_SDK.git "$HOME/fw-AC79_AIoT_SDK"
           test -f "$HOME/fw-AC79_AIoT_SDK/cpu/wl82/tools/uboot.boot"
-      - name: Compile CHORDON BLEU native core with JieLi target compiler
+      - name: Cross-compile native CHORDON modules for pi32v2
         run: |
           mkdir -p /tmp/chordon-pi32
           "$HOME/.jieli/toolchain/pi32v2/bin/clang" -target pi32v2 -DCB_FREESTANDING -std=c99 -Os -ffreestanding -Wall -Wextra -Werror -Icore -c core/chordon_harmony.c -o /tmp/chordon-pi32/harmony.o
           "$HOME/.jieli/toolchain/pi32v2/bin/clang" -target pi32v2 -DCB_FREESTANDING -std=c99 -Os -ffreestanding -Wall -Wextra -Werror -Icore -Ifirmware -c firmware/cb_fm1.c -o /tmp/chordon-pi32/controller.o
           "$HOME/.jieli/toolchain/pi32v2/bin/clang" -target pi32v2 -DCB_FREESTANDING -std=c99 -Os -ffreestanding -Wall -Wextra -Werror -Ifirmware -c firmware/cb_voice.c -o /tmp/chordon-pi32/voice.o
           "$HOME/.jieli/toolchain/pi32v2/bin/clang" -target pi32v2 -DCB_FREESTANDING -std=c99 -Os -ffreestanding -Wall -Wextra -Werror -Ifirmware -c firmware/cb_store.c -o /tmp/chordon-pi32/store.o
-      - name: Compile original Felucca firmware reference
+      - name: Compile unmodified Felucca
         run: |
           cd upstream
           ./build.sh
           test -s build/felucca.bin
           test -s build/felucca.fwsc
-          echo "Upstream Felucca reference built. NOT a CHORDON BLEU installable firmware."
-      - name: Host test portability fix (upstream test harness missing stdint)
+      - name: Make upstream fuzz harness compile with explicit stdint
         run: |
           sed -i '/sys\/time.h/a #include <stdint.h>' upstream/tests/drumfuzz_test.c
-      - name: Felucca upstream host regression suite
+      - name: Felucca unmodified host regression tests
         run: |
           cd upstream
           sh tests/run_tests.sh
-      - name: Patch pinned Felucca checkout with experimental CHORDON app
+      - name: Integrate experimental CHORDON application
         run: |
           python3 firmware/felucca-overlay/apply.py upstream
           grep -q 'chordon/platform.c' upstream/firmware/src/felucca.c
-      - name: Link native CHORDON screens, inputs and voices against Felucca
+      - name: Compile Felucca with CHORDON screens and sound bridge
         run: |
           cd upstream
           ./build.sh
           test -s build/felucca.bin
-          echo "EXPERIMENTAL ONLY: binary has not passed device/flash validation. DO NOT INSTALL."
-      - name: Felucca host regression after CHORDON integration
+          echo "Experimental proof of integration - NOT authorized for device flashing."
+      - name: Run Felucca regression after integration
         run: |
           cd upstream
           sh tests/run_tests.sh
-      - name: 'Security - never upload upstream test firmware'
+      - name: Confirm no binary publishing steps
         run: |
-          echo "No .bin or .fwsc release artifacts are published by this workflow."
- upstream/tests/drumfuzz_test.c
-      - name: Felucca upstream host regression suite
-        run: |
-          cd upstream
-          sh tests/run_tests.sh
-      - name: Patch pinned Felucca checkout with experimental CHORDON app
-        run: |
-          python3 firmware/felucca-overlay/apply.py upstream
-          grep -q 'chordon/platform.c' upstream/firmware/src/felucca.c
-      - name: Link native CHORDON screens, inputs and voices against Felucca
-        run: |
-          cd upstream
-          ./build.sh
-          test -s build/felucca.bin
-          echo "EXPERIMENTAL ONLY: binary has not passed device/flash validation. DO NOT INSTALL."
-      - name: Felucca host regression after CHORDON integration
-        run: |
-          cd upstream
-          sh tests/run_tests.sh
-      - name: 'Security - never upload upstream test firmware'
-        run: |
-          echo "No .bin or .fwsc release artifacts are published by this workflow."
+          echo "All firmware binaries remain confined to the ephemeral CI runner."
