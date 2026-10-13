@@ -12,7 +12,8 @@ typedef enum { CB_RECIPE_CLASSIC, CB_RECIPE_GHIBLI } CbRecipe;
 typedef enum { CB_FEEL_WARM, CB_FEEL_CRISPY, CB_FEEL_CHEESY } CbFeel;
 typedef enum { CB_MOTION_HOLD, CB_MOTION_PULSE, CB_MOTION_ARP } CbMotion;
 typedef enum { CB_B_PLAY, CB_B_FLIP, CB_B_SAVE, CB_B_HOME, CB_B_RECIPE,
-               CB_B_CHORD, CB_B_ARP, CB_B_SELECT, CB_B_KEEP_ALL, CB_B_UNDO } CbButton;
+               CB_B_CHORD, CB_B_ARP, CB_B_SELECT, CB_B_KEEP_ALL, CB_B_UNDO,
+               CB_B_FEEL, CB_B_MOTION } CbButton;
 
 typedef struct {
  CbLoop loop;
