@@ -54,7 +54,7 @@ const bindings=[
 ];
 for(const [physical,semantic] of bindings){
  const escaped=physical.replaceAll('_','_');
- assert.ok(new RegExp('panel\\.btn\\['+escaped+'\\]\\]\\)\\)cb_fm1_button\\(&cbh_device,'+semantic).test(platform),
+ assert.ok(new RegExp('panel\\.btn\\['+escaped+'\\]\\)\\)cb_fm1_button\\(&cbh_device,'+semantic).test(platform),
   physical+' must dispatch to '+semantic+' via calibrated Felucca panel');
 }
 assert.match(controller,/case CB_B_FEEL:m->feel=/);
