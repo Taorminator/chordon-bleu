@@ -728,7 +728,9 @@ function setupFM1Hardware(){
   key.style.width='calc('+(100/whiteNotes.length)+'% - 4px)';
   key.textContent=i<7?String(i+1):'';
   key.title='Note '+NAMES[midi%12];key.setAttribute('aria-label','Note '+NAMES[midi%12]);
-  key.dataset.note=midi;kbd.append(key);
+  key.dataset.note=midi;
+  if(i<4){key.dataset.chordPad=String(i);key.title+=' · REC: chord pad '+(i+1);}
+  kbd.append(key);
  }
  for(const midi of blackNotes){
   const previous=whiteNotes.filter(n=>n<midi).length;
@@ -737,14 +739,19 @@ function setupFM1Hardware(){
   key.style.width='4.9%';key.dataset.note=midi;key.title='Note '+NAMES[midi%12];
   key.setAttribute('aria-label','Note '+NAMES[midi%12]);kbd.append(key);
  }
+ function playPhysicalKey(key){
+  // The first four white keys are chord pads while REC is armed.
+  if(state.rec && key.dataset.chordPad!==undefined){padChord(Number(key.dataset.chordPad));return;}
+  ensureAudio().then(ok=>{if(ok)tone(Number(key.dataset.note)+12*hwOctave,ctx.currentTime+.01,.42,.85,false,true);});
+ }
  for(const key of kbd.querySelectorAll('[data-note]')){
   key.addEventListener('pointerdown',e=>{
    if(e.pointerType==='mouse'&&e.button!==0)return;
    e.preventDefault();key.setPointerCapture(e.pointerId);key.classList.add('active');
-   ensureAudio().then(ok=>{if(ok)tone(Number(key.dataset.note)+12*hwOctave,ctx.currentTime+.01,.42,.85,false,true);});
+   playPhysicalKey(key);
   });
   for(const event of ['pointerup','pointercancel','lostpointercapture'])key.addEventListener(event,()=>key.classList.remove('active'));
-  key.addEventListener('keydown',e=>{if(e.repeat)return;if(e.key==='Enter'||e.key===' '){e.preventDefault();key.classList.add('active');ensureAudio().then(ok=>{if(ok)tone(Number(key.dataset.note)+12*hwOctave,ctx.currentTime+.01,.42,.85,false,true);});}});
+  key.addEventListener('keydown',e=>{if(e.repeat)return;if(e.key==='Enter'||e.key===' '){e.preventDefault();key.classList.add('active');playPhysicalKey(key);}});
   key.addEventListener('keyup',()=>key.classList.remove('active'));
  }
  const setScreen=screen=>{fm1Screen=screen;drawFM1();syncFM1Hardware();};
