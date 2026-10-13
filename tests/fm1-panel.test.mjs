@@ -16,8 +16,12 @@ const octave=html.match(/<div class="octaves">([\s\S]*?)<\/div>/)?.[1]||'';
 assert.deepEqual([...octave.matchAll(/data-hw-action="([^"]+)"/g)].map(x=>x[1]),['OCT_DOWN','OCT_UP']);
 assert.match(html,/Number\(key\.dataset\.note\)\+12\*hwOctave/,'Octave controls must affect physical keyboard sound');
 assert.match(html,/key\.dataset\.chordPad=String\(i\)/,'Record-mode chord pad tagging is required');
-assert.match(html,/if\(state\.rec && key\.dataset\.chordPad!==undefined\)\{padChord\(Number\(key\.dataset\.chordPad\)\);return;\}/,
+assert.match(html,/if\(state\.rec&&pad!==undefined\)\{padChord\(pad\);return;\}/,
  'REC should allow four on-device chord pads, not only the hidden browser editor');
+assert.match(html,/let performanceMode='chords'/,'The device must start in playable CHORDS mode');
+assert.match(html,/if\(mode==='notes'\)tone\(note/,'Single notes must be opt-in');
+assert.match(html,/else playVoicing\(harmony/,'Chord mode must use the full voicing engine');
+assert.match(html,/function fm1KeyboardChord\(midi,pad,steps,selected\)/,'Chord selection must be independently testable');
 
 // Test the ACTUAL hardware event dispatcher extracted from inline browser script.
 const begin=html.indexOf(' function runAction(name){');
