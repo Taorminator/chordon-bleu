@@ -1,0 +1,31 @@
+name: CHORDON BLEU checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  instrument:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate offline recipe bundle
+        run: node tools/build-recipes.mjs --check
+      - name: Exercise harmonic search and arpeggiator
+        run: |
+          node tests/harmony.test.mjs
+          node tests/recipes.test.mjs
+      - name: C99 harmony research core
+        run: |
+          cc -std=c99 -O2 -Wall -Wextra -Werror -pedantic core/chordon_harmony.c tests/core_test.c -o /tmp/chordon-harmony-test
+          /tmp/chordon-harmony-test
+      - name: Never publish untested FM1 binaries
+        run: |
+          test -s index.html
+          grep -q GHIBLI index.html
+          if find . -type f \( -name '*.fwsc' -o -name '*.bin' \) | grep .; then
+            echo 'Unverified device firmware found' >&2
+            exit 1
+          fi
