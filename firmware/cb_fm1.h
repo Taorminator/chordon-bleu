@@ -40,6 +40,8 @@ typedef struct {
  void (*notes)(void*,const uint8_t*,uint8_t,uint16_t,uint8_t);
  /* Called on explicit SAVE. Persist a versioned snapshot outside the audio ISR. */
  void (*save)(void*,const CbFM1*);
+ /* Stop any sustained notes on transport STOP. */
+ void (*panic)(void*);
 } CbFM1Host;
 
 void cb_fm1_init(CbFM1 *m, uint32_t seed);
