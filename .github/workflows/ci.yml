@@ -21,6 +21,14 @@ jobs:
         run: |
           cc -std=c99 -O2 -Wall -Wextra -Werror -pedantic core/chordon_harmony.c tests/core_test.c -o /tmp/chordon-harmony-test
           /tmp/chordon-harmony-test
+      - name: Portable FM1 application simulation (not a firmware build)
+        run: |
+          cc -std=c99 -O2 -Wall -Wextra -Werror -pedantic core/chordon_harmony.c firmware/cb_fm1.c tests/device_test.c -o /tmp/chordon-device-test
+          /tmp/chordon-device-test
+      - name: Install status safety
+        run: |
+          test -s install/index.html
+          grep -q 'NOT INSTALLABLE YET' install/index.html
       - name: Never publish untested FM1 binaries
         run: |
           test -s index.html
