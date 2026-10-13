@@ -5,6 +5,9 @@ on:
   push:
     paths:
       - ".github/workflows/felucca-baseline.yml"
+      - "firmware/**"
+      - "core/**"
+      - "tests/*.c"
 permissions:
   contents: read
 jobs:
