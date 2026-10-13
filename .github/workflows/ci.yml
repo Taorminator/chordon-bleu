@@ -23,6 +23,8 @@ jobs:
         run: node tests/performance.test.mjs
       - name: Browser performance controls and expanded recipes
         run: node tests/browser-performance.test.mjs
+      - name: Color-blocked UI and readable, playable chord cards
+        run: node tests/color-block-ui.test.mjs
       - name: Safari audio, new instruments and grouped UI
         run: node tests/safari-synth-ui.test.mjs
       - name: Pencil-sketch UI, BPM, PUNCH, DX7 ROM1A and GRAND regression
