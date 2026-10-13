@@ -445,7 +445,7 @@ function arpNote(pattern,hit){const dir=state.arp.direction;
  if(dir==='updown'&&pattern.length>1){const cycle=pattern.length*2-2,index=hit%cycle;return pattern[index<pattern.length?index:cycle-index];}
  return pattern[hit%pattern.length];
 }
-function playVoicing(c,time,duration,variant=state.motion,explicitNotes=null){const root=36+c.root;const prev=state.steps[(state.selected+3)%4]||null;let notes=explicitNotes||voiceNotes(c,prev?voiceNotes(prev):null);const lift=state.holdLift;const rush=state.holdRush;const dur=Math.max(.13,duration);
+function playVoicing(c,time,duration,variant=state.motion,explicitNotes=null,octaveShift=0){const root=36+c.root+12*octaveShift;const prev=state.steps[(state.selected+3)%4]||null;let notes=(explicitNotes||voiceNotes(c,prev?voiceNotes(prev):null)).map(n=>n+12*octaveShift);const lift=state.holdLift;const rush=state.holdRush;const dur=Math.max(.13,duration);
   if(lift)notes=notes.map(n=>n+12);
   if(variant==='arp'||rush){const hits=rush?Math.max(8,(state.arp.rate/4)*2):state.arp.rate/4*2;const pattern=arpBaseNotes(notes,c);const step=dur/hits;for(let j=0;j<hits;j++){tone(arpNote(pattern,j),time+j*step,Math.max(.018,step*state.arp.gate/100),.85,false,true);if(j===0&&!rush)tone(root,time,Math.min(dur,.23),.5,true);}}
   else if(variant==='pulse'){for(let j=0;j<2;j++){for(const [i,n] of notes.entries())tone(n,time+j*dur/2+i*.007,dur*.38,.82);if(j===0)tone(root,time,.28,.7,true);}}
@@ -765,7 +765,7 @@ function setupFM1Hardware(){
   ensureAudio().then(ok=>{
     if(!ok||!ctx)return;
     if(mode==='notes')tone(note,ctx.currentTime+.01,.42,.85,false,true);
-    else playVoicing(harmony,ctx.currentTime+.01,Math.max(.28,60/state.tempo*.92),state.motion);
+    else playVoicing(harmony,ctx.currentTime+.01,Math.max(.28,60/state.tempo*.92),state.motion,null,hwOctave);
   }).catch(()=>audioFeedback(false,'Ton ist nicht verfügbar. Erneut PLAY drücken.'));
  }
  function releasePhysicalKey(key){activePerformanceKeys.delete(key);key.classList.remove('active');}
