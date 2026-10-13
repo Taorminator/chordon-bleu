@@ -135,7 +135,7 @@ body.fm1-mode>.app{display:none}
 </style>
 </head>
 <body>
-<script>if(new URLSearchParams(location.search).get("view")==="fm1")document.body.classList.add("fm1-mode");</script>
+<script>if(typeof location!=="undefined" && /(?:^|[?&])view=fm1(?:&|$)/.test(location.search||""))document.body.classList.add("fm1-mode");</script>
 
 <!-- Browser-only physical surface: FM-XY chassis design ported with attribution, never load FM-XY at runtime. -->
 <div class="cb-hardware" id="cb-fmxy-device" aria-label="CHORDON BLEU FM1 Browsergerät">
