@@ -8,6 +8,8 @@ const order=['id="recipechoices"','id="wonder"','id="feelchoices"','id="keepone"
 assert.ok(order.every(x=>x>=0)&&order.every((x,i)=>i===0||x>order[i-1]),'Grouped harmony order');
 const performance=extract('<section class="performance-station"','</section>');
 assert.match(performance,/<select id="sound"/);
+assert.match(performance,/id="audioreset"/);
+assert.match(html,/\$\('audioreset'\)\.addEventListener\('click'/);
 assert.match(performance,/data-motion="pulse"/);
 assert.doesNotMatch(performance,/data-motion="slice"/);
 assert.match(performance,/id="slicegate"/);
