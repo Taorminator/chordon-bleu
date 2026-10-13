@@ -1,6 +1,6 @@
 /* CHORDON BLEU harmonic suggestion engine, host-buildable C99. GPL-3.0-only. */
 #include "chordon_harmony.h"
-#include <string.h>
+#include "../firmware/cb_libc.h"
 typedef struct { uint8_t n; int8_t steps[5]; } Shape;
 static const Shape shapes[CB_QUALITIES]={
   {3,{0,4,7}}, {3,{0,3,7}}, {4,{0,4,7,11}}, {4,{0,3,7,10}},
