@@ -11,6 +11,9 @@
     "native Felucca build with JieLi pi32v2 toolchain",
     "Felucca host and firmware regression tests",
     "FM1 physical audio, screen, controls and CPU tests",
-    "flash backup and recovery test on actual hardware"
+    "flash backup and recovery test on actual hardware",
+    "unchanged bootloader system clock (no PLL retune), CPU1/watchdog boot-loop audit on actual FM1",
+    "verified full-flash backup, official V15 rollback and ROM UBOOT recovery test on actual hardware",
+    "hardware power-cycle, early-boot, USB/MIDI and power-cut fault-injection tests"
   ]
 }
