@@ -40,9 +40,17 @@ static void chordon_init(void) {
 /* Own input surface, using Felucca's hardware-calibrated matrix and encoders. */
 static void chordon_input(void) {
     uint32_t edges=fm1_input_edges(0),now=fm1_ms;
+    uint32_t keys=fm1_input_note_edges();
     uint32_t dt=now-cbh_last_ms;
     int32_t s;
-    (void)fm1_input_note_edges();
+    /* Four adjacent piano keys become direct chord pads, not a menu. */
+    for(uint8_t i=0;i<4u;i++)if(keys&(1u<<i)){
+        uint8_t notes[4];
+        cbh_device.selected=i;
+        uint8_t count=cb_fm1_chord_notes(&cbh_device.loop.steps[i],notes);
+        cbh_notes(0,notes,count,350u,0);
+        cbh_dirty=1;
+    }
     cbh_last_ms=now;
     if(dt>200u)dt=200u;
     if(edges)cbh_dirty=1;
