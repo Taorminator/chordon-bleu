@@ -10,6 +10,10 @@ on:
       - "tests/*.c"
 permissions:
   contents: read
+# A new firmware commit supersedes earlier full regression runs.
+concurrency:
+  group: chordon-native-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   upstream-reference:
     runs-on: ubuntu-24.04
