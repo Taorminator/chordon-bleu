@@ -463,13 +463,75 @@ async function ensureAudio(){
   return false;
  }
 }
-const SOUNDS=[{name:'WARM',wave:'triangle',second:'sine',cut:1250,a:.027,dec:.45,sus:.43,rel:.65,detune:5},{name:'GLASS',wave:'sine',second:'triangle',cut:4000,a:.008,dec:.7,sus:.22,rel:.85,detune:2},{name:'DUSK',wave:'sawtooth',second:'triangle',cut:620,a:.09,dec:.42,sus:.42,rel:1.05,detune:3}];
-function tone(midi,at,dur,vel=.6,bass=false,pluck=false){if(!ctx||!master)return;const sound=SOUNDS[state.sound],freq=440*Math.pow(2,(midi-69)/12),env=ctx.createGain(),filter=ctx.createBiquadFilter();filter.type='lowpass';filter.frequency.setValueAtTime(bass?550:sound.cut,at);filter.Q.value=bass?.55:.45;env.connect(filter);filter.connect(master);if(reverb&&!bass)filter.connect(reverb);
-  const melt=state.holdLift&&!bass&&!pluck,attack=melt?.24:pluck?Math.min(.008,dur*.16):(bass?.013:sound.a),release=melt?2.7:pluck?Math.min(.15,.055+dur*.24):(bass?.22:sound.rel),decay=melt?.75:pluck?Math.min(.09,dur*.22):(bass?.13:sound.dec),sustain=melt?.79:pluck?.58:(bass?.43:sound.sus);
-  const level=(bass?.13:.105)*vel;
-  env.gain.setValueAtTime(.0001,at);env.gain.exponentialRampToValueAtTime(Math.max(.0002,level),at+Math.max(.005,attack));env.gain.exponentialRampToValueAtTime(Math.max(.0002,level*sustain),at+attack+decay);env.gain.setValueAtTime(Math.max(.0002,level*sustain),at+Math.max(attack+decay,dur));env.gain.exponentialRampToValueAtTime(.0001,at+Math.max(attack+decay,dur)+release);
-  const osc=ctx.createOscillator();osc.type=bass?'sine':sound.wave;osc.frequency.setValueAtTime(freq,at);osc.connect(env);osc.start(at);osc.stop(at+Math.max(attack+decay,dur)+release+.04);
-  if(!bass){const osc2=ctx.createOscillator(),g2=ctx.createGain();g2.gain.value=.22;osc2.type=sound.second;osc2.frequency.setValueAtTime(freq,at);osc2.detune.value=sound.detune;osc2.connect(g2);g2.connect(env);osc2.start(at);osc2.stop(at+Math.max(attack+decay,dur)+release+.04);}
+const SOUNDS=[
+ {name:'WARM',kind:'classic',wave:'triangle',second:'sine',cut:1250,a:.027,dec:.45,sus:.43,rel:.65,detune:5},
+ {name:'GLASS',kind:'classic',wave:'sine',second:'triangle',cut:4000,a:.008,dec:.7,sus:.22,rel:.85,detune:2},
+ {name:'DUSK',kind:'classic',wave:'sawtooth',second:'triangle',cut:620,a:.09,dec:.42,sus:.42,rel:1.05,detune:3},
+ {name:'DX7 EP',kind:'fm',wave:'sine',second:'sine',cut:4900,a:.006,dec:.42,sus:.26,rel:.95,detune:0},
+ {name:'GRAND',kind:'grand',wave:'sine',second:'triangle',cut:5500,a:.003,dec:.58,sus:.32,rel:1.0,detune:2},
+ {name:'90s HOUSE',kind:'house',wave:'sawtooth',second:'triangle',cut:4400,a:.002,dec:.19,sus:.30,rel:.30,detune:4}
+];
+// All six programs use the same self-contained oscillator engine; no external samples.
+function tone(midi,at,dur,vel=.6,bass=false,pluck=false){
+ if(!ctx||!master)return;
+ const sound=SOUNDS[state.sound]||SOUNDS[0],kind=bass?'classic':sound.kind,
+       freq=440*Math.pow(2,(midi-69)/12),env=ctx.createGain(),filter=ctx.createBiquadFilter(),
+       melt=state.holdLift&&!bass&&!pluck;
+ filter.type='lowpass';filter.frequency.setValueAtTime(bass?550:sound.cut,at);
+ filter.Q.value=bass?.55:.45;
+ env.connect(filter);filter.connect(master);
+ if(reverb&&!bass)filter.connect(reverb);
+ const attack=melt?.24:pluck?Math.min(.008,dur*.16):(bass?.013:sound.a),
+       decay=melt?.75:pluck?Math.min(.09,dur*.22):(bass?.13:sound.dec),
+       sustain=melt?.79:pluck?.58:(bass?.43:sound.sus),
+       release=melt?2.7:pluck?Math.min(.15,.055+dur*.24):(bass?.22:sound.rel),
+       level=(bass?.13:kind==='house'?.080:kind==='grand'?.11:kind==='fm'?.108:.105)*vel,
+       bodyEnd=at+Math.max(attack+decay,dur),end=bodyEnd+release+.05;
+ env.gain.setValueAtTime(.0001,at);
+ env.gain.exponentialRampToValueAtTime(Math.max(.0002,level),at+Math.max(.005,attack));
+ env.gain.exponentialRampToValueAtTime(Math.max(.0002,level*sustain),at+Math.max(attack+decay,.006));
+ env.gain.setValueAtTime(Math.max(.0002,level*sustain),bodyEnd);
+ env.gain.exponentialRampToValueAtTime(.0001,bodyEnd+release);
+ function voice(type,hz,volume=1,detune=0){
+  const osc=ctx.createOscillator();
+  osc.type=type;osc.frequency.setValueAtTime(hz,at);osc.detune.value=detune;
+  if(volume===1)osc.connect(env);
+  else{const mix=ctx.createGain();mix.gain.value=volume;osc.connect(mix);mix.connect(env);}
+  osc.start(at);osc.stop(end);return osc;
+ }
+ if(kind==='fm'){
+  // Two-operator frequency modulation: DX7-inspired E-piano attack (not a DX7 SysEx patch).
+  const carrier=voice('sine',freq,.92);
+  const modulator=ctx.createOscillator(),index=ctx.createGain();
+  modulator.type='sine';modulator.frequency.setValueAtTime(freq*3,at);
+  index.gain.setValueAtTime(freq*2.2,at);
+  index.gain.exponentialRampToValueAtTime(Math.max(1,freq*.035),at+.42);
+  modulator.connect(index);index.connect(carrier.frequency);
+  modulator.start(at);modulator.stop(end);
+  voice('sine',freq*2,.16,3);
+ }else if(kind==='grand'){
+  // Acoustic-style partials with mild inharmonicity and a short hammer transient.
+  voice('sine',freq,.9);
+  voice('triangle',freq*2.005,.31);
+  voice('sine',freq*3.012,.13);
+ }else if(kind==='house'){
+  // Bright transient, brassy chord stabs: original synth approximation of a 90s piano.
+  voice('sawtooth',freq,.66);
+  voice('triangle',freq*2,.31,4);
+  voice('sine',freq*3,.15);
+ }else{
+  voice(bass?'sine':sound.wave,freq,1);
+  if(!bass)voice(sound.second,freq,.22,sound.detune);
+ }
+ if(kind==='grand'||kind==='house'){
+  const hammer=ctx.createOscillator(),snap=ctx.createGain();
+  hammer.type='triangle';
+  hammer.frequency.setValueAtTime(freq*4.5,at);
+  hammer.frequency.exponentialRampToValueAtTime(freq*2.3,at+.022);
+  snap.gain.setValueAtTime(.020*vel,at);
+  snap.gain.exponentialRampToValueAtTime(.0001,at+.035);
+  hammer.connect(snap);snap.connect(filter);hammer.start(at);hammer.stop(at+.042);
+ }
 }
 function arpBaseNotes(notes,c){
  const sorted=notes.slice().sort((a,b)=>a-b);const order=state.arp.order;
