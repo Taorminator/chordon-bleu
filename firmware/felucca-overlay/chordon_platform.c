@@ -92,6 +92,18 @@ static void cbh_rect(void *u,int x,int y,int w,int h,uint16_t color){
 }
 static void cbh_line(void *u,int x,int y,int xx,int yy,uint16_t color){
     (void)u;
+    /* One LCD transfer for straight lines, not 100+ individual 1-pixel
+       SPI transactions: essential on the small FM1 display. */
+    if(y==yy){
+        int a=x<xx?x:xx, span=x<xx?xx-x+1:x-xx+1;
+        if(a>=0&&y>=0&&a+span<=240&&y<240)lcd_fill((uint32_t)a,(uint32_t)y,(uint32_t)span,1u,color);
+        return;
+    }
+    if(x==xx){
+        int a=y<yy?y:yy, span=y<yy?yy-y+1:y-yy+1;
+        if(x>=0&&a>=0&&x<240&&a+span<=240)lcd_fill((uint32_t)x,(uint32_t)a,1u,(uint32_t)span,color);
+        return;
+    }
     int dx=xx>x?xx-x:x-xx,dy=yy>y?yy-y:y-yy;
     int sx=x<xx?1:-1,sy=y<yy?1:-1,err=dx-dy;
     for(;;){
