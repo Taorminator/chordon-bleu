@@ -50,6 +50,24 @@ void cb_fm1_init(CbFM1 *m,uint32_t seed){
  m->bpm=92;m->gate=62;m->arp_rate=2;m->view=CB_VIEW_HOME;
 }
 static void save_undo(CbFM1 *m){m->undo=m->loop;m->undo_valid=1;}
+/* A tiny native FEEL palette: hints from music, never a music-theory menu.
+ * Retain explicit TYPE locks and the selected KEEP 1 chord. */
+static void season(CbFM1 *m,uint8_t keep){
+ for(uint8_t i=0;i<4u;i++){
+  CbChord *c=&m->loop.steps[i];
+  if(i==keep||c->lock_type)continue;
+  if(m->feel==CB_FEEL_WARM){
+   if(c->quality==CB_MAJOR)c->quality=CB_MAJ9;
+   else if(c->quality==CB_MINOR)c->quality=CB_M9;
+  }else if(m->feel==CB_FEEL_CRISPY){
+   if(c->quality==CB_MAJOR||c->quality==CB_MAJ7)c->quality=CB_ADD9;
+   else if(c->quality==CB_MINOR)c->quality=CB_SUS2;
+  }else if(m->feel==CB_FEEL_CHEESY){
+   if(c->quality==CB_MAJOR)c->quality=CB_SIX;
+   else if(c->quality==CB_MINOR)c->quality=CB_M7;
+  }
+ }
+}
 static void mutate(CbFM1 *m){
  save_undo(m);
  if(m->all_four){
@@ -75,6 +93,7 @@ static void mutate(CbFM1 *m){
     else if(q==CB_MINOR)m->loop.steps[i].quality=CB_M9;
    }
   }
+  season(m,m->all_four?255u:m->selected);
  }
 }
 /* Host emits at note boundaries. The control task should call tick every 1-10 ms.
