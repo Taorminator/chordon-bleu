@@ -263,6 +263,16 @@ body.fm1-mode>.app{display:none}
  .season-station .punch{flex:1 1 75px;font-size:11px}
 }
 
+
+.dx7-original{display:flex;flex-direction:column;align-items:flex-start;gap:9px;
+ border-top:1px solid #435170;margin-top:8px;padding-top:14px}
+.dx7-original[hidden]{display:none!important}
+.dx7-import-btn{cursor:pointer;display:flex;align-items:center;justify-content:center;min-height:44px;
+ padding:9px 12px;font:750 11px ui-monospace,monospace;color:#f8faff;
+ border:1px solid #8495d5;background:#354985;border-radius:8px}
+.dx7-import-btn:hover{background:#475da0}
+.dx7-patch-source{font-size:11px;font-weight:650;color:#c0ccff;text-decoration:underline;text-underline-offset:3px}
+
 </style>
 </head>
 <body>
@@ -314,7 +324,13 @@ body.fm1-mode>.app{display:none}
 </div>
  <section class="performance-station" aria-label="Instrument und Spielweise">
  <div class="station-heading"><span class="micro">PERFORM / HOW IT SOUNDS</span><span class="station-sub">Instrument und Rhythmus</span></div>
- <div class="sound-picker"><label class="micro" for="sound">INSTRUMENT / KLANG</label><select id="sound" class="soundbutton" aria-label="Instrument wählen"></select><button id="audioreset" type="button" class="audio-reset" title="Wenn Safari stumm bleibt, Audio neu initialisieren">↻ TON NEU STARTEN</button><span class="sound-help">Sechs eigenständige Synth-Klänge · keine Samples</span></div>
+ <div class="sound-picker"><label class="micro" for="sound">INSTRUMENT / KLANG</label><select id="sound" class="soundbutton" aria-label="Instrument wählen"></select><button id="audioreset" type="button" class="audio-reset" title="Wenn Safari stumm bleibt, Audio neu initialisieren">↻ TON NEU STARTEN</button><span class="sound-help">Sechs Klangprogramme · das originale DX7-Preset ist per SysEx ladbar</span>
+ <div class="dx7-original" id="dx7-original" hidden>
+  <label class="dx7-import-btn" for="dx7file">↓ ORIGINAL E.PIANO 1 LADEN (.SYX)</label>
+  <input type="file" id="dx7file" accept=".syx,.SYX,application/octet-stream" hidden>
+  <span class="sound-help" id="dx7status" role="status">DX7 EP ist zunächst ein Preview. Lade deine ROM1A-Bank für den originalen 6-Operator-Patch.</span>
+  <a href="https://yamahablackboxes.com/collection/yamaha-dx7-synthesizer/patches/" target="_blank" rel="noopener noreferrer" class="dx7-patch-source">Yamaha DX7 ROM1A · Preset 11 E.PIANO 1 ↗</a>
+ </div></div>
  <div class="minitools"><div><span class="micro" style="display:block;margin-bottom:7px">MOTION / BEWEGUNG</span><div class="motionbuttons" id="motion" role="group" aria-label="Akkorde rhythmisch spielen"><button data-motion="hold" class="active">HOLD</button><button data-motion="pulse">PULSE</button><button data-motion="arp">ARP</button></div></div></div>
 <div class="arpdeck" id="slicedeck" hidden aria-label="Pulse: Akkord rhythmisch wiederholen"><div class="arphead"><span class="micro">PULSE / CHORD REPEATS</span><span class="micro">REPEAT THE WHOLE CHORD</span></div><div class="arpgrid"><label class="arpcell"><span>HITS</span><select id="slicehits"><option value="2">2×</option><option value="4">4×</option><option value="8">8×</option></select></label><label class="arpcell"><span>SPEED</span><select id="slicerate"><option value="4">1/4</option><option value="8">1/8</option><option value="16">1/16</option><option value="32">1/32</option></select></label><label class="arpcell"><span>GATE <output id="slicegatevalue">40%</output></span><input id="slicegate" type="range" min="10" max="95" step="5" value="40"></label><span class="arpcell"><span>RHYTHM</span><span style="color:#c8d3f3;font-size:12px">Tempo-synced</span></span></div></div>
 <div class="arpdeck" id="arpdeck" hidden aria-label="Vier Regler für den Arpeggiator"><div class="arphead"><span class="micro">ARP / FOUR KNOBS</span><span class="micro">FM1 · K1—K4</span></div><div class="arpgrid"><label class="arpcell"><span>K1 · SPEED</span><select id="arprate"><option value="4">1/4</option><option value="8">1/8</option><option value="16">1/16</option><option value="32">1/32</option></select></label><label class="arpcell"><span>K2 · GATE <output id="gatevalue">62%</output></span><input id="arpgate" type="range" min="15" max="100" step="5" value="62"></label><label class="arpcell"><span>K3 · DIR</span><select id="arpdirection"><option value="up">↑ UP</option><option value="down">↓ DOWN</option><option value="updown">↕ UP/DOWN</option><option value="random">⤨ RANDOM</option></select></label><label class="arpcell"><span>K4 · ORDER</span><select id="arporder"><option value="pitch">PITCH</option><option value="root">ROOT 1ST</option><option value="outside">OUT / IN</option><option value="fifth">FIFTH 1ST</option></select></label></div></div>
