@@ -28,7 +28,7 @@ Aus diesen Prinzipien komponieren wir **neue, eigene harmonische Ausgangspunkte*
 
 1. Neues `recipes/meine-welt.json` nach dem Schema der existierenden JSON-Datei erstellen. `id`, `name`, `suggested*`, `templates`, `palette`, `minSpice`, `weight` hinzufügen.
 2. `node tools/build-recipes.mjs` ausführen, um das Rezept ins **autarke HTML** einzubetten. Keine Web-Abhängigkeit oder Laufzeit-Downloads.
-3. Einen **sichtbaren Chip** mit `data-recipe="meine-welt"` in der `recipechoices`-Leiste ergänzen. Bei vielen Recipes später **seitlich scrollbare Chips** statt tiefer Menüs nutzen.
+3. Das neue Recipe erscheint nach dem Build **automatisch als auswählbarer Chip** in der seitlich scrollbaren Rezeptleiste. Kein neues Menü und keine Änderung am HTML notwendig.
 4. `node tests/recipes.test.mjs`, `node tests/harmony.test.mjs`, `python3 tests/browser_test.py` testen. Testen, wie sich das Recipe **anfühlt und anhört**, nicht bloß ob der Code läuft.
 5. Technische Quellen angeben und prüfen, dass keine fremden Melodien oder geschützten Audioassets kopiert werden.
 
