@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-3.0-only */
 #include "cb_voice.h"
-#include <string.h>
+#include "cb_libc.h"
 void cb_voice_init(CbVoice *v,CbVoiceOut io){memset(v,0,sizeof(*v));v->output=io;}
 void cb_voice_stop(CbVoice *v){
  for(unsigned i=0;i<v->n;i++)if(v->output.off)v->output.off(v->output.user,v->note[i]);
