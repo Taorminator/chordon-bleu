@@ -176,7 +176,7 @@ body.fm1-mode>.app{display:none}
 <main class="content" id="main">
 <div class="topbar"><span class="micro">01 — YOUR LITTLE LOOP</span><div class="topright"><label class="visuallyhidden" for="key">Tonart</label><select class="pillselect" id="key" aria-label="Tonart wählen"></select><button id="sound" class="soundbutton" title="Klang wechseln" aria-label="Klang wechseln">◉ WARM</button></div></div>
 <div class="recipe-strip" aria-label="Musikalische Recipes"><span class="micro">RECIPES</span><div id="recipechoices" class="recipechoices" role="group" aria-label="Musikalische Klangwelt wählen"><button data-recipe="classic" class="recipe-chip active" type="button" aria-pressed="true">CLASSIC</button><button data-recipe="ghibli-dream" class="recipe-chip" type="button" aria-pressed="false">✦ GHIBLI DREAM</button><button data-recipe="blue-hour" class="recipe-chip" type="button" aria-pressed="false">MANHATTAN</button><button data-recipe="moonlit-kingdom" class="recipe-chip" type="button" aria-pressed="false">TOKYO</button><button data-recipe="dust-and-echoes" class="recipe-chip" type="button" aria-pressed="false">CAPRESE</button></div></div>
-<div class="stage" aria-label="Vier Akkorde deiner Progression"><div class="stage-top"><span><span class="led" id="led"></span> <span id="runlabel">READY TO PLAY</span></span><span class="right"><span id="stagebpm">92 BPM</span><span>01 — 04</span></span></div><div class="stages" id="steps"></div><div class="stagefooter"><span id="status" aria-live="polite">TIPP: DRÜCK PLAY.</span><span class="thermal-label">◉ <span id="heatname">COZY</span></span><span id="loopindicator">LOOP / 001</span></div><div id="audiohealth" class="audiohealth" role="status" aria-live="polite" hidden><span id="audionote">Ton ist noch nicht aktiv.</span><button id="audionudge" type="button" aria-label="Ton einschalten">TON AKTIVIEREN ↗</button></div></div>
+<div class="stage" aria-label="Vier Akkorde deiner Progression"><div class="stage-top"><span><span class="led" id="led"></span> <span id="runlabel">READY TO PLAY</span></span><span class="right"><span id="stagebpm">92 BPM</span><span>01 — 04</span></span></div><div class="stages" id="steps"></div><div class="stagefooter"><span id="status" aria-live="polite">TIPP: DRÜCK PLAY.</span><span class="thermal-label">◉ <span id="heatname">COZY</span></span><span id="loopindicator">LOOP / 001</span></div><div id="audiohealth" class="audiohealth" role="status" aria-live="polite" hidden><span id="audionote">Ton ist noch nicht aktiv.</span><button id="audionudge" type="button" aria-label="Audiokontext neu starten">TON NEU STARTEN ↻</button></div></div>
 <div class="maincontrols"><button id="play" class="bigbtn primary" aria-label="Loop abspielen"><b aria-hidden="true">▶</b><span>PLAY</span></button><button id="mutate" class="bigbtn surprise" aria-label="Neue passende Akkordvariante erzeugen"><b aria-hidden="true"><svg width="23" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h3c5 0 7 12 12 12h3"/><path d="m18 15 3 3-3 3"/><path d="M3 18h3c5 0 7-12 12-12h3"/><path d="m18 3 3 3-3 3"/></svg></b><span>FLIP</span><small>NEW IDEA</small></button><button id="keep" class="bigbtn keep" aria-label="Aktuellen Loop speichern"><b aria-hidden="true">↓</b><span>SAVE</span></button></div>
 <div class="flipbar" aria-label="FLIP-MODUS"><span class="micro">CHANGE</span><div class="flipmodes" role="group" aria-label="Akkorde beim FLIP behalten"><button id="keepone" class="flipmode active" type="button" aria-pressed="true">◈ KEEP 1</button><button id="allfour" class="flipmode" type="button" aria-pressed="false">⤨ ALL 4</button></div><span class="flipcaption" id="flipcaption">CHORD 01 BLEIBT</span></div>
 <div class="feelbar"><span class="micro">FEEL</span><div class="feelchoices" id="feelchoices" role="group" aria-label="Gefühl für Akkordvorschläge"><button type="button" data-feel="warm" class="feelbutton active" aria-pressed="true">◒ WARM</button><button type="button" data-feel="crispy" class="feelbutton" aria-pressed="false">✳ CRISPY</button><button type="button" data-feel="cheesy" class="feelbutton" aria-pressed="false">♡ CHEESY</button></div></div>
@@ -387,47 +387,81 @@ function audioFeedback(ok,message=''){
   $('audionote').textContent=message;
   $('audioinfo').textContent=ok?' Audio: bereit.':message?' Audio: nicht freigegeben.':'';
 }
+// Build a minimal dry output first: Safari must not depend on optional effects.
+let fxReady=false;
+function releaseAudio(){
+ if(state.play)stopPlayback();
+ const previous=ctx;
+ ctx=null;master=null;reverb=null;chorusWet=null;delayWet=null;delayNode=null;fxReady=false;
+ if(previous&&previous.state!=='closed')try{const p=previous.close();if(p?.catch)p.catch(()=>{});}catch(_){}
+}
+function initializeAudio(){
+ const Context=window.AudioContext||window.webkitAudioContext;
+ if(!Context)throw Error('Web Audio unavailable');
+ ctx=new Context();
+ master=ctx.createGain();master.gain.value=.62;
+ master.connect(ctx.destination); // Direct fallback, never through the effects chain.
+ ctx.onstatechange=()=>{
+  if(!ctx)return;
+  if(ctx.state==='interrupted'||ctx.state==='suspended'){
+   if(state.play)stopPlayback();
+   audioFeedback(false,'Audio: '+ctx.state+'. Tippe TON NEU STARTEN, falls kein Ton kommt.');
+  }else if(ctx.state==='running')audioFeedback(true);
+ };
+ // Start a barely audible unlock signal during the originating tap/click.
+ try{
+  const osc=ctx.createOscillator(),quiet=ctx.createGain();
+  quiet.gain.value=.000001;osc.connect(quiet);quiet.connect(ctx.destination);
+  osc.start();osc.stop(ctx.currentTime+.035);
+ }catch(e){console.warn('WebAudio unlock signal:',e);}
+}
+function setupOptionalEffects(){
+ if(!ctx||ctx.state!=='running'||fxReady)return;
+ fxReady=true;
+ try{
+  const conv=ctx.createConvolver(),len=Math.round(ctx.sampleRate*.8),imp=ctx.createBuffer(2,len,ctx.sampleRate);
+  for(let ch=0;ch<2;ch++){const d=imp.getChannelData(ch);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,3.2)*.55;}
+  conv.buffer=imp;const wet=ctx.createGain();wet.gain.value=.095;
+  conv.connect(wet);wet.connect(ctx.destination);reverb=conv;
+ }catch(e){reverb=null;console.warn('Optional reverb:',e);}
+ try{
+  const chorus=ctx.createDelay(.05),wet=ctx.createGain();
+  chorus.delayTime.value=.021;wet.gain.value=state.holdRush?.32:0;
+  master.connect(chorus);chorus.connect(wet);wet.connect(ctx.destination);
+  const lfo=ctx.createOscillator(),depth=ctx.createGain();
+  lfo.frequency.value=.72;depth.gain.value=.005;
+  lfo.connect(depth);depth.connect(chorus.delayTime);lfo.start();chorusWet=wet;
+ }catch(e){chorusWet=null;console.warn('Optional chorus:',e);}
+ try{
+  const delay=ctx.createDelay(2),feedback=ctx.createGain(),wet=ctx.createGain();
+  delay.delayTime.value=Math.min(1.9,60/state.tempo*state.delayBeats);
+  feedback.gain.value=.29;wet.gain.value=state.holdDelay?.32:0;
+  master.connect(delay);delay.connect(feedback);feedback.connect(delay);
+  delay.connect(wet);wet.connect(ctx.destination);delayNode=delay;delayWet=wet;
+ }catch(e){delayWet=null;delayNode=null;console.warn('Optional delay:',e);}
+}
 async function ensureAudio(){
-  try{
-    // Must happen synchronously inside the user gesture on iOS.
-    configureAudioSession();
-    if(!ctx){
-      const Context=window.AudioContext||window.webkitAudioContext;
-      if(!Context){audioFeedback(false,'Dieser Browser unterstützt leider kein Web Audio. Bitte in Safari öffnen.');return false;}
-      ctx=new Context();
-      master=ctx.createGain();master.gain.value=.72;
-      const comp=ctx.createDynamicsCompressor();comp.threshold.value=-18;comp.knee.value=14;comp.ratio.value=3;comp.attack.value=.005;comp.release.value=.24;
-      master.connect(comp);comp.connect(ctx.destination);
-      reverb=ctx.createConvolver();const len=Math.round(ctx.sampleRate*1.25),imp=ctx.createBuffer(2,len,ctx.sampleRate);
-      for(let ch=0;ch<2;ch++){const data=imp.getChannelData(ch);for(let i=0;i<len;i++)data[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.9)*.7;}
-      reverb.buffer=imp;const wet=ctx.createGain();wet.gain.value=.12;reverb.connect(wet);wet.connect(comp);
-      const chorus=ctx.createDelay(.05);chorus.delayTime.value=.021;chorusWet=ctx.createGain();chorusWet.gain.value=0;master.connect(chorus);chorus.connect(chorusWet);chorusWet.connect(comp);
-      const lfo=ctx.createOscillator(),depth=ctx.createGain();lfo.frequency.value=.72;depth.gain.value=.005;lfo.connect(depth);depth.connect(chorus.delayTime);lfo.start();
-      delayNode=ctx.createDelay(2);delayNode.delayTime.value=60/state.tempo*state.delayBeats;const feedback=ctx.createGain();feedback.gain.value=.29;delayWet=ctx.createGain();delayWet.gain.value=0;
-      master.connect(delayNode);delayNode.connect(feedback);feedback.connect(delayNode);delayNode.connect(delayWet);delayWet.connect(comp);
-      ctx.onstatechange=()=>{
-        if(ctx.state==='interrupted'||ctx.state==='suspended'){
-          if(state.play)stopPlayback();
-          audioFeedback(false,'Audio wurde pausiert. Zum Fortsetzen TON AKTIVIEREN tippen.');
-        }else if(ctx.state==='running')audioFeedback(true);
-      };
-    }
-    if(ctx.state!=='running'){
-      const promise=ctx.resume();
-      // In some embedded iOS browsers resume() remains pending. Keep the UI responsive.
-      if(promise&&typeof promise.then==='function')await Promise.race([promise,new Promise(resolve=>setTimeout(resolve,2200))]);
-    }
-    if(ctx.state!=='running'){
-      audioFeedback(false,'iPhone blockiert den Ton. Öffne CHORDON BLEU als Webseite direkt in Safari und tippe PLAY.');
-      return false;
-    }
-    audioFeedback(true);
-    return true;
-  }catch(e){
-    audioFeedback(false,'Ton konnte nicht aktiviert werden. Bitte direkt in Safari öffnen.');
-    if(!audioWarned){console.warn('CHORDON BLEU Audio:',e);audioWarned=true;}
-    return false;
+ try{
+  configureAudioSession();
+  if(!ctx)initializeAudio();
+  const current=ctx;
+  // Resume is initiated in the original user gesture, before the first await.
+  if(current.state!=='running'){
+   const pending=current.resume();
+   if(pending&&typeof pending.then==='function')
+    await Promise.race([pending.catch(()=>{}),new Promise(resolve=>setTimeout(resolve,1200))]);
   }
+  if(current!==ctx||current.state!=='running'){
+   audioFeedback(false,'Safari / Web Audio: '+current.state+'. Tippe TON NEU STARTEN und prüfe deine Audioausgabe.');
+   return false;
+  }
+  setupOptionalEffects();
+  audioFeedback(true);return true;
+ }catch(e){
+  audioFeedback(false,'Audio-Start fehlgeschlagen. Tippe TON NEU STARTEN.');
+  if(!audioWarned){console.warn('CHORDON BLEU Audio:',e);audioWarned=true;}
+  return false;
+ }
 }
 const SOUNDS=[{name:'WARM',wave:'triangle',second:'sine',cut:1250,a:.027,dec:.45,sus:.43,rel:.65,detune:5},{name:'GLASS',wave:'sine',second:'triangle',cut:4000,a:.008,dec:.7,sus:.22,rel:.85,detune:2},{name:'DUSK',wave:'sawtooth',second:'triangle',cut:620,a:.09,dec:.42,sus:.42,rel:1.05,detune:3}];
 function tone(midi,at,dur,vel=.6,bass=false,pluck=false){if(!ctx||!master)return;const sound=SOUNDS[state.sound],freq=440*Math.pow(2,(midi-69)/12),env=ctx.createGain(),filter=ctx.createBiquadFilter();filter.type='lowpass';filter.frequency.setValueAtTime(bass?550:sound.cut,at);filter.Q.value=bass?.55:.45;env.connect(filter);filter.connect(master);if(reverb&&!bass)filter.connect(reverb);
@@ -519,7 +553,7 @@ function renderRecipe(){document.querySelectorAll('[data-recipe]').forEach(b=>{c
 function toast(msg){const box=$('toast');box.textContent=msg;box.classList.add('shown');clearTimeout(toastTimer);toastTimer=setTimeout(()=>box.classList.remove('shown'),2400);}
 function holdButton(id,name){const b=$(id);let held=false;const set=v=>{held=v;state[name]=v;b.classList.toggle('pressed',v);if(ctx){const fx=name==='holdRush'?chorusWet:name==='holdDelay'?delayWet:null;if(fx)fx.gain.setTargetAtTime(v?.35:0,ctx.currentTime,.035);}};b.addEventListener('pointerdown',e=>{if(e.button!==0)return;set(true);b.setPointerCapture(e.pointerId);ensureAudio().then(ok=>{if(!ok||!held)return;set(true);const c=state.steps[state.play&&state.current>=0?state.current:state.selected];playVoicing(c,ctx.currentTime+.012,.72,'hold');});});for(const event of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(event,()=>{if(held)set(false);});b.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){set(true);}});b.addEventListener('keyup',()=>set(false));}
 function setup(){for(let key=0;key<12;key++)for(const mode of ['major','minor']){const opt=document.createElement('option');opt.value=mode+':'+key;opt.textContent=rootName(key)+' '+(mode==='major'?'MAJOR':'MINOR');$('key').appendChild(opt);}let auto=document.createElement('option');auto.value='auto';auto.textContent='AUTO';$('root').appendChild(auto);for(let i=0;i<12;i++){const opt=document.createElement('option');opt.value=String(i);opt.textContent=rootName(i);$('root').appendChild(opt);}auto=document.createElement('option');auto.value='auto';auto.textContent='AUTO';$('quality').appendChild(auto);for(const [id,q] of Object.entries(Q)){const opt=document.createElement('option');opt.value=id;opt.textContent=q.label;$('quality').appendChild(opt);}
-  loadSaved();if(!sessionLoad())startProgression();render();$('play').addEventListener('click',togglePlayback);$('audionudge').addEventListener('click',async()=>{if(await ensureAudio()){toast('Ton aktiviert. ▶');if(!state.play)startPlayback();}});$('mutate').addEventListener('click',()=>{if(harmonicVariation()&&!state.play)startPlayback();});$('recipechoices').addEventListener('click',e=>{const b=e.target.closest('[data-recipe]');if(b)selectRecipe(b.dataset.recipe);});$('keepone').addEventListener('click',()=>setFlipMode('keep'));$('allfour').addEventListener('click',()=>setFlipMode('all'));$('feelchoices').addEventListener('click',e=>{const b=e.target.closest('[data-feel]');if(b)setFeel(b.dataset.feel);});$('slicehits').addEventListener('change',e=>setSlice('hits',e.target.value));$('slicerate').addEventListener('change',e=>setSlice('rate',e.target.value));$('slicegate').addEventListener('input',e=>setSlice('gate',e.target.value));$('cb-delay-time').addEventListener('change',e=>{state.delayBeats=Number(e.target.value);if(delayNode&&ctx)delayNode.delayTime.setTargetAtTime(60/state.tempo*state.delayBeats,ctx.currentTime,.02);sessionSave();});$('arprate').addEventListener('change',e=>setArp('rate',e.target.value));$('arpgate').addEventListener('input',e=>setArp('gate',e.target.value));$('arpdirection').addEventListener('change',e=>setArp('direction',e.target.value));$('arporder').addEventListener('change',e=>setArp('order',e.target.value));$('keep').addEventListener('click',saveIdea);$('undo').addEventListener('click',undo);$('newloop').addEventListener('click',newLoop);$('key').addEventListener('change',e=>changeKey(e.target.value));$('root').addEventListener('change',e=>changeEditor('root',e.target.value));$('quality').addEventListener('change',e=>changeEditor('quality',e.target.value));$('wonder').addEventListener('input',e=>{state.wonder=Number(e.target.value);renderMeta();drawFM1();sessionSave();});$('wonder').addEventListener('change',()=>{if(harmonicVariation()){const i=state.flipMode==='keep'?(state.selected+1)%4:state.selected;if(!state.play)audition(state.steps[i]);}});$('sound').addEventListener('click',setSound);$('tempodown').addEventListener('click',()=>updateTempo(-4));$('tempoup').addEventListener('click',()=>updateTempo(4));$('motion').addEventListener('click',e=>{const b=e.target.closest('[data-motion]');if(b)setMotion(b.dataset.motion);});$('rec').addEventListener('click',recToggle);$('export').addEventListener('click',exportIdeas);$('import').addEventListener('change',e=>{importIdeas(e.target.files?.[0]);e.target.value='';});$('help').addEventListener('click',()=>{$('dialogoverlay').classList.add('open');$('closedialog').focus();});$('closedialog').addEventListener('click',()=>{$('dialogoverlay').classList.remove('open');$('help').focus();});$('dialogoverlay').addEventListener('click',e=>{if(e.target===$('dialogoverlay'))$('dialogoverlay').classList.remove('open');});holdButton('lift','holdLift');holdButton('rush','holdRush');holdButton('cb-delay','holdDelay');
+  loadSaved();if(!sessionLoad())startProgression();render();$('play').addEventListener('click',togglePlayback);$('audionudge').addEventListener('click',async()=>{releaseAudio();if(await ensureAudio()){toast('Audio neu gestartet. ▶');if(!state.play)startPlayback();}});$('mutate').addEventListener('click',()=>{if(harmonicVariation()&&!state.play)startPlayback();});$('recipechoices').addEventListener('click',e=>{const b=e.target.closest('[data-recipe]');if(b)selectRecipe(b.dataset.recipe);});$('keepone').addEventListener('click',()=>setFlipMode('keep'));$('allfour').addEventListener('click',()=>setFlipMode('all'));$('feelchoices').addEventListener('click',e=>{const b=e.target.closest('[data-feel]');if(b)setFeel(b.dataset.feel);});$('slicehits').addEventListener('change',e=>setSlice('hits',e.target.value));$('slicerate').addEventListener('change',e=>setSlice('rate',e.target.value));$('slicegate').addEventListener('input',e=>setSlice('gate',e.target.value));$('cb-delay-time').addEventListener('change',e=>{state.delayBeats=Number(e.target.value);if(delayNode&&ctx)delayNode.delayTime.setTargetAtTime(60/state.tempo*state.delayBeats,ctx.currentTime,.02);sessionSave();});$('arprate').addEventListener('change',e=>setArp('rate',e.target.value));$('arpgate').addEventListener('input',e=>setArp('gate',e.target.value));$('arpdirection').addEventListener('change',e=>setArp('direction',e.target.value));$('arporder').addEventListener('change',e=>setArp('order',e.target.value));$('keep').addEventListener('click',saveIdea);$('undo').addEventListener('click',undo);$('newloop').addEventListener('click',newLoop);$('key').addEventListener('change',e=>changeKey(e.target.value));$('root').addEventListener('change',e=>changeEditor('root',e.target.value));$('quality').addEventListener('change',e=>changeEditor('quality',e.target.value));$('wonder').addEventListener('input',e=>{state.wonder=Number(e.target.value);renderMeta();drawFM1();sessionSave();});$('wonder').addEventListener('change',()=>{if(harmonicVariation()){const i=state.flipMode==='keep'?(state.selected+1)%4:state.selected;if(!state.play)audition(state.steps[i]);}});$('sound').addEventListener('click',setSound);$('tempodown').addEventListener('click',()=>updateTempo(-4));$('tempoup').addEventListener('click',()=>updateTempo(4));$('motion').addEventListener('click',e=>{const b=e.target.closest('[data-motion]');if(b)setMotion(b.dataset.motion);});$('rec').addEventListener('click',recToggle);$('export').addEventListener('click',exportIdeas);$('import').addEventListener('change',e=>{importIdeas(e.target.files?.[0]);e.target.value='';});$('help').addEventListener('click',()=>{$('dialogoverlay').classList.add('open');$('closedialog').focus();});$('closedialog').addEventListener('click',()=>{$('dialogoverlay').classList.remove('open');$('help').focus();});$('dialogoverlay').addEventListener('click',e=>{if(e.target===$('dialogoverlay'))$('dialogoverlay').classList.remove('open');});holdButton('lift','holdLift');holdButton('rush','holdRush');holdButton('cb-delay','holdDelay');
   window.addEventListener('keydown',e=>{if(e.target.matches('input,select,textarea')||e.ctrlKey||e.altKey||e.metaKey)return;if(e.key==='Escape'){$('dialogoverlay').classList.remove('open');return;}const key=e.key.toLowerCase();if(key===' '){e.preventDefault();if(!e.repeat)togglePlayback();}if(key==='w'&&!e.repeat)harmonicVariation();if(key==='k'&&!e.repeat)saveIdea();if(key==='z'&&!e.repeat)undo();if('1234'.includes(key)){state.selected=Number(key)-1;renderStage();renderEditor();audition(state.steps[state.selected]);}const p='asdfghj'.indexOf(key);if(p!==-1&&!e.repeat)padChord(p);});
   document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.play)stopPlayback();});
 }
