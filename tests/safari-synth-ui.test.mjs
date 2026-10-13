@@ -39,7 +39,7 @@ assert.equal(vm.runInContext('master.connections.includes(ctx.destination)',safa
 vm.runInContext('releaseAudio()',safari);
 assert.equal(await vm.runInContext('ensureAudio()',safari),true,'Manual recovery must work');
 class SynthAudio extends SafariAudio{constructor(){super();this.state='running';this.oscillators=[];}createOscillator(){const n=new Node();this.oscillators.push(n);return n;}createBiquadFilter(){return new Node();}}
-const ctx=new SynthAudio(),synth={ctx,master:new Node(),reverb:null,Math,state:{sound:3,holdLift:false}};
+const ctx=new SynthAudio(),synth={ctx,master:new Node(),reverb:null,Math,state:{sound:3,holdLift:false},dx7Patch:null,scheduleDX7Voice(){return false;}};
 vm.createContext(synth);vm.runInContext(programs,synth);
 function voices(index){ctx.oscillators.length=0;synth.state.sound=index;vm.runInContext('tone(69,0,.4,.8,false,false)',synth);return ctx.oscillators.map(x=>x.type);}
 assert.ok(voices(3).filter(x=>x==='sine').length>=3,'DX FM');

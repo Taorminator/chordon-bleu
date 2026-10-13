@@ -204,6 +204,75 @@ body.fm1-mode>.app{display:none}
  .station-heading{margin-bottom:12px}
 }
 
+
+/* 2026-10: layout from the user's pencil sketch, not a visual redesign. */
+.content{
+ display:grid!important;grid-template-columns:minmax(0,1.22fr) minmax(0,.78fr);
+ grid-template-areas:"head head" "chords live" "harmony season" "pick shape" "library library";
+ gap:16px 20px;align-items:start;
+}
+.content>.topbar{grid-area:head!important;order:initial;margin:0 0 1px;align-self:stretch}
+.chord-workspace{grid-area:chords;min-width:0;display:flex;flex-direction:column}
+.chord-workspace>.station-heading{margin:0 0 9px}
+.chord-workspace .stage{min-width:0;margin:0;padding:14px}
+.chord-workspace .step{height:228px;min-width:0}
+.chord-workspace .maincontrols{margin:7px 0 0!important;gap:8px}
+.chord-workspace .bigbtn{min-height:61px}
+.chord-workspace .belowstage{display:flex;justify-content:flex-start;margin:8px 0 0;padding:0}
+.live-workspace{grid-area:live;min-width:0;display:flex;flex-direction:column;gap:13px}
+.tempo-station,.season-station{border:1px solid #354462;background:#141b30;border-radius:13px;padding:16px;min-width:0}
+.tempo-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+.tempo-head output{font-weight:850;font-size:22px;letter-spacing:-.035em;font-variant-numeric:tabular-nums;color:#f7f9ff}
+.tempo-slider{height:10px;width:100%;touch-action:pan-y;background:linear-gradient(90deg,#4657ff,#aab5ff);border-radius:6px}
+.tempo-slider::-webkit-slider-thumb{height:25px;width:25px;background:#fff;border:3px solid #4657ff;box-shadow:0 2px 6px #05091b77}
+.tempo-slider::-moz-range-thumb{height:20px;width:20px;background:#fff;border:3px solid #4657ff;box-shadow:0 2px 6px #05091b77;border-radius:50%}
+.tempo-slider:focus-visible{outline:2px solid #bacaff;outline-offset:7px}
+.tempo-range{display:flex;justify-content:space-between;color:#9daaD3;margin-top:12px;font:650 10px ui-monospace,monospace}
+.live-workspace .performance-station{margin:0!important;min-width:0;padding:15px}
+.live-workspace .performance-station .station-heading{margin-bottom:10px}
+.live-workspace .performance-station .sound-picker{margin-bottom:14px}
+.live-workspace .performance-station .motionbuttons button{flex:1;min-width:0}
+.harmony-station{grid-area:harmony;margin:0!important;min-width:0;padding:16px}
+.season-station{grid-area:season;margin:0!important;padding:16px;align-self:stretch}
+.season-station>.sectiontop{margin:0 0 10px}
+.season-station .punchrow{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+.season-station .punch{flex:1 1 90px;min-width:0;min-height:66px}
+.season-station .sectionnote{margin:0 0 12px}
+.content>.playpanel{grid-area:pick;margin:0!important;padding:15px;min-width:0}
+.content>.editor{grid-area:shape;margin:0!important;min-width:0;padding:15px}
+.content>.favorites-station{grid-area:library;margin:0!important;padding:17px 15px;min-width:0}
+.favorites-station>.sectiontop{margin:0 0 13px!important}
+@media(max-width:820px){
+ .content{display:grid!important;grid-template-columns:1fr;
+  grid-template-areas:"head" "chords" "live" "harmony" "season" "pick" "shape" "library";gap:13px}
+ .chord-workspace .step{height:clamp(190px,36vw,250px)}
+ .live-workspace{gap:10px}
+ .live-workspace .performance-station{margin:0}
+ .season-station .punch{min-height:56px}
+}
+@media(min-width:650px) and (max-width:820px){
+ .live-workspace{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);align-items:start}
+ .live-workspace .performance-station{min-width:0}
+}
+@media(max-width:420px){
+ .chord-workspace .stage{padding:10px}
+ .chord-workspace .step{height:195px}
+ .chord-workspace .maincontrols{gap:6px;margin-top:6px!important}
+ .tempo-station,.season-station,.harmony-station{padding:13px}
+ .tempo-head output{font-size:19px}
+ .season-station .punch{flex:1 1 75px;font-size:11px}
+}
+
+
+.dx7-original{display:flex;flex-direction:column;align-items:flex-start;gap:9px;
+ border-top:1px solid #435170;margin-top:8px;padding-top:14px}
+.dx7-original[hidden]{display:none!important}
+.dx7-import-btn{cursor:pointer;display:flex;align-items:center;justify-content:center;min-height:44px;
+ padding:9px 12px;font:750 11px ui-monospace,monospace;color:#f8faff;
+ border:1px solid #8495d5;background:#354985;border-radius:8px}
+.dx7-import-btn:hover{background:#475da0}
+.dx7-patch-source{font-size:11px;font-weight:650;color:#c0ccff;text-decoration:underline;text-underline-offset:3px}
+
 </style>
 </head>
 <body>
@@ -238,6 +307,37 @@ body.fm1-mode>.app{display:none}
 <header class="mast"><div><div class="brand">CHORDON<span class="brandblue"> BLEU</span><span class="branddot">.</span></div><p class="tagline">COOK UP SOMETHING BEAUTIFUL.</p><p class="manufacturer">BY MIDDLE AGE ENGINEERING</p></div><div class="headright"><a class="fm1-open-link" href="?view=fm1" style="color:#4657ff;font-size:11px;font-weight:800;text-decoration:underline">FM1 DEVICE VIEW ↗</a><span class="micro">PLAY<br>FLIP<br>SAVE</span><button class="helpbutton" id="help" aria-label="So funktioniert CHORDON BLEU" title="Hilfe">?</button></div></header>
 <main class="content" id="main">
 <div class="topbar"><span class="micro">01 — YOUR LITTLE LOOP</span><div class="topright"><label class="visuallyhidden" for="key">Tonart</label><select class="pillselect" id="key" aria-label="Tonart wählen"></select></div></div>
+
+<section class="chord-workspace" aria-label="CHORDS und Transport">
+ <div class="station-heading"><span class="micro">CHORDS</span><span class="station-sub">Your little loop · 4 chords</span></div>
+ <div class="stage" aria-label="Vier Akkorde deiner Progression"><div class="stage-top"><span><span class="led" id="led"></span> <span id="runlabel">READY TO PLAY</span></span><span class="right"><span id="stagebpm">92 BPM</span><span>01 — 04</span></span></div><div class="stages" id="steps"></div><div class="stagefooter"><span id="status" aria-live="polite">TIPP: DRÜCK PLAY.</span><span class="thermal-label">◉ <span id="heatname">COZY</span></span><span id="loopindicator">LOOP / 001</span></div><div id="audiohealth" class="audiohealth" role="status" aria-live="polite" hidden><span id="audionote">Ton ist noch nicht aktiv.</span><button id="audionudge" type="button" aria-label="Audiokontext neu starten">TON NEU STARTEN ↻</button></div></div>
+
+ <div class="maincontrols"><button id="play" class="bigbtn primary" aria-label="Loop abspielen"><b aria-hidden="true">▶</b><span>PLAY</span></button><button id="mutate" class="bigbtn surprise" aria-label="Neue passende Akkordvariante erzeugen"><b aria-hidden="true"><svg width="23" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h3c5 0 7 12 12 12h3"/><path d="m18 15 3 3-3 3"/><path d="M3 18h3c5 0 7-12 12-12h3"/><path d="m18 3 3 3-3 3"/></svg></b><span>FLIP</span><small>NEW IDEA</small></button><button id="keep" class="bigbtn keep" aria-label="Aktuellen Loop speichern"><b aria-hidden="true">↓</b><span>SAVE</span></button></div>
+
+ <div class="belowstage"><span class="micro" id="selection">CHORD 01 SELECTED</span></div>
+</section>
+<aside class="live-workspace" aria-label="Tempo und Spielweise">
+ <div class="tempo-station" aria-label="Tempo einstellen">
+ <div class="tempo-head"><label for="tempoSlider" class="micro">TEMPO / BPM</label><output for="tempoSlider" id="tempotext">92 BPM</output></div>
+ <input type="range" id="tempoSlider" class="range tempo-slider" min="48" max="160" step="1" value="92" aria-label="Loop-Tempo in BPM">
+ <div class="tempo-range"><span>48 / SLOW</span><span>160 / FAST</span></div>
+</div>
+ <section class="performance-station" aria-label="Instrument und Spielweise">
+ <div class="station-heading"><span class="micro">PERFORM / HOW IT SOUNDS</span><span class="station-sub">Instrument und Rhythmus</span></div>
+ <div class="sound-picker"><label class="micro" for="sound">INSTRUMENT / KLANG</label><select id="sound" class="soundbutton" aria-label="Instrument wählen"></select><button id="audioreset" type="button" class="audio-reset" title="Wenn Safari stumm bleibt, Audio neu initialisieren">↻ TON NEU STARTEN</button><span class="sound-help">Sechs Klangprogramme · das originale DX7-Preset ist per SysEx ladbar</span>
+ <div class="dx7-original" id="dx7-original" hidden>
+  <label class="dx7-import-btn" for="dx7file">↓ ORIGINAL E.PIANO 1 LADEN (.SYX)</label>
+  <input type="file" id="dx7file" accept=".syx,.SYX,application/octet-stream" hidden>
+  <span class="sound-help" id="dx7status" role="status">DX7 EP ist zunächst ein Preview. Lade deine ROM1A-Bank für den originalen 6-Operator-Patch.</span>
+  <a href="https://yamahablackboxes.com/collection/yamaha-dx7-synthesizer/patches/" target="_blank" rel="noopener noreferrer" class="dx7-patch-source">Yamaha DX7 ROM1A · Preset 11 E.PIANO 1 ↗</a>
+ </div></div>
+ <div class="minitools"><div><span class="micro" style="display:block;margin-bottom:7px">MOTION / BEWEGUNG</span><div class="motionbuttons" id="motion" role="group" aria-label="Akkorde rhythmisch spielen"><button data-motion="hold" class="active">HOLD</button><button data-motion="pulse">PULSE</button><button data-motion="arp">ARP</button></div></div></div>
+<div class="arpdeck" id="slicedeck" hidden aria-label="Pulse: Akkord rhythmisch wiederholen"><div class="arphead"><span class="micro">PULSE / CHORD REPEATS</span><span class="micro">REPEAT THE WHOLE CHORD</span></div><div class="arpgrid"><label class="arpcell"><span>HITS</span><select id="slicehits"><option value="2">2×</option><option value="4">4×</option><option value="8">8×</option></select></label><label class="arpcell"><span>SPEED</span><select id="slicerate"><option value="4">1/4</option><option value="8">1/8</option><option value="16">1/16</option><option value="32">1/32</option></select></label><label class="arpcell"><span>GATE <output id="slicegatevalue">40%</output></span><input id="slicegate" type="range" min="10" max="95" step="5" value="40"></label><span class="arpcell"><span>RHYTHM</span><span style="color:#c8d3f3;font-size:12px">Tempo-synced</span></span></div></div>
+<div class="arpdeck" id="arpdeck" hidden aria-label="Vier Regler für den Arpeggiator"><div class="arphead"><span class="micro">ARP / FOUR KNOBS</span><span class="micro">FM1 · K1—K4</span></div><div class="arpgrid"><label class="arpcell"><span>K1 · SPEED</span><select id="arprate"><option value="4">1/4</option><option value="8">1/8</option><option value="16">1/16</option><option value="32">1/32</option></select></label><label class="arpcell"><span>K2 · GATE <output id="gatevalue">62%</output></span><input id="arpgate" type="range" min="15" max="100" step="5" value="62"></label><label class="arpcell"><span>K3 · DIR</span><select id="arpdirection"><option value="up">↑ UP</option><option value="down">↓ DOWN</option><option value="updown">↕ UP/DOWN</option><option value="random">⤨ RANDOM</option></select></label><label class="arpcell"><span>K4 · ORDER</span><select id="arporder"><option value="pitch">PITCH</option><option value="root">ROOT 1ST</option><option value="outside">OUT / IN</option><option value="fifth">FIFTH 1ST</option></select></label></div></div>
+
+</section>
+
+</aside>
 <section class="harmony-station" aria-label="Akkordgenerator: Rezepte, Spice, Feel und Flip">
  <div class="station-heading"><span class="micro">HARMONY / YOUR INGREDIENTS</span><span class="station-sub">Akkorde formen und variieren</span></div>
  <div class="recipe-strip" aria-label="Musikalische Recipes"><span class="micro">RECIPES</span><div id="recipechoices" class="recipechoices" role="group" aria-label="Musikalische Klangwelt wählen"><button data-recipe="classic" class="recipe-chip active" type="button" aria-pressed="true">CLASSIC</button><button data-recipe="ghibli-dream" class="recipe-chip" type="button" aria-pressed="false">✦ GHIBLI DREAM</button><button data-recipe="blue-hour" class="recipe-chip" type="button" aria-pressed="false">MANHATTAN</button><button data-recipe="moonlit-kingdom" class="recipe-chip" type="button" aria-pressed="false">TOKYO</button><button data-recipe="dust-and-echoes" class="recipe-chip" type="button" aria-pressed="false">CAPRESE</button></div></div>
@@ -247,20 +347,16 @@ body.fm1-mode>.app{display:none}
 
  <div class="quickactions"><button id="newloop" class="undo" aria-label="Neue Akkordfolge vorschlagen und direkt abspielen" title="Neue Akkordfolge">✳ NEW</button><button id="undo" class="undo" aria-label="Letzte Änderung rückgängig machen" disabled>↶ UNDO</button></div>
 </section>
-<div class="stage" aria-label="Vier Akkorde deiner Progression"><div class="stage-top"><span><span class="led" id="led"></span> <span id="runlabel">READY TO PLAY</span></span><span class="right"><span id="stagebpm">92 BPM</span><span>01 — 04</span></span></div><div class="stages" id="steps"></div><div class="stagefooter"><span id="status" aria-live="polite">TIPP: DRÜCK PLAY.</span><span class="thermal-label">◉ <span id="heatname">COZY</span></span><span id="loopindicator">LOOP / 001</span></div><div id="audiohealth" class="audiohealth" role="status" aria-live="polite" hidden><span id="audionote">Ton ist noch nicht aktiv.</span><button id="audionudge" type="button" aria-label="Audiokontext neu starten">TON NEU STARTEN ↻</button></div></div>
-<div class="maincontrols"><button id="play" class="bigbtn primary" aria-label="Loop abspielen"><b aria-hidden="true">▶</b><span>PLAY</span></button><button id="mutate" class="bigbtn surprise" aria-label="Neue passende Akkordvariante erzeugen"><b aria-hidden="true"><svg width="23" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h3c5 0 7 12 12 12h3"/><path d="m18 15 3 3-3 3"/><path d="M3 18h3c5 0 7-12 12-12h3"/><path d="m18 3 3 3-3 3"/></svg></b><span>FLIP</span><small>NEW IDEA</small></button><button id="keep" class="bigbtn keep" aria-label="Aktuellen Loop speichern"><b aria-hidden="true">↓</b><span>SAVE</span></button></div>
-<section class="performance-station" aria-label="Instrument und Spielweise">
- <div class="station-heading"><span class="micro">PERFORM / HOW IT SOUNDS</span><span class="station-sub">Instrument und Rhythmus</span></div>
- <div class="sound-picker"><label class="micro" for="sound">INSTRUMENT / KLANG</label><select id="sound" class="soundbutton" aria-label="Instrument wählen"></select><button id="audioreset" type="button" class="audio-reset" title="Wenn Safari stumm bleibt, Audio neu initialisieren">↻ TON NEU STARTEN</button><span class="sound-help">Sechs eigenständige Synth-Klänge · keine Samples</span></div>
- <div class="minitools"><div><span class="micro" style="display:block;margin-bottom:7px">MOTION / BEWEGUNG</span><div class="motionbuttons" id="motion" role="group" aria-label="Akkorde rhythmisch spielen"><button data-motion="hold" class="active">HOLD</button><button data-motion="pulse">PULSE</button><button data-motion="arp">ARP</button></div></div></div>
-<div class="arpdeck" id="slicedeck" hidden aria-label="Pulse: Akkord rhythmisch wiederholen"><div class="arphead"><span class="micro">PULSE / CHORD REPEATS</span><span class="micro">REPEAT THE WHOLE CHORD</span></div><div class="arpgrid"><label class="arpcell"><span>HITS</span><select id="slicehits"><option value="2">2×</option><option value="4">4×</option><option value="8">8×</option></select></label><label class="arpcell"><span>SPEED</span><select id="slicerate"><option value="4">1/4</option><option value="8">1/8</option><option value="16">1/16</option><option value="32">1/32</option></select></label><label class="arpcell"><span>GATE <output id="slicegatevalue">40%</output></span><input id="slicegate" type="range" min="10" max="95" step="5" value="40"></label><span class="arpcell"><span>RHYTHM</span><span style="color:#c8d3f3;font-size:12px">Tempo-synced</span></span></div></div>
-<div class="arpdeck" id="arpdeck" hidden aria-label="Vier Regler für den Arpeggiator"><div class="arphead"><span class="micro">ARP / FOUR KNOBS</span><span class="micro">FM1 · K1—K4</span></div><div class="arpgrid"><label class="arpcell"><span>K1 · SPEED</span><select id="arprate"><option value="4">1/4</option><option value="8">1/8</option><option value="16">1/16</option><option value="32">1/32</option></select></label><label class="arpcell"><span>K2 · GATE <output id="gatevalue">62%</output></span><input id="arpgate" type="range" min="15" max="100" step="5" value="62"></label><label class="arpcell"><span>K3 · DIR</span><select id="arpdirection"><option value="up">↑ UP</option><option value="down">↓ DOWN</option><option value="updown">↕ UP/DOWN</option><option value="random">⤨ RANDOM</option></select></label><label class="arpcell"><span>K4 · ORDER</span><select id="arporder"><option value="pitch">PITCH</option><option value="root">ROOT 1ST</option><option value="outside">OUT / IN</option><option value="fifth">FIFTH 1ST</option></select></label></div></div>
 
+<section class="section season-station" aria-labelledby="functitle"><div class="sectiontop"><h2 id="functitle">SEASON</h2><span class="micro">PUNCH IN</span></div><p class="sectionnote">Gedrückt halten – der Loop verändert sich.</p><div class="punchrow"><button class="punch" id="lift" aria-label="MELT: Weiche lange überlappende Akkorde, solange gedrückt">〰 MELT</button><button class="punch" id="rush" aria-label="CHORUS: Schwebender Doppelklang, solange gedrückt">◎ CHORUS</button><button class="punch" id="cb-delay" aria-label="DELAY: Rhythmisches Echo, solange gedrückt">↝ DELAY</button></div><div class="micro" style="margin-top:7px">PUNCH gedrückt halten · <label for="cb-delay-time">DELAY TIME</label> <select id="cb-delay-time" style="max-width:135px;padding:4px;border-radius:5px"><option value="0.25">1/16</option><option value="0.5">1/8</option><option value="0.75" selected>1/8 DOT</option><option value="1">1/4</option></select></div>
 </section>
-<div class="belowstage"><span class="micro" id="selection">CHORD 01 SELECTED</span><div class="tempo"><button id="tempodown" aria-label="Tempo um 4 BPM langsamer">−</button><span id="tempotext">92 BPM</span><button id="tempoup" aria-label="Tempo um 4 BPM schneller">+</button></div></div>
 <section class="section playpanel" aria-labelledby="padtitle"><div class="sectiontop"><h2 id="padtitle">Pick a chord.</h2><span class="micro">JUST TAP</span></div><p class="sectionnote">Antippen: hören. REC: vier Akkorde zum Loop machen.</p><div class="padrow" id="pads"></div><div class="recordbar"><button class="recbtn" id="rec">● REC 4 CHORDS</button><span class="recordhint" id="rechint">Vier Akkorde tippen → dein neuer Loop spielt automatisch.</span></div></section>
+
 <div class="editor" aria-labelledby="editheading"><div class="editorhead"><strong id="editheading">Shape this chord.</strong><span class="editorhint" id="editcount">01 / 04</span></div><div class="editgrid"><div class="edititem"><label for="root">ROOT / GRUNDTON</label><select id="root" aria-label="Grundton für ausgewählten Akkord"></select></div><div class="edititem"><label for="quality">TYPE / AKKORDFORM</label><select id="quality" aria-label="Akkordform für ausgewählten Akkord"></select></div></div><div class="editfoot" id="edithint">AUTO bedeutet: CHORDON BLEU darf entscheiden. Ein fester Wert bleibt bei KEEP 1 erhalten. ALL 4 setzt Fixierungen zurück.</div></div>
-<section class="section extrapanel" aria-labelledby="functitle"><div class="sectiontop"><h2 id="functitle">Season your loop.</h2><span class="micro">PUNCH IN</span></div><p class="sectionnote">Gedrückt halten – der Loop verändert sich.</p><div class="punchrow"><button class="punch" id="lift" aria-label="MELT: Weiche lange überlappende Akkorde, solange gedrückt">〰 MELT</button><button class="punch" id="rush" aria-label="CHORUS: Schwebender Doppelklang, solange gedrückt">◎ CHORUS</button><button class="punch" id="cb-delay" aria-label="DELAY: Rhythmisches Echo, solange gedrückt">↝ DELAY</button></div><div class="micro" style="margin-top:7px">PUNCH gedrückt halten · <label for="cb-delay-time">DELAY TIME</label> <select id="cb-delay-time" style="max-width:135px;padding:4px;border-radius:5px"><option value="0.25">1/16</option><option value="0.5">1/8</option><option value="0.75" selected>1/8 DOT</option><option value="1">1/4</option></select></div><div class="sectiontop" style="margin-top:22px"><h2>Your saved loops.</h2><span class="micro">FAVORITES</span></div><div class="saved" id="saved"><span class="empty">Hier landen deine Lieblingsloops.</span></div><div class="saveactions"><button class="subtlelink" id="export">↓ Ideen exportieren</button><label class="subtlelink" style="cursor:pointer" for="import">↑ Importieren</label><input id="import" type="file" accept="application/json,.json" hidden></div></section>
+
+<section class="section favorites-station" aria-label="Gespeicherte Loops">
+<div class="sectiontop" style="margin-top:22px"><h2>Your saved loops.</h2><span class="micro">FAVORITES</span></div><div class="saved" id="saved"><span class="empty">Hier landen deine Lieblingsloops.</span></div><div class="saveactions"><button class="subtlelink" id="export">↓ Ideen exportieren</button><label class="subtlelink" style="cursor:pointer" for="import">↑ Importieren</label><input id="import" type="file" accept="application/json,.json" hidden></div>
+</section>
 </main>
 
 <section class="fm1-lab" id="fm1-lab" aria-label="FM1 Display Lab">
@@ -467,6 +563,7 @@ function audioFeedback(ok,message=''){
 let fxReady=false;
 function releaseAudio(){
  if(state.play)stopPlayback();
+ resetDX7Engine();
  const previous=ctx;
  ctx=null;master=null;reverb=null;chorusWet=null;delayWet=null;delayNode=null;fxReady=false;
  if(previous&&previous.state!=='closed')try{const p=previous.close();if(p?.catch)p.catch(()=>{});}catch(_){}
@@ -532,6 +629,7 @@ async function ensureAudio(){
    return false;
   }
   setupOptionalEffects();
+  if(dx7Patch&&state.sound===3&&!dx7Node)void ensureDX7Engine();
   audioFeedback(true);return true;
  }catch(e){
   audioFeedback(false,'Audio-Start fehlgeschlagen. Tippe TON NEU STARTEN.');
@@ -539,21 +637,95 @@ async function ensureAudio(){
   return false;
  }
 }
+// Optional six-operator DX7 backend: MIT OpenDX7 engine; Yamaha ROM data is NOT bundled.
+// Works only after the user imports their own standard DX7 32-voice .SYX bank.
+let dx7Patch=null,dx7Node=null,dx7Loading=null;
+const dx7Timers=new Set();
+const DX7_STORE_KEY='chordon-bleu.user-dx7-ep1.v1';
+function clearDX7Notes(){
+ for(const id of dx7Timers)clearTimeout(id);dx7Timers.clear();
+ if(dx7Node)try{dx7Node.port.postMessage({type:'panic'});}catch(_){}
+}
+function resetDX7Engine(){
+ clearDX7Notes();dx7Node=null;dx7Loading=null;
+}
+function restoreDX7Patch(){
+ try{
+  const p=JSON.parse(localStorage.getItem(DX7_STORE_KEY)||'null');
+  if(p&&Array.isArray(p.ops)&&p.ops.length===6&&p.algorithm===4&&p.name)dx7Patch=p;
+ }catch(_){}
+}
+async function importDX7Bank(bytes){
+ if(!(bytes instanceof Uint8Array)||bytes.length!==4104||bytes[0]!==0xf0||bytes[1]!==0x43||bytes[3]!==0x09||bytes[4]!==0x20||bytes[5]!==0||bytes[4103]!==0xf7)
+  throw Error('Bitte eine vollständige Yamaha DX7 32-Voice Bank (.syx, 4104 Bytes) wählen.');
+ let checksum=0;for(let i=6;i<=4102;i++)checksum+=bytes[i];
+ if(checksum&127)throw Error('DX7-Bank hat eine ungültige Prüfsumme.');
+ const {parseSyxBank}=await import('./vendor/opendx7/dx7-patch.js');
+ const patches=parseSyxBank(bytes);
+ const normalize=p=>String(p.name||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+ // ROM1A slot 11 is E.PIANO 1. The FM1 stock PIANO 1 is byte-identical to it.
+ const patch=patches.find(p=>normalize(p)==='EPIANO1'&&p.algorithm===4)
+   ||(normalize(patches[0]||{})==='PIANO1'&&patches[0].algorithm===4?patches[0]:null);
+ if(!patch)throw Error('Keine originale E.PIANO 1 (Algorithmus 5) gefunden. Verwende ROM1A oder die FM1-Werksbank 1.');
+ dx7Patch=patch;
+ resetDX7Engine();
+ try{localStorage.setItem(DX7_STORE_KEY,JSON.stringify(dx7Patch));}catch(_){}
+ if(ctx&&ctx.state==='running')await ensureDX7Engine();
+ renderMeta();
+ return patch;
+}
+async function ensureDX7Engine(){
+ if(!dx7Patch||!ctx||ctx.state!=='running')return false;
+ if(dx7Node)return true;
+ if(dx7Loading)return dx7Loading;
+ const activeCtx=ctx;
+ if(!activeCtx.audioWorklet||!window.AudioWorkletNode)return false; // Keep the preview voice audible.
+ dx7Loading=(async()=>{
+  try{
+   await activeCtx.audioWorklet.addModule('./vendor/opendx7/dx7-processor.js');
+   if(activeCtx!==ctx||!dx7Patch)return false;
+   const node=new window.AudioWorkletNode(activeCtx,'dx7-processor',{outputChannelCount:[2]});
+   node.connect(master);node.port.postMessage({type:'patch',patch:dx7Patch});
+   dx7Node=node;
+   if($('dx7status'))$('dx7status').textContent='ORIGINAL E.PIANO 1 · 6 Operatoren aktiv';
+   return true;
+  }catch(e){
+   console.warn('CHORDON BLEU: DX7-Worklet nicht verfügbar, Preview-FM bleibt aktiv.',e);
+   if($('dx7status'))$('dx7status').textContent='Bank geladen, aber FM-Worklet nicht verfügbar. DX7-Preview bleibt aktiv.';
+   return false;
+  }
+ })();
+ try{return await dx7Loading;}finally{dx7Loading=null;}
+}
+function scheduleDX7Voice(midi,time,duration,velocity){
+ if(!dx7Node||!ctx)return false;
+ const node=dx7Node,note=clamp(Math.round(midi),0,127),vel=clamp(Math.round(velocity*112),1,127),now=ctx.currentTime;
+ function queue(at,message){
+  const ms=Math.max(0,(at-now)*1000);
+  if(ms<5){node.port.postMessage(message);return;}
+  const id=setTimeout(()=>{dx7Timers.delete(id);if(node===dx7Node)node.port.postMessage(message);},ms);
+  dx7Timers.add(id);
+ }
+ queue(time,{type:'noteOn',note,velocity:vel});
+ queue(time+Math.max(.06,duration),{type:'noteOff',note});
+ return true;
+}
 const SOUNDS=[
  {name:'WARM',kind:'classic',wave:'triangle',second:'sine',cut:1250,a:.027,dec:.45,sus:.43,rel:.65,detune:5},
  {name:'GLASS',kind:'classic',wave:'sine',second:'triangle',cut:4000,a:.008,dec:.7,sus:.22,rel:.85,detune:2},
  {name:'DUSK',kind:'classic',wave:'sawtooth',second:'triangle',cut:620,a:.09,dec:.42,sus:.42,rel:1.05,detune:3},
  {name:'DX7 EP',kind:'fm',wave:'sine',second:'sine',cut:4900,a:.006,dec:.42,sus:.26,rel:.95,detune:0},
- {name:'GRAND',kind:'grand',wave:'sine',second:'triangle',cut:5500,a:.003,dec:.58,sus:.32,rel:1.0,detune:2},
+ {name:'GRAND',kind:'grand',wave:'sine',second:'triangle',cut:10200,a:.002,dec:.35,sus:.32,rel:1.0,detune:2},
  {name:'90s HOUSE',kind:'house',wave:'sawtooth',second:'triangle',cut:4400,a:.002,dec:.19,sus:.30,rel:.30,detune:4}
 ];
 // All six programs use the same self-contained oscillator engine; no external samples.
 function tone(midi,at,dur,vel=.6,bass=false,pluck=false){
  if(!ctx||!master)return;
+ if(!bass&&state.sound===3&&dx7Patch&&scheduleDX7Voice(midi,at,dur,vel))return;
  const sound=SOUNDS[state.sound]||SOUNDS[0],kind=bass?'classic':sound.kind,
        freq=440*Math.pow(2,(midi-69)/12),env=ctx.createGain(),filter=ctx.createBiquadFilter(),
        melt=state.holdLift&&!bass&&!pluck;
- filter.type='lowpass';filter.frequency.setValueAtTime(bass?550:sound.cut,at);
+ filter.type='lowpass';filter.frequency.setValueAtTime(bass?550:Math.min(ctx.sampleRate*.44,sound.cut*(kind==='grand'?.79+vel*.35:1)),at);
  filter.Q.value=bass?.55:.45;
  env.connect(filter);filter.connect(master);
  if(reverb&&!bass)filter.connect(reverb);
@@ -587,9 +759,11 @@ function tone(midi,at,dur,vel=.6,bass=false,pluck=false){
   voice('sine',freq*2,.16,3);
  }else if(kind==='grand'){
   // Acoustic-style partials with mild inharmonicity and a short hammer transient.
-  voice('sine',freq,.9);
-  voice('triangle',freq*2.005,.31);
-  voice('sine',freq*3.012,.13);
+  voice('sine',freq,.85);
+  voice('triangle',freq*2.005,.30);
+  voice('sine',freq*3.012,.16);
+  voice('sine',freq*4.026,.10);
+  voice('triangle',freq*5.065,.045);
  }else if(kind==='house'){
   // Bright transient, brassy chord stabs: original synth approximation of a 90s piano.
   voice('sawtooth',freq,.66);
@@ -604,7 +778,7 @@ function tone(midi,at,dur,vel=.6,bass=false,pluck=false){
   hammer.type='triangle';
   hammer.frequency.setValueAtTime(freq*4.5,at);
   hammer.frequency.exponentialRampToValueAtTime(freq*2.3,at+.022);
-  snap.gain.setValueAtTime(.020*vel,at);
+  snap.gain.setValueAtTime((kind==='grand'?.034:.020)*vel,at);
   snap.gain.exponentialRampToValueAtTime(.0001,at+.035);
   hammer.connect(snap);snap.connect(filter);hammer.start(at);hammer.stop(at+.042);
  }
@@ -634,11 +808,12 @@ async function audition(c){if(await ensureAudio())playVoicing(c,ctx.currentTime+
 function releaseVisualTimers(){for(const id of visTimers)clearTimeout(id);visTimers=[];}
 function tick(){if(!ctx)return;const beat=60/state.tempo,interval=beat*2;while(nextTime<ctx.currentTime+.115){const i=nextStep;let time=nextTime,notes=state.steps[i];if(notes)playVoicing(notes,time,interval*.91,state.motion,voicesForLoop()[i]);const scheduledIndex=i;const delay=Math.max(0,(time-ctx.currentTime)*1000);const tid=setTimeout(()=>{if(!state.play)return;state.current=scheduledIndex;if(scheduledIndex===0&&state.loopCount>0)state.loopCount++;renderStage();drawFM1();},delay);visTimers.push(tid);if(visTimers.length>25)visTimers.splice(0,15);nextStep=(nextStep+1)%4;nextTime+=interval;}}
 async function startPlayback(){const token=++playLaunchToken;$('play').classList.add('starting');const ready=await ensureAudio();if(token!==playLaunchToken)return;$('play').classList.remove('starting');if(!ready)return;clearInterval(scheduler);releaseVisualTimers();state.play=true;state.current=-1;state.loopCount=0;nextStep=0;nextTime=ctx.currentTime+.085;tick();scheduler=setInterval(tick,25);render();}
-function stopPlayback(){++playLaunchToken;$('play').classList.remove('starting');state.play=false;clearInterval(scheduler);scheduler=null;releaseVisualTimers();state.current=-1;render();}
+function stopPlayback(){clearDX7Notes();++playLaunchToken;$('play').classList.remove('starting');state.play=false;clearInterval(scheduler);scheduler=null;releaseVisualTimers();state.current=-1;render();}
 function togglePlayback(){if(state.play||$('play').classList.contains('starting'))stopPlayback();else startPlayback();}
-function updateTempo(delta){state.tempo=clamp(state.tempo+delta,48,160);if(delayNode&&ctx)delayNode.delayTime.setTargetAtTime(60/state.tempo*state.delayBeats,ctx.currentTime,.025);renderMeta();sessionSave();}
+function setTempo(value){const next=clamp(Math.round(Number(value)),48,160);if(!Number.isFinite(next)||next===state.tempo)return;state.tempo=next;if(delayNode&&ctx)delayNode.delayTime.setTargetAtTime(60/state.tempo*state.delayBeats,ctx.currentTime,.025);renderMeta();sessionSave();}
+function updateTempo(delta){setTempo(state.tempo+delta);}
 function changeKey(value){const [m,k]=value.split(':');if(m===state.mode&&Number(k)===state.key)return;pushUndo();state.mode=m;state.key=Number(k);const was=state.play;if(was)stopPlayback();startProgression();render();if(was)startPlayback();toast('Neue Tonart. Neue Möglichkeiten.');}
-function setSound(value){const next=value===undefined?(state.sound+1)%SOUNDS.length:Number(value);if(!Number.isInteger(next)||next<0||next>=SOUNDS.length)return;state.sound=next;renderMeta();sessionSave();if(!state.play)audition(state.steps[state.selected]);}
+function setSound(value){const next=value===undefined?(state.sound+1)%SOUNDS.length:Number(value);if(!Number.isInteger(next)||next<0||next>=SOUNDS.length)return;if(state.sound===3&&next!==3)clearDX7Notes();state.sound=next;renderMeta();sessionSave();if(next===3&&dx7Patch&&ctx?.state==='running')void ensureDX7Engine();if(!state.play)audition(state.steps[state.selected]);}
 function setMotion(m){if(!['hold','pulse','arp','slice'].includes(m))return;state.motion=m==='slice'?'pulse':m;renderMeta();sessionSave();if(!state.play)audition(state.steps[state.selected]);}
 function setFeel(feel){if(!FEELS.includes(feel)||feel===state.feel)return;state.feel=feel;renderMeta();sessionSave();drawFM1();toast('FEEL: '+feel.toUpperCase()+' · FLIP für neue Vorschläge.');}
 function setFlipMode(mode){if(!['keep','all'].includes(mode))return;state.flipMode=mode;renderMeta();sessionSave();}
@@ -672,7 +847,7 @@ function renderEditor(){const c=state.steps[state.selected];$('editcount').textC
   $('edithint').textContent=r&&t?'Beide Werte sind fixiert. FLIP verändert die anderen Akkorde.':r?'Root bleibt fest, Akkordform darf sich ändern.':t?'Akkordform bleibt fest, Root darf sich ändern.':'Beides auf AUTO: CHORDON BLEU darf diesen Akkord verändern.';
 }
 function renderMeta(){renderRecipe();$('play').innerHTML=state.play?'<b aria-hidden="true">Ⅱ</b><span>PAUSE</span>':'<b aria-hidden="true">▶</b><span>PLAY</span>';$('play').setAttribute('aria-label',state.play?'Loop pausieren':'Loop abspielen');
- $('wonderval').textContent=state.wonder;$('wonderlevel').textContent=state.wonder<22?'MILD':state.wonder<57?'MEDIUM':state.wonder<81?'SPICY':'EXTRA HOT';$('wonder').value=state.wonder;$('tempotext').textContent=state.tempo+' BPM';$('stagebpm').textContent=state.tempo+' BPM';$('sound').value=String(state.sound);$('key').value=state.mode+':'+state.key;
+ $('wonderval').textContent=state.wonder;$('wonderlevel').textContent=state.wonder<22?'MILD':state.wonder<57?'MEDIUM':state.wonder<81?'SPICY':'EXTRA HOT';$('wonder').value=state.wonder;$('tempotext').textContent=state.tempo+' BPM';$('tempoSlider').value=String(state.tempo);$('tempoSlider').setAttribute('aria-valuetext',state.tempo+' beats per minute');$('stagebpm').textContent=state.tempo+' BPM';$('sound').value=String(state.sound);$('dx7-original').hidden=state.sound!==3;$('sound').options[3].textContent=dx7Patch?'DX7 E.PIANO 1 · ROM1A':'DX7 EP · PREVIEW';if(dx7Patch&&dx7Node)$('dx7status').textContent='ORIGINAL E.PIANO 1 · 6 Operatoren aktiv';$('key').value=state.mode+':'+state.key;
  document.querySelectorAll('[data-motion]').forEach(b=>{b.classList.toggle('active',b.dataset.motion===state.motion);b.setAttribute('aria-pressed',String(b.dataset.motion===state.motion));});$('undo').disabled=!state.undo.length;
  $('keepone').classList.toggle('active',state.flipMode==='keep');$('allfour').classList.toggle('active',state.flipMode==='all');$('keepone').setAttribute('aria-pressed',String(state.flipMode==='keep'));$('allfour').setAttribute('aria-pressed',String(state.flipMode==='all'));
  document.querySelectorAll('[data-feel]').forEach(b=>{b.classList.toggle('active',b.dataset.feel===state.feel);b.setAttribute('aria-pressed',String(b.dataset.feel===state.feel));});
@@ -688,9 +863,9 @@ function render(){renderStage();renderEditor();renderMeta();renderPads();renderS
 function renderRecipe(){document.querySelectorAll('[data-recipe]').forEach(b=>{const active=b.dataset.recipe===state.recipeId;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});}
 
 function toast(msg){const box=$('toast');box.textContent=msg;box.classList.add('shown');clearTimeout(toastTimer);toastTimer=setTimeout(()=>box.classList.remove('shown'),2400);}
-function holdButton(id,name){const b=$(id);let held=false;const set=v=>{held=v;state[name]=v;b.classList.toggle('pressed',v);if(ctx){const fx=name==='holdRush'?chorusWet:name==='holdDelay'?delayWet:null;if(fx)fx.gain.setTargetAtTime(v?.35:0,ctx.currentTime,.035);}};b.addEventListener('pointerdown',e=>{if(e.button!==0)return;set(true);b.setPointerCapture(e.pointerId);ensureAudio().then(ok=>{if(!ok||!held)return;set(true);const c=state.steps[state.play&&state.current>=0?state.current:state.selected];playVoicing(c,ctx.currentTime+.012,.72,'hold');});});for(const event of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(event,()=>{if(held)set(false);});b.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){set(true);}});b.addEventListener('keyup',()=>set(false));}
+function holdButton(id,name){const b=$(id);let held=false;const set=v=>{held=v;state[name]=v;b.classList.toggle('pressed',v);if(ctx){const fx=name==='holdRush'?chorusWet:name==='holdDelay'?delayWet:null;if(fx)fx.gain.setTargetAtTime(v?.35:0,ctx.currentTime,.035);}};b.addEventListener('pointerdown',e=>{if(e.button!==0)return;set(true);b.setPointerCapture(e.pointerId);ensureAudio().then(ok=>{if(!ok||!held)return;set(true);/* While PLAY is running, PUNCH is effect-only: never retrigger the chord. */if(!state.play){const c=state.steps[state.selected];if(c)playVoicing(c,ctx.currentTime+.012,.72,'hold');}});});for(const event of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(event,()=>{if(held)set(false);});b.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){set(true);}});b.addEventListener('keyup',()=>set(false));}
 function setup(){for(let key=0;key<12;key++)for(const mode of ['major','minor']){const opt=document.createElement('option');opt.value=mode+':'+key;opt.textContent=rootName(key)+' '+(mode==='major'?'MAJOR':'MINOR');$('key').appendChild(opt);}let auto=document.createElement('option');auto.value='auto';auto.textContent='AUTO';$('root').appendChild(auto);for(let i=0;i<12;i++){const opt=document.createElement('option');opt.value=String(i);opt.textContent=rootName(i);$('root').appendChild(opt);}auto=document.createElement('option');auto.value='auto';auto.textContent='AUTO';$('quality').appendChild(auto);for(const [id,q] of Object.entries(Q)){const opt=document.createElement('option');opt.value=id;opt.textContent=q.label;$('quality').appendChild(opt);}for(const [i,preset] of SOUNDS.entries()){const opt=document.createElement('option');opt.value=String(i);opt.textContent=preset.name;$('sound').appendChild(opt);}
-  loadSaved();if(!sessionLoad())startProgression();render();$('play').addEventListener('click',togglePlayback);$('audionudge').addEventListener('click',async()=>{releaseAudio();if(await ensureAudio()){toast('Audio neu gestartet. ▶');if(!state.play)startPlayback();}});$('mutate').addEventListener('click',()=>{if(harmonicVariation()&&!state.play)startPlayback();});$('recipechoices').addEventListener('click',e=>{const b=e.target.closest('[data-recipe]');if(b)selectRecipe(b.dataset.recipe);});$('keepone').addEventListener('click',()=>setFlipMode('keep'));$('allfour').addEventListener('click',()=>setFlipMode('all'));$('feelchoices').addEventListener('click',e=>{const b=e.target.closest('[data-feel]');if(b)setFeel(b.dataset.feel);});$('slicehits').addEventListener('change',e=>setSlice('hits',e.target.value));$('slicerate').addEventListener('change',e=>setSlice('rate',e.target.value));$('slicegate').addEventListener('input',e=>setSlice('gate',e.target.value));$('cb-delay-time').addEventListener('change',e=>{state.delayBeats=Number(e.target.value);if(delayNode&&ctx)delayNode.delayTime.setTargetAtTime(60/state.tempo*state.delayBeats,ctx.currentTime,.02);sessionSave();});$('arprate').addEventListener('change',e=>setArp('rate',e.target.value));$('arpgate').addEventListener('input',e=>setArp('gate',e.target.value));$('arpdirection').addEventListener('change',e=>setArp('direction',e.target.value));$('arporder').addEventListener('change',e=>setArp('order',e.target.value));$('keep').addEventListener('click',saveIdea);$('undo').addEventListener('click',undo);$('newloop').addEventListener('click',newLoop);$('key').addEventListener('change',e=>changeKey(e.target.value));$('root').addEventListener('change',e=>changeEditor('root',e.target.value));$('quality').addEventListener('change',e=>changeEditor('quality',e.target.value));$('wonder').addEventListener('input',e=>{state.wonder=Number(e.target.value);renderMeta();drawFM1();sessionSave();});$('wonder').addEventListener('change',()=>{if(harmonicVariation()){const i=state.flipMode==='keep'?(state.selected+1)%4:state.selected;if(!state.play)audition(state.steps[i]);}});$('sound').addEventListener('change',e=>setSound(e.target.value));$('audioreset').addEventListener('click',async()=>{const wasPlaying=state.play;releaseAudio();if(await ensureAudio()){if(wasPlaying)startPlayback();else audition(state.steps[state.selected]);toast('Audio neu gestartet.');}});$('tempodown').addEventListener('click',()=>updateTempo(-4));$('tempoup').addEventListener('click',()=>updateTempo(4));$('motion').addEventListener('click',e=>{const b=e.target.closest('[data-motion]');if(b)setMotion(b.dataset.motion);});$('rec').addEventListener('click',recToggle);$('export').addEventListener('click',exportIdeas);$('import').addEventListener('change',e=>{importIdeas(e.target.files?.[0]);e.target.value='';});$('help').addEventListener('click',()=>{$('dialogoverlay').classList.add('open');$('closedialog').focus();});$('closedialog').addEventListener('click',()=>{$('dialogoverlay').classList.remove('open');$('help').focus();});$('dialogoverlay').addEventListener('click',e=>{if(e.target===$('dialogoverlay'))$('dialogoverlay').classList.remove('open');});holdButton('lift','holdLift');holdButton('rush','holdRush');holdButton('cb-delay','holdDelay');
+  restoreDX7Patch();loadSaved();if(!sessionLoad())startProgression();render();$('play').addEventListener('click',togglePlayback);$('audionudge').addEventListener('click',async()=>{releaseAudio();if(await ensureAudio()){toast('Audio neu gestartet. ▶');if(!state.play)startPlayback();}});$('mutate').addEventListener('click',()=>{if(harmonicVariation()&&!state.play)startPlayback();});$('recipechoices').addEventListener('click',e=>{const b=e.target.closest('[data-recipe]');if(b)selectRecipe(b.dataset.recipe);});$('keepone').addEventListener('click',()=>setFlipMode('keep'));$('allfour').addEventListener('click',()=>setFlipMode('all'));$('feelchoices').addEventListener('click',e=>{const b=e.target.closest('[data-feel]');if(b)setFeel(b.dataset.feel);});$('slicehits').addEventListener('change',e=>setSlice('hits',e.target.value));$('slicerate').addEventListener('change',e=>setSlice('rate',e.target.value));$('slicegate').addEventListener('input',e=>setSlice('gate',e.target.value));$('cb-delay-time').addEventListener('change',e=>{state.delayBeats=Number(e.target.value);if(delayNode&&ctx)delayNode.delayTime.setTargetAtTime(60/state.tempo*state.delayBeats,ctx.currentTime,.02);sessionSave();});$('arprate').addEventListener('change',e=>setArp('rate',e.target.value));$('arpgate').addEventListener('input',e=>setArp('gate',e.target.value));$('arpdirection').addEventListener('change',e=>setArp('direction',e.target.value));$('arporder').addEventListener('change',e=>setArp('order',e.target.value));$('keep').addEventListener('click',saveIdea);$('undo').addEventListener('click',undo);$('newloop').addEventListener('click',newLoop);$('key').addEventListener('change',e=>changeKey(e.target.value));$('root').addEventListener('change',e=>changeEditor('root',e.target.value));$('quality').addEventListener('change',e=>changeEditor('quality',e.target.value));$('wonder').addEventListener('input',e=>{state.wonder=Number(e.target.value);renderMeta();drawFM1();sessionSave();});$('wonder').addEventListener('change',()=>{if(harmonicVariation()){const i=state.flipMode==='keep'?(state.selected+1)%4:state.selected;if(!state.play)audition(state.steps[i]);}});$('sound').addEventListener('change',e=>setSound(e.target.value));$('dx7file').addEventListener('change',async e=>{const file=e.target.files?.[0];e.target.value='';if(!file)return;try{if(file.size!==4104)throw Error('Erwartet wird eine DX7-Bank mit 4104 Bytes.');const bytes=new Uint8Array(await file.arrayBuffer());const patch=await importDX7Bank(bytes);toast('Original '+patch.name+' geladen.');if(!state.play)audition(state.steps[state.selected]);}catch(error){$('dx7status').textContent='Import: '+error.message;toast('DX7-Import nicht möglich.');}});$('audioreset').addEventListener('click',async()=>{const wasPlaying=state.play;releaseAudio();if(await ensureAudio()){if(wasPlaying)startPlayback();else audition(state.steps[state.selected]);toast('Audio neu gestartet.');}});$('tempoSlider').addEventListener('input',e=>setTempo(e.target.value));$('motion').addEventListener('click',e=>{const b=e.target.closest('[data-motion]');if(b)setMotion(b.dataset.motion);});$('rec').addEventListener('click',recToggle);$('export').addEventListener('click',exportIdeas);$('import').addEventListener('change',e=>{importIdeas(e.target.files?.[0]);e.target.value='';});$('help').addEventListener('click',()=>{$('dialogoverlay').classList.add('open');$('closedialog').focus();});$('closedialog').addEventListener('click',()=>{$('dialogoverlay').classList.remove('open');$('help').focus();});$('dialogoverlay').addEventListener('click',e=>{if(e.target===$('dialogoverlay'))$('dialogoverlay').classList.remove('open');});holdButton('lift','holdLift');holdButton('rush','holdRush');holdButton('cb-delay','holdDelay');
   window.addEventListener('keydown',e=>{if(e.target.matches('input,select,textarea')||e.ctrlKey||e.altKey||e.metaKey)return;if(e.key==='Escape'){$('dialogoverlay').classList.remove('open');return;}const key=e.key.toLowerCase();if(key===' '){e.preventDefault();if(!e.repeat)togglePlayback();}if(key==='w'&&!e.repeat)harmonicVariation();if(key==='k'&&!e.repeat)saveIdea();if(key==='z'&&!e.repeat)undo();if('1234'.includes(key)){state.selected=Number(key)-1;renderStage();renderEditor();audition(state.steps[state.selected]);}const p='asdfghj'.indexOf(key);if(p!==-1&&!e.repeat)padChord(p);});
   document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.play)stopPlayback();});
 }
