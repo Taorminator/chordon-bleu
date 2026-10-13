@@ -13,6 +13,8 @@ jobs:
           node-version: "22"
       - name: Validate offline recipe bundle
         run: node tools/build-recipes.mjs --check
+      - name: Refuse mismatched Felucca checkout before overlay writes
+        run: python3 tests/overlay_preflight.test.py
       - name: Validate FM1 browser device surface
         run: node tests/device-view.test.mjs
       - name: Verify plated Cordon Bleu browser illustration
