@@ -1,0 +1,278 @@
+{
+  "id": "ghibli-dream",
+  "name": "GHIBLI DREAM",
+  "caption": "Schwebend · nostalgisch · filmisch",
+  "description": "Eine eigenstaendige Ghibli-inspirierte Klangwelt: offene 9er- und Sus-Akkorde, weich gefuehrte Stimmen, manchmal geliehene Mollfarben und lydische Ueberraschungen.",
+  "inspiredBy": "Musiktheoretische Analysen von Joe Hisaishis Filmmusik; keine Melodien, Aufnahmen oder Akkordtranskriptionen uebernommen.",
+  "suggestedMode": "major",
+  "suggestedKey": 0,
+  "suggestedTempo": 80,
+  "suggestedSound": 1,
+  "templates": [
+    {
+      "minSpice": 0,
+      "chords": [
+        [
+          5,
+          "maj9"
+        ],
+        [
+          4,
+          "m7"
+        ],
+        [
+          9,
+          "m9"
+        ],
+        [
+          7,
+          "sus4"
+        ]
+      ]
+    },
+    {
+      "minSpice": 0,
+      "chords": [
+        [
+          0,
+          "maj9"
+        ],
+        [
+          7,
+          "sus4"
+        ],
+        [
+          9,
+          "m9"
+        ],
+        [
+          5,
+          "maj7"
+        ]
+      ]
+    },
+    {
+      "minSpice": 0,
+      "chords": [
+        [
+          9,
+          "m9"
+        ],
+        [
+          5,
+          "maj7"
+        ],
+        [
+          2,
+          "m7"
+        ],
+        [
+          7,
+          "sus4"
+        ]
+      ]
+    },
+    {
+      "minSpice": 0,
+      "chords": [
+        [
+          4,
+          "m7"
+        ],
+        [
+          5,
+          "maj9"
+        ],
+        [
+          0,
+          "add9"
+        ],
+        [
+          7,
+          "sus4"
+        ]
+      ]
+    },
+    {
+      "minSpice": 32,
+      "chords": [
+        [
+          5,
+          "maj7"
+        ],
+        [
+          5,
+          "m6"
+        ],
+        [
+          0,
+          "maj9"
+        ],
+        [
+          7,
+          "sus4"
+        ]
+      ]
+    },
+    {
+      "minSpice": 42,
+      "chords": [
+        [
+          0,
+          "maj9"
+        ],
+        [
+          10,
+          "maj7"
+        ],
+        [
+          5,
+          "maj9"
+        ],
+        [
+          7,
+          "sus4"
+        ]
+      ]
+    },
+    {
+      "minSpice": 45,
+      "chords": [
+        [
+          4,
+          "m7"
+        ],
+        [
+          9,
+          "dom7"
+        ],
+        [
+          2,
+          "m9"
+        ],
+        [
+          7,
+          "sus4"
+        ]
+      ]
+    },
+    {
+      "minSpice": 65,
+      "chords": [
+        [
+          0,
+          "maj9"
+        ],
+        [
+          2,
+          "maj"
+        ],
+        [
+          4,
+          "m7"
+        ],
+        [
+          5,
+          "maj9"
+        ]
+      ]
+    }
+  ],
+  "palette": [
+    {
+      "semi": 0,
+      "quality": "maj9",
+      "weight": 2.2,
+      "minSpice": 0
+    },
+    {
+      "semi": 0,
+      "quality": "add9",
+      "weight": 1.8,
+      "minSpice": 0
+    },
+    {
+      "semi": 2,
+      "quality": "m7",
+      "weight": 1.1,
+      "minSpice": 0
+    },
+    {
+      "semi": 2,
+      "quality": "m9",
+      "weight": 1.6,
+      "minSpice": 0
+    },
+    {
+      "semi": 4,
+      "quality": "m7",
+      "weight": 1.1,
+      "minSpice": 0
+    },
+    {
+      "semi": 5,
+      "quality": "maj9",
+      "weight": 2.4,
+      "minSpice": 0
+    },
+    {
+      "semi": 5,
+      "quality": "maj7",
+      "weight": 2,
+      "minSpice": 0
+    },
+    {
+      "semi": 7,
+      "quality": "sus4",
+      "weight": 2,
+      "minSpice": 0
+    },
+    {
+      "semi": 7,
+      "quality": "sus2",
+      "weight": 1.4,
+      "minSpice": 0
+    },
+    {
+      "semi": 9,
+      "quality": "m9",
+      "weight": 2.2,
+      "minSpice": 0
+    },
+    {
+      "semi": 9,
+      "quality": "m7",
+      "weight": 1.3,
+      "minSpice": 0
+    },
+    {
+      "semi": 5,
+      "quality": "m6",
+      "weight": 1.6,
+      "minSpice": 32
+    },
+    {
+      "semi": 10,
+      "quality": "maj7",
+      "weight": 1.2,
+      "minSpice": 42
+    },
+    {
+      "semi": 9,
+      "quality": "dom7",
+      "weight": 1.1,
+      "minSpice": 45
+    },
+    {
+      "semi": 2,
+      "quality": "maj",
+      "weight": 1.5,
+      "minSpice": 65
+    }
+  ],
+  "sources": [
+    "https://rsucon.rsu.ac.th/2021/paper/1923",
+    "https://ir.unimas.my/id/eprint/28966/",
+    "https://music.stackexchange.com/questions/69210/analyzing-hisaishi-joes-path-of-the-wind-1"
+  ]
+}
