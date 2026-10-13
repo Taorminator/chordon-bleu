@@ -204,6 +204,65 @@ body.fm1-mode>.app{display:none}
  .station-heading{margin-bottom:12px}
 }
 
+
+/* 2026-10: layout from the user's pencil sketch, not a visual redesign. */
+.content{
+ display:grid!important;grid-template-columns:minmax(0,1.22fr) minmax(0,.78fr);
+ grid-template-areas:"head head" "chords live" "harmony season" "pick shape" "library library";
+ gap:16px 20px;align-items:start;
+}
+.content>.topbar{grid-area:head!important;order:initial;margin:0 0 1px;align-self:stretch}
+.chord-workspace{grid-area:chords;min-width:0;display:flex;flex-direction:column}
+.chord-workspace>.station-heading{margin:0 0 9px}
+.chord-workspace .stage{min-width:0;margin:0;padding:14px}
+.chord-workspace .step{height:228px;min-width:0}
+.chord-workspace .maincontrols{margin:7px 0 0!important;gap:8px}
+.chord-workspace .bigbtn{min-height:61px}
+.chord-workspace .belowstage{display:flex;justify-content:flex-start;margin:8px 0 0;padding:0}
+.live-workspace{grid-area:live;min-width:0;display:flex;flex-direction:column;gap:13px}
+.tempo-station,.season-station{border:1px solid #354462;background:#141b30;border-radius:13px;padding:16px;min-width:0}
+.tempo-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+.tempo-head output{font-weight:850;font-size:22px;letter-spacing:-.035em;font-variant-numeric:tabular-nums;color:#f7f9ff}
+.tempo-slider{height:10px;width:100%;touch-action:pan-y;background:linear-gradient(90deg,#4657ff,#aab5ff);border-radius:6px}
+.tempo-slider::-webkit-slider-thumb{height:25px;width:25px;background:#fff;border:3px solid #4657ff;box-shadow:0 2px 6px #05091b77}
+.tempo-slider::-moz-range-thumb{height:20px;width:20px;background:#fff;border:3px solid #4657ff;box-shadow:0 2px 6px #05091b77;border-radius:50%}
+.tempo-slider:focus-visible{outline:2px solid #bacaff;outline-offset:7px}
+.tempo-range{display:flex;justify-content:space-between;color:#9daaD3;margin-top:12px;font:650 10px ui-monospace,monospace}
+.live-workspace .performance-station{margin:0!important;min-width:0;padding:15px}
+.live-workspace .performance-station .station-heading{margin-bottom:10px}
+.live-workspace .performance-station .sound-picker{margin-bottom:14px}
+.live-workspace .performance-station .motionbuttons button{flex:1;min-width:0}
+.harmony-station{grid-area:harmony;margin:0!important;min-width:0;padding:16px}
+.season-station{grid-area:season;margin:0!important;padding:16px;align-self:stretch}
+.season-station>.sectiontop{margin:0 0 10px}
+.season-station .punchrow{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+.season-station .punch{flex:1 1 90px;min-width:0;min-height:66px}
+.season-station .sectionnote{margin:0 0 12px}
+.content>.playpanel{grid-area:pick;margin:0!important;padding:15px;min-width:0}
+.content>.editor{grid-area:shape;margin:0!important;min-width:0;padding:15px}
+.content>.favorites-station{grid-area:library;margin:0!important;padding:17px 15px;min-width:0}
+.favorites-station>.sectiontop{margin:0 0 13px!important}
+@media(max-width:820px){
+ .content{display:grid!important;grid-template-columns:1fr;
+  grid-template-areas:"head" "chords" "live" "harmony" "season" "pick" "shape" "library";gap:13px}
+ .chord-workspace .step{height:clamp(190px,36vw,250px)}
+ .live-workspace{gap:10px}
+ .live-workspace .performance-station{margin:0}
+ .season-station .punch{min-height:56px}
+}
+@media(min-width:650px) and (max-width:820px){
+ .live-workspace{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);align-items:start}
+ .live-workspace .performance-station{min-width:0}
+}
+@media(max-width:420px){
+ .chord-workspace .stage{padding:10px}
+ .chord-workspace .step{height:195px}
+ .chord-workspace .maincontrols{gap:6px;margin-top:6px!important}
+ .tempo-station,.season-station,.harmony-station{padding:13px}
+ .tempo-head output{font-size:19px}
+ .season-station .punch{flex:1 1 75px;font-size:11px}
+}
+
 </style>
 </head>
 <body>
