@@ -21,6 +21,8 @@ jobs:
         run: node tests/recipe-visual.test.mjs
       - name: Test chord performance controls and octave voicing
         run: node tests/performance.test.mjs
+      - name: Browser performance controls and expanded recipes
+        run: node tests/browser-performance.test.mjs
       - name: Exercise harmonic search and arpeggiator
         run: |
           node tests/harmony.test.mjs
