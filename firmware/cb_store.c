@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-3.0-only */
 #include "cb_store.h"
-#include <string.h>
+#include "cb_libc.h"
 static void w32(uint8_t *p,uint32_t v){for(unsigned i=0;i<4;i++)p[i]=(uint8_t)(v>>(i*8u));}
 static uint32_t r32(const uint8_t *p){uint32_t v=0;for(unsigned i=0;i<4;i++)v|=(uint32_t)p[i]<<(i*8u);return v;}
 static uint32_t crc32(const uint8_t *p,unsigned count){
