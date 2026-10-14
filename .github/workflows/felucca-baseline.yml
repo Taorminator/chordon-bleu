@@ -51,6 +51,10 @@ jobs:
           ./build.sh
           test -s build/felucca.bin
           test -s build/felucca.fwsc
+      - name: Felucca unmodified host regression tests
+        run: |
+          cd upstream
+          sh tests/run_tests.sh
       - name: Make upstream fuzz harness compile with explicit stdint
         run: |
           sed -i '/sys\/time.h/a #include <stdint.h>' upstream/tests/drumfuzz_test.c
@@ -64,10 +68,6 @@ jobs:
           ./build.sh
           test -s build/felucca.bin
           echo "Experimental proof of integration - NOT authorized for device flashing."
-      - name: Felucca unmodified host regression tests
-        run: |
-          cd upstream
-          sh tests/run_tests.sh
       - name: Run Felucca regression after integration
         run: |
           cd upstream
