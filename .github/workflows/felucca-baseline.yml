@@ -51,13 +51,13 @@ jobs:
           ./build.sh
           test -s build/felucca.bin
           test -s build/felucca.fwsc
+      - name: Make upstream fuzz harness compile with explicit stdint
+        run: |
+          sed -i '/sys\/time.h/a #include <stdint.h>' upstream/tests/drumfuzz_test.c
       - name: Felucca unmodified host regression tests
         run: |
           cd upstream
           sh tests/run_tests.sh
-      - name: Make upstream fuzz harness compile with explicit stdint
-        run: |
-          sed -i '/sys\/time.h/a #include <stdint.h>' upstream/tests/drumfuzz_test.c
       - name: Integrate experimental CHORDON application
         run: |
           python3 firmware/felucca-overlay/apply.py upstream
