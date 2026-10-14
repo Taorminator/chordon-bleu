@@ -19,7 +19,7 @@ Last checked: 2026-10-14. This is a snapshot, not a live CI dashboard.
 - Cross-compilation and a successful experimental native image build do **not** prove real FM1 behavior.
 - The browser's 240×240 Screen Lab is a concept simulator, **not** a firmware-derived WASM emulator.
 - Native and browser feature parity is incomplete, especially recipes and persistence.
-- ACI status must always be checked against its exact commit. Do not equate a green branch build with a green `main` build.
+- CI status must always be checked against its exact commit. Do not equate a green branch build with a green `main` build.
 
 ## Immediate next actions
 1. Review/merge `ci/native-pre-overlay-baseline` after confirming the diff and branch policy; re-run native CI on the resulting `main` commit.
