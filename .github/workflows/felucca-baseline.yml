@@ -54,7 +54,18 @@ jobs:
       - name: Make upstream fuzz harness compile with explicit stdint
         run: |
           sed -i '/sys\/time.h/a #include <stdint.h>' upstream/tests/drumfuzz_test.c
-      - name: Felucca unmodified host regression tests
+      - name: Guard pinned upstream against zero BPM in host test and overlay
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path("upstream/firmware/src/fx.c")
+          source = path.read_text()
+          old = "(uint32_t)FS * 60u / (uint32_t)song.g[G_BPM]"
+          new = "(uint32_t)FS * 60u / (song.g[G_BPM] ? (uint32_t)song.g[G_BPM] : 120u)"
+          assert source.count(old) == 1, "Pinned Felucca source differs; refuse blind patch"
+          path.write_text(source.replace(old, new))
+          PY
+      - name: Felucca baseline host regression tests (with zero-BPM guard)
         run: |
           cd upstream
           sh tests/run_tests.sh
