@@ -16,7 +16,7 @@ Last checked: 2026-10-14. This is a snapshot, not a live CI dashboard.
 - A pipeline fix to place baseline upstream host regression *before* the CHORDON overlay was prepared on `ci/native-pre-overlay-baseline` at `0fbee09d`: [successful native run 38563077339](https://github.com/Taorminator/chordon-bleu/actions/runs/38563077339). This is a **separate branch**, not yet merged into `main`.
 - The follow-up `fix/native-upstream-zero-bpm-guard` at `c566cad1ed8c533aa26a5a5b7f5cce75bdd5e6c2` includes that pipeline fix and guards the pinned Felucca delay calculation against BPM 0 with a 120 BPM fallback. Nonzero BPM values retain their original calculation; the patch aborts unless exactly one expected upstream expression exists.
 - Native verification: [successful run 38571385615](https://github.com/Taorminator/chordon-bleu/actions/runs/38571385615), on `c566cad1`: pi32v2 module compilation, unmodified Felucca reference build, guarded host baseline, experimental CHORDON build, and post-integration host regression passed. The unmodified reference binary is built before the guard. Host logs explicitly skip the Emscripten browser emulator and optional unavailable editor capabilities; these are not hardware checks.
-- The native fix branch has incorporated the existing `main` documentation without changing browser or FM-XY source. CHORDON BLEU checks for the proposed PR head must be verified separately; the native run above does not establish those results.
+- [PR #10](https://github.com/Taorminator/chordon-bleu/pull/10) incorporates the existing `main` documentation without changing browser or FM-XY source. CHORDON BLEU checks passed in [run 38580447879](https://github.com/Taorminator/chordon-bleu/actions/runs/38580447879) on `586fae10797c2826e5bac9fe89ce4c4c920efafc`: JavaScript regressions, C99 harmony core, portable application simulation, ASan/UBSan snapshot fault injection and voice stress, and publication-safety checks. Later documentation-only commits still require their own PR checks; neither run above verifies a merged `main` commit.
 
 ## Important distinctions
 - Cross-compilation and a successful experimental native image build do **not** prove real FM1 behavior.
@@ -31,4 +31,3 @@ Last checked: 2026-10-14. This is a snapshot, not a live CI dashboard.
 4. Keep [FM1 acceptance gates](FM1_ACCEPTANCE.md) up to date; treat earlier status claims in [FM1_PORT.md](FM1_PORT.md) as historical when they conflict with dated evidence above.
 
 See [architecture](ARCHITECTURE.md) and [decision log](DECISIONS.md).
-
