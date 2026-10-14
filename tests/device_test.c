@@ -51,6 +51,18 @@ int main(void){
    }
   }
  }
+ /* Native root validation: reject malformed MIDI pitch classes. */
+ {
+  CbChord chord={0};
+  uint8_t notes[4]={0};
+  chord.root=12;
+  assert(cb_fm1_chord_notes(&chord,notes)==0);
+  chord.root=255;
+  assert(cb_fm1_chord_notes(&chord,notes)==0);
+  chord.root=11;
+  assert(cb_fm1_chord_notes(&chord,notes)==3);
+  assert(notes[0]==59&&notes[1]==63&&notes[2]==66);
+ }
  assert(draw_count>8000&&notes_count>500&&save_count==256&&panic_count==256);
  printf("PASS: 256 device-state, 240x240 bounded render, event and scheduling scenarios (%d notes, %d render ops)\n",notes_count,draw_count);
  return 0;
