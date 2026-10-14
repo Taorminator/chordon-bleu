@@ -182,7 +182,7 @@ void cb_fm1_knob(CbFM1 *m,uint8_t knob,int8_t turn){
  }
 }
 uint8_t cb_fm1_chord_notes(const CbChord *c,uint8_t *notes){
- if(!c||!notes||c->quality>=CB_QUALITIES)return 0;
+ if(!c||!notes||c->root>=12u||c->quality>=CB_QUALITIES)return 0;
  uint8_t n=0;for(int i=0;i<4;i++)if(INTERVALS[c->quality][i]!=255)
   notes[n++]=(uint8_t)(48+c->root+INTERVALS[c->quality][i]);
  return n;
