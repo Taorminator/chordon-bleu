@@ -533,6 +533,7 @@ body.fm1-mode>.app{display:none}
 .app .headright .helpbutton{border:0!important;border-radius:50%;background:#bdc7ff;color:#182144}
 .app .dx7-original{border:0!important;border-top:0!important;margin-top:8px;padding-top:6px}
 .app .dx7-original .dx7-import-btn{border:0!important;border-radius:999px!important;background:#ffbf86;color:#18213a}
+.app #dx7preset{min-height:44px;max-width:100%;width:100%;font-size:16px}
 .app .dialog{border:0!important;border-radius:24px}
 @media(max-width:820px){
  .app .content{display:grid!important;grid-template-columns:1fr;
@@ -626,10 +627,14 @@ body.fm1-mode>.app{display:none}
  <div class="station-heading"><span class="micro">PERFORM</span></div>
  <div class="sound-picker"><label class="visuallyhidden" for="sound">Instrument</label><select id="sound" class="soundbutton" aria-label="Select instrument"></select>
  <div class="dx7-original" id="dx7-original" hidden>
-  <label class="dx7-import-btn" for="dx7file">↓ LOAD ORIGINAL E.PIANO 1 (.SYX)</label>
-  <input type="file" id="dx7file" accept=".syx,.SYX,application/octet-stream" hidden>
-  <span class="sound-help" id="dx7status" role="status">DX7 EP is a preview until you load your own ROM1A bank.</span>
-  <a href="https://yamahablackboxes.com/collection/yamaha-dx7-synthesizer/patches/" target="_blank" rel="noopener noreferrer" class="dx7-patch-source">Yamaha DX7 ROM1A · Preset 11 E.PIANO 1 ↗</a>
+  <label class="micro" for="dx7preset">SOUND</label>
+  <select id="dx7preset" class="soundbutton" aria-label="DX7 Sound auswählen"><option value="aquazone:1">Aqua Zone · DX Fast 1</option></select>
+  <span class="sound-help" id="dx7status" role="status">Aquanode Sounds sind integriert. Wähle einen Sound und spiel los.</span>
+  <a href="https://github.com/aquanodemusic/aquanode-soundscapes/tree/main/dexed" target="_blank" rel="noopener noreferrer" class="dx7-patch-source">Sounds by Aquanode ↗</a>
+  <details><summary>Eigene E.PIANO 1 laden</summary>
+   <label class="dx7-import-btn" for="dx7file">ROM1A / FM1 Bank öffnen (.SYX)</label>
+   <input type="file" id="dx7file" accept=".syx,.SYX,application/octet-stream" hidden>
+  </details>
  </div></div>
  <div class="minitools"><div><div class="motionbuttons" id="motion" role="group" aria-label="Chord playback motion"><button data-motion="hold" class="active">HOLD</button><button data-motion="pulse">PULSE</button><button data-motion="arp">ARP</button></div></div></div>
 <div class="arpdeck" id="slicedeck" hidden aria-label="Pulse chord repetitions"><div class="arphead"><span class="micro">PULSE</span></div><div class="arpgrid"><label class="arpcell"><span>HITS</span><select id="slicehits"><option value="2">2×</option><option value="4">4×</option><option value="8">8×</option></select></label><label class="arpcell"><span>SPEED</span><select id="slicerate"><option value="4">1/4</option><option value="8">1/8</option><option value="16">1/16</option><option value="32">1/32</option></select></label><label class="arpcell"><span>GATE <output id="slicegatevalue">40%</output></span><input id="slicegate" type="range" min="10" max="95" step="5" value="40"></label></div></div>
@@ -727,7 +732,7 @@ function selectRecipe(id){if((id!=='classic'&&!RECIPE_CATALOG.some(r=>r.id===id)
 }
 function validSlice(a){return a&&[2,4,8].includes(a.hits)&&[4,8,16,32].includes(a.rate)&&Number.isInteger(a.gate)&&a.gate>=10&&a.gate<=95;}
 function validArp(a){return a&&[4,8,16,32].includes(a.rate)&&Number.isInteger(a.gate)&&a.gate>=15&&a.gate<=100&&ARP_DIRECTIONS.includes(a.direction)&&ARP_ORDERS.includes(a.order);}
-let state={recipeId:'classic',flipMode:'keep',feel:'warm',arp:{...ARP_DEFAULT},slice:{...SLICE_DEFAULT},delayBeats:.75,holdDelay:false,key:9,mode:'minor',tempo:92,motion:'hold',sound:0,wonder:38,selected:0,steps:[],saved:[],undo:[],rec:false,recIdx:0,play:false,current:-1,loopCount:1,holdLift:false,holdRush:false};
+let state={recipeId:'classic',flipMode:'keep',feel:'warm',arp:{...ARP_DEFAULT},slice:{...SLICE_DEFAULT},delayBeats:.75,holdDelay:false,key:9,mode:'minor',tempo:92,motion:'hold',sound:0,dx7Preset:'aquazone:1',wonder:38,selected:0,steps:[],saved:[],undo:[],rec:false,recIdx:0,play:false,current:-1,loopCount:1,holdLift:false,holdRush:false};
 let ctx=null,master=null,reverb=null,chorusWet=null,delayWet=null,delayNode=null,scheduler=null,nextStep=0,nextTime=0,visTimers=[],toastTimer=null,audioWarned=false,gestureInit=false,playLaunchToken=0;
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const mod=n=>(n%12+12)%12;
@@ -853,8 +858,8 @@ function harmonicVariation({editing=false,forceIndex=-1,skipUndo=false}={}){
   if(!editing)toast(all?'Vier frische Akkorde. ✳':`Akkord ${held+1} bleibt. Neuer FLIP!`);
   return true;
 }
-function pushUndo(){state.undo.push({recipeId:state.recipeId,steps:clone(state.steps),key:state.key,mode:state.mode,motion:state.motion,sound:state.sound,feel:state.feel,flipMode:state.flipMode,arp:clone(state.arp),slice:clone(state.slice),delayBeats:state.delayBeats});if(state.undo.length>30)state.undo.shift();}
-function undo(){if(!state.undo.length)return;const u=state.undo.pop();Object.assign(state,{recipeId:RECIPE_CATALOG.some(r=>r.id===u.recipeId)?u.recipeId:'classic',steps:u.steps,key:u.key,mode:u.mode,motion:u.motion,sound:u.sound,feel:u.feel||'warm',flipMode:u.flipMode||'keep',arp:validArp(u.arp)?u.arp:{...ARP_DEFAULT}});render();toast('Zurück zur letzten Idee.');}
+function pushUndo(){state.undo.push({recipeId:state.recipeId,steps:clone(state.steps),key:state.key,mode:state.mode,motion:state.motion,sound:state.sound,dx7Preset:dx7PresetId(),feel:state.feel,flipMode:state.flipMode,arp:clone(state.arp),slice:clone(state.slice),delayBeats:state.delayBeats});if(state.undo.length>30)state.undo.shift();}
+function undo(){if(!state.undo.length)return;const u=state.undo.pop();Object.assign(state,{recipeId:RECIPE_CATALOG.some(r=>r.id===u.recipeId)?u.recipeId:'classic',steps:u.steps,key:u.key,mode:u.mode,motion:u.motion,sound:u.sound,dx7Preset:dx7PresetId(u.dx7Preset),feel:u.feel||'warm',flipMode:u.flipMode||'keep',arp:validArp(u.arp)?u.arp:{...ARP_DEFAULT}});render();if(state.sound===3)void ensureDX7Patch().then(()=>{if(state.sound===3&&ctx?.state==='running')void ensureDX7Engine();});toast('Zurück zur letzten Idee.');}
 function noteToMidi(c){return 48+c.root;}
 function voiceNotes(c,previous=null){let tones=Q[c.quality].notes.map(n=>noteToMidi(c)+n);tones=tones.map(n=>{while(n<53)n+=12;while(n>78)n-=12;return n;}).sort((a,b)=>a-b);
   if(previous){const orig=tones.slice(),poss=[];for(let shift=-1;shift<=1;shift++)for(let inv=0;inv<orig.length;inv++){let v=orig.slice();for(let j=0;j<inv;j++)v[j]+=12;v=v.map(n=>n+shift*12).sort((a,b)=>a-b);if(v[0]<49||v.at(-1)>82)continue;let dist=0;for(const n of v)dist+=Math.min(...previous.map(p=>Math.abs(p-n)));poss.push({v,dist});}poss.sort((a,b)=>a.dist-b.dist);if(poss.length)return poss[0].v;}
@@ -942,7 +947,7 @@ async function ensureAudio(){
    return false;
   }
   setupOptionalEffects();
-  if(dx7Patch&&state.sound===3&&!dx7Node)void ensureDX7Engine();
+  if(state.sound===3){await ensureDX7Patch();await ensureDX7Engine();}
   audioFeedback(true);return true;
  }catch(e){
   audioFeedback(false,'Audio-Start fehlgeschlagen. Tippe TON NEU STARTEN.');
@@ -950,9 +955,9 @@ async function ensureAudio(){
   return false;
  }
 }
-// Optional six-operator DX7 backend: MIT OpenDX7 engine; Yamaha ROM data is NOT bundled.
-// Works only after the user imports their own standard DX7 32-voice .SYX bank.
-let dx7Patch=null,dx7Node=null,dx7Loading=null;
+// Six-operator DX7 backend with local CC0 Aquanode presets; no Yamaha ROM data bundled.
+let dx7Patch=null,dx7Node=null,dx7Loading=null,dx7ReadyId=null,dx7Library=null,dx7Generation=0;
+const dx7Modules=new WeakMap();
 const dx7Timers=new Set();
 const DX7_STORE_KEY='chordon-bleu.user-dx7-ep1.v1';
 function clearDX7Notes(){
@@ -960,12 +965,49 @@ function clearDX7Notes(){
  if(dx7Node)try{dx7Node.port.postMessage({type:'panic'});}catch(_){}
 }
 function resetDX7Engine(){
- clearDX7Notes();dx7Node=null;dx7Loading=null;
+ clearDX7Notes();if(dx7Node)try{dx7Node.disconnect();}catch(_){}
+ dx7Generation++;dx7Node=null;dx7Loading=null;
 }
+function validDX7Preset(id){return id==='user'||/^(aquazone|presets-[1-4]):([0-9]|[12][0-9]|3[01])$/.test(id||'');}
+function dx7PresetId(value=state.dx7Preset){return validDX7Preset(value)?value:'aquazone:1';}
+function updateDX7Picker(library){
+ const picker=$('dx7preset');if(!picker)return;
+ picker.replaceChildren();
+ for(const bank of library.banks){const group=document.createElement('optgroup');group.label=bank.name;
+  for(const p of bank.presets){const option=document.createElement('option');option.value=p.id;option.textContent=p.name;group.appendChild(option);}picker.appendChild(group);
+ }
+ if(dx7UserPatch){const option=document.createElement('option');option.value='user';option.textContent='Eigene · '+dx7UserPatch.name;picker.appendChild(option);}
+ picker.value=dx7PresetId();
+}
+async function ensureDX7Patch(){
+ const id=dx7PresetId();
+ if(dx7Patch&&dx7ReadyId===id)return true;
+ try{
+  const library=await (dx7Library??=import('./assets/dx7/aquanode-presets.js'));
+  if(id!==dx7PresetId())return false;
+  if(dx7Patch&&dx7ReadyId===id)return true;
+  const patch=id==='user'?dx7UserPatch:library.presetById(id);
+  if(!patch){state.dx7Preset='aquazone:1';return ensureDX7Patch();}
+  resetDX7Engine();dx7Patch=patch;dx7ReadyId=id;updateDX7Picker(library);
+  $('dx7status').textContent=patch.name+' · bereit';
+  return true;
+ }catch(e){if(id!==dx7PresetId())return false;console.warn('CHORDON BLEU: DX7-Preset nicht verfügbar.',e);dx7Library=null;dx7Patch=null;dx7ReadyId=null;resetDX7Engine();
+  $('dx7status').textContent='Sound konnte nicht geladen werden. FM-Preview aktiv.';return false;
+ }
+}
+async function selectDX7Preset(id){
+ if(!validDX7Preset(id))return;
+ state.dx7Preset=id;dx7Patch=null;dx7ReadyId=null;resetDX7Engine();sessionSave();
+ if(await ensureDX7Patch()){
+  if(state.sound===3&&ctx?.state==='running')await ensureDX7Engine();
+  if(id===dx7PresetId()&&state.sound===3&&!state.play)audition(state.steps[state.selected]);
+ }
+}
+let dx7UserPatch=null;
 function restoreDX7Patch(){
  try{
   const p=JSON.parse(localStorage.getItem(DX7_STORE_KEY)||'null');
-  if(p&&Array.isArray(p.ops)&&p.ops.length===6&&p.algorithm===4&&p.name)dx7Patch=p;
+  if(p&&Array.isArray(p.ops)&&p.ops.length===6&&p.algorithm===4&&p.name){dx7UserPatch=p;state.dx7Preset='user';}
  }catch(_){}
 }
 async function importDX7Bank(bytes){
@@ -980,10 +1022,11 @@ async function importDX7Bank(bytes){
  const patch=patches.find(p=>normalize(p)==='EPIANO1'&&p.algorithm===4)
    ||(normalize(patches[0]||{})==='PIANO1'&&patches[0].algorithm===4?patches[0]:null);
  if(!patch)throw Error('Keine originale E.PIANO 1 (Algorithmus 5) gefunden. Verwende ROM1A oder die FM1-Werksbank 1.');
- dx7Patch=patch;
+ dx7UserPatch=patch;state.dx7Preset='user';dx7Patch=patch;dx7ReadyId='user';
  resetDX7Engine();
  try{localStorage.setItem(DX7_STORE_KEY,JSON.stringify(dx7Patch));}catch(_){}
  if(ctx&&ctx.state==='running')await ensureDX7Engine();
+ if(dx7Library)updateDX7Picker(await dx7Library);
  renderMeta();
  return patch;
 }
@@ -991,24 +1034,27 @@ async function ensureDX7Engine(){
  if(!dx7Patch||!ctx||ctx.state!=='running')return false;
  if(dx7Node)return true;
  if(dx7Loading)return dx7Loading;
- const activeCtx=ctx;
- if(!activeCtx.audioWorklet||!window.AudioWorkletNode)return false; // Keep the preview voice audible.
- dx7Loading=(async()=>{
+ const activeCtx=ctx,generation=dx7Generation;
+ if(!activeCtx.audioWorklet||!window.AudioWorkletNode){$('dx7status').textContent='FM-Preview aktiv · dieser Browser unterstützt die DX7-Engine nicht.';return false;}
+ const pending=(async()=>{
   try{
-   await activeCtx.audioWorklet.addModule('./vendor/opendx7/dx7-processor.js');
-   if(activeCtx!==ctx||!dx7Patch)return false;
+   if(!dx7Modules.has(activeCtx))dx7Modules.set(activeCtx,(async()=>{await activeCtx.audioWorklet.addModule('./vendor/opendx7/dx7-processor.js');})());
+   await dx7Modules.get(activeCtx);
+   if(activeCtx!==ctx||!dx7Patch||generation!==dx7Generation||state.sound!==3)return false;
    const node=new window.AudioWorkletNode(activeCtx,'dx7-processor',{outputChannelCount:[2]});
    node.connect(master);node.port.postMessage({type:'patch',patch:dx7Patch});
    dx7Node=node;
-   if($('dx7status'))$('dx7status').textContent='ORIGINAL E.PIANO 1 · 6 Operatoren aktiv';
+   if($('dx7status'))$('dx7status').textContent=dx7Patch.name+' · 6 Operatoren aktiv';
    return true;
   }catch(e){
    console.warn('CHORDON BLEU: DX7-Worklet nicht verfügbar, Preview-FM bleibt aktiv.',e);
-   if($('dx7status'))$('dx7status').textContent='Bank geladen, aber FM-Worklet nicht verfügbar. DX7-Preview bleibt aktiv.';
+   dx7Modules.delete(activeCtx);
+   if(generation===dx7Generation&&$('dx7status'))$('dx7status').textContent='FM-Preview aktiv · DX7-Engine konnte nicht starten.';
    return false;
   }
  })();
- try{return await dx7Loading;}finally{dx7Loading=null;}
+ dx7Loading=pending;
+ try{return await pending;}finally{if(dx7Loading===pending)dx7Loading=null;}
 }
 function scheduleDX7Voice(midi,time,duration,velocity){
  if(!dx7Node||!ctx)return false;
@@ -1031,7 +1077,7 @@ const SOUNDS=[
  {name:'GRAND',kind:'grand',wave:'sine',second:'triangle',cut:10200,a:.002,dec:.35,sus:.32,rel:1.0,detune:2},
  {name:'90s HOUSE',kind:'house',wave:'sawtooth',second:'triangle',cut:4400,a:.002,dec:.19,sus:.30,rel:.30,detune:4}
 ];
-// All six programs use the same self-contained oscillator engine; no external samples.
+// Local synth programs plus bundled DX7 parameters; no external samples.
 function tone(midi,at,dur,vel=.6,bass=false,pluck=false){
  if(!ctx||!master)return;
  if(!bass&&state.sound===3&&dx7Patch&&scheduleDX7Voice(midi,at,dur,vel))return;
@@ -1126,7 +1172,7 @@ function togglePlayback(){if(state.play||$('play').classList.contains('starting'
 function setTempo(value){const next=clamp(Math.round(Number(value)),48,160);if(!Number.isFinite(next)||next===state.tempo)return;state.tempo=next;if(delayNode&&ctx)delayNode.delayTime.setTargetAtTime(60/state.tempo*state.delayBeats,ctx.currentTime,.025);renderMeta();sessionSave();}
 function updateTempo(delta){setTempo(state.tempo+delta);}
 function changeKey(value){const [m,k]=value.split(':');if(m===state.mode&&Number(k)===state.key)return;pushUndo();state.mode=m;state.key=Number(k);const was=state.play;if(was)stopPlayback();startProgression();render();if(was)startPlayback();toast('Neue Tonart. Neue Möglichkeiten.');}
-function setSound(value){const next=value===undefined?(state.sound+1)%SOUNDS.length:Number(value);if(!Number.isInteger(next)||next<0||next>=SOUNDS.length)return;if(state.sound===3&&next!==3)clearDX7Notes();state.sound=next;renderMeta();sessionSave();if(next===3&&dx7Patch&&ctx?.state==='running')void ensureDX7Engine();if(!state.play)audition(state.steps[state.selected]);}
+function setSound(value){const next=value===undefined?(state.sound+1)%SOUNDS.length:Number(value);if(!Number.isInteger(next)||next<0||next>=SOUNDS.length)return;if(state.sound===3&&next!==3)resetDX7Engine();state.sound=next;renderMeta();sessionSave();if(next===3)void ensureDX7Patch().then(()=>{if(state.sound===3&&ctx?.state==='running')void ensureDX7Engine();});if(!state.play)audition(state.steps[state.selected]);}
 function setMotion(m){if(!['hold','pulse','arp','slice'].includes(m))return;state.motion=m==='slice'?'pulse':m;renderMeta();sessionSave();if(!state.play)audition(state.steps[state.selected]);}
 function setFeel(feel){if(!FEELS.includes(feel)||feel===state.feel)return;state.feel=feel;renderMeta();sessionSave();drawFM1();toast('FEEL: '+feel.toUpperCase()+' · FLIP für neue Vorschläge.');}
 function setFlipMode(mode){if(!['keep','all'].includes(mode))return;state.flipMode=mode;renderMeta();sessionSave();}
@@ -1143,8 +1189,8 @@ function changeEditor(which,value){pushUndo();const c=state.steps[state.selected
   harmonicVariation({editing:true,forceIndex:state.selected,skipUndo:true});
   render();audition(state.steps[state.selected]);
 }
-function saveIdea(){const item={recipeId:state.recipeId,feel:state.feel,arp:clone(state.arp),wonder:state.wonder,id:Date.now()+'-'+Math.floor(Math.random()*999),date:new Date().toISOString(),key:state.key,mode:state.mode,motion:state.motion,sound:state.sound,tempo:state.tempo,slice:clone(state.slice),delayBeats:state.delayBeats,steps:clone(state.steps)};state.saved.unshift(item);state.saved=state.saved.slice(0,16);store();renderSaved();toast('Saved! ♡');}
-function loadIdea(id){const entry=state.saved.find(s=>s.id===id);if(!entry)return;pushUndo();const was=state.play;if(was)stopPlayback();Object.assign(state,{recipeId:RECIPE_CATALOG.some(r=>r.id===entry.recipeId)?entry.recipeId:'classic',key:entry.key,mode:entry.mode,motion:entry.motion==='slice'?'pulse':entry.motion,sound:entry.sound,tempo:entry.tempo,feel:FEELS.includes(entry.feel)?entry.feel:'warm',arp:validArp(entry.arp)?entry.arp:{...ARP_DEFAULT},slice:validSlice(entry.slice)?entry.slice:{...SLICE_DEFAULT},delayBeats:[.25,.5,.75,1].includes(entry.delayBeats)?entry.delayBeats:.75,wonder:entry.wonder??state.wonder,steps:clone(entry.steps),selected:0});render();if(was)startPlayback();else audition(state.steps[0]);toast('Lieblingsidee geladen.');}
+function saveIdea(){const item={recipeId:state.recipeId,feel:state.feel,arp:clone(state.arp),wonder:state.wonder,id:Date.now()+'-'+Math.floor(Math.random()*999),date:new Date().toISOString(),key:state.key,mode:state.mode,motion:state.motion,sound:state.sound,dx7Preset:dx7PresetId(),tempo:state.tempo,slice:clone(state.slice),delayBeats:state.delayBeats,steps:clone(state.steps)};state.saved.unshift(item);state.saved=state.saved.slice(0,16);store();renderSaved();toast('Saved! ♡');}
+function loadIdea(id){const entry=state.saved.find(s=>s.id===id);if(!entry)return;pushUndo();const was=state.play;if(was)stopPlayback();Object.assign(state,{recipeId:RECIPE_CATALOG.some(r=>r.id===entry.recipeId)?entry.recipeId:'classic',key:entry.key,mode:entry.mode,motion:entry.motion==='slice'?'pulse':entry.motion,sound:entry.sound,dx7Preset:dx7PresetId(entry.dx7Preset),tempo:entry.tempo,feel:FEELS.includes(entry.feel)?entry.feel:'warm',arp:validArp(entry.arp)?entry.arp:{...ARP_DEFAULT},slice:validSlice(entry.slice)?entry.slice:{...SLICE_DEFAULT},delayBeats:[.25,.5,.75,1].includes(entry.delayBeats)?entry.delayBeats:.75,wonder:entry.wonder??state.wonder,steps:clone(entry.steps),selected:0});render();if(was)startPlayback();else audition(state.steps[0]);toast('Lieblingsidee geladen.');}
 function store(){try{localStorage.setItem('chordon-bleu.recipes.v1',JSON.stringify(state.saved));}catch(e){toast('Speicher ist voll oder blockiert. Bitte exportieren.');}}
 function loadSaved(){try{const obj=JSON.parse(localStorage.getItem('chordon-bleu.recipes.v1')||localStorage.getItem('elsewhere.souvenirs.v1')||'[]');if(Array.isArray(obj))state.saved=obj.filter(i=>i&&Number.isInteger(i.key)&&MODES[i.mode]&&Array.isArray(i.steps)&&i.steps.length===4&&i.steps.every(c=>c&&Q[c.quality]&&Number.isInteger(c.root))).slice(0,16);}catch(e){state.saved=[];}}
 function exportIdeas(){const data={name:'CHORDON BLEU recipes',version:1,ideas:state.saved};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const link=document.createElement('a');link.href=url;link.download='chordon-bleu-recipes.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),2000);toast('Deine Ideen sind exportiert.');}
@@ -1162,7 +1208,7 @@ function renderEditor(){const c=state.steps[state.selected];$('editcount').textC
   $('edithint').textContent=r&&t?'Root and quality fixed.':r?'Root fixed. Quality can change.':t?'Quality fixed. Root can change.':'AUTO: both can change.';
 }
 function renderMeta(){renderRecipe();$('play').innerHTML=state.play?'<b aria-hidden="true">Ⅱ</b><span>PAUSE</span>':'<b aria-hidden="true">▶</b><span>PLAY</span>';$('play').setAttribute('aria-label',state.play?'Loop pausieren':'Loop abspielen');
- $('wonderval').textContent=state.wonder;$('wonderlevel').textContent=state.wonder<22?'MILD':state.wonder<57?'MEDIUM':state.wonder<81?'SPICY':'EXTRA HOT';$('wonder').value=state.wonder;$('tempotext').textContent=state.tempo+' BPM';$('tempoSlider').value=String(state.tempo);$('tempoSlider').setAttribute('aria-valuetext',state.tempo+' beats per minute');$('stagebpm').textContent=state.tempo+' BPM';$('sound').value=String(state.sound);$('dx7-original').hidden=state.sound!==3;$('sound').options[3].textContent=dx7Patch?'DX7 E.PIANO 1 · ROM1A':'DX7 EP · PREVIEW';if(dx7Patch&&dx7Node)$('dx7status').textContent='ORIGINAL E.PIANO 1 · 6 Operatoren aktiv';$('key').value=state.mode+':'+state.key;
+ $('wonderval').textContent=state.wonder;$('wonderlevel').textContent=state.wonder<22?'MILD':state.wonder<57?'MEDIUM':state.wonder<81?'SPICY':'EXTRA HOT';$('wonder').value=state.wonder;$('tempotext').textContent=state.tempo+' BPM';$('tempoSlider').value=String(state.tempo);$('tempoSlider').setAttribute('aria-valuetext',state.tempo+' beats per minute');$('stagebpm').textContent=state.tempo+' BPM';$('sound').value=String(state.sound);$('dx7-original').hidden=state.sound!==3;$('sound').options[3].textContent='DX7 · AQUANODE';if($('dx7preset'))$('dx7preset').value=dx7PresetId();$('key').value=state.mode+':'+state.key;
  document.querySelectorAll('[data-motion]').forEach(b=>{b.classList.toggle('active',b.dataset.motion===state.motion);b.setAttribute('aria-pressed',String(b.dataset.motion===state.motion));});$('undo').disabled=!state.undo.length;
  $('keepone').classList.toggle('active',state.flipMode==='keep');$('allfour').classList.toggle('active',state.flipMode==='all');$('keepone').setAttribute('aria-pressed',String(state.flipMode==='keep'));$('allfour').setAttribute('aria-pressed',String(state.flipMode==='all'));
  document.querySelectorAll('[data-feel]').forEach(b=>{b.classList.toggle('active',b.dataset.feel===state.feel);b.setAttribute('aria-pressed',String(b.dataset.feel===state.feel));});
@@ -1172,15 +1218,15 @@ function renderMeta(){renderRecipe();$('play').innerHTML=state.play?'<b aria-hid
 }
 function renderPads(){$('pads').replaceChildren();const M=MODES[state.mode];for(let i=0;i<7;i++){const c=baseChord(i,false),btn=document.createElement('button');btn.className='pad';btn.type='button';btn.setAttribute('aria-label',`Play ${rootName(c.root)} ${Q[c.quality].label}`);btn.innerHTML=`<span class="roman">${M.roman[i]}</span><span class="padchord">${label(c)}</span>`;btn.addEventListener('click',()=>padChord(i));$('pads').appendChild(btn);}}
 function renderSaved(){const wrap=$('saved');wrap.replaceChildren();if(state.saved.length===0){const empty=document.createElement('span');empty.className='empty';empty.textContent='No saved loops yet.';wrap.appendChild(empty);return;}state.saved.forEach((item,i)=>{const b=document.createElement('button');b.type='button';b.className='savedbtn';const name=Array.isArray(item.steps)?item.steps.map(label).join(' · '):'Idea';const recipe=RECIPE_CATALOG.find(r=>r.id===item.recipeId);b.textContent='♡ '+(recipe?'✦ ':'')+(state.saved.length-i)+'  '+name;b.title='Load saved loop';b.addEventListener('click',()=>loadIdea(item.id));wrap.appendChild(b);});}
-function sessionSave(){try{localStorage.setItem('chordon-bleu.session.v1',JSON.stringify({recipeId:state.recipeId,key:state.key,mode:state.mode,wonder:state.wonder,tempo:state.tempo,motion:state.motion,sound:state.sound,feel:state.feel,flipMode:state.flipMode,arp:state.arp,slice:state.slice,delayBeats:state.delayBeats,steps:state.steps}));}catch(_){}}
-function sessionLoad(){try{const x=JSON.parse(localStorage.getItem('chordon-bleu.session.v1')||localStorage.getItem('elsewhere.session.v2')||'null');if(!x||!MODES[x.mode]||!Number.isInteger(x.key)||x.key<0||x.key>11||!Number.isInteger(x.tempo)||x.tempo<48||x.tempo>160||!Number.isInteger(x.wonder)||x.wonder<0||x.wonder>100||!['hold','pulse','arp','slice'].includes(x.motion)||!Number.isInteger(x.sound)||x.sound<0||x.sound>=SOUNDS.length||!Array.isArray(x.steps)||x.steps.length!==4||!x.steps.every(c=>Number.isInteger(c.root)&&c.root>=0&&c.root<12&&Q[c.quality]&&(c.manualRoot===null||(Number.isInteger(c.manualRoot)&&c.manualRoot>=0&&c.manualRoot<12))&&(c.manualQuality===null||Q[c.manualQuality])))return false;Object.assign(state,{recipeId:RECIPE_CATALOG.some(r=>r.id===x.recipeId)?x.recipeId:'classic',key:x.key,mode:x.mode,wonder:x.wonder,tempo:x.tempo,motion:x.motion==='slice'?'pulse':x.motion,sound:x.sound,feel:FEELS.includes(x.feel)?x.feel:'warm',flipMode:['keep','all'].includes(x.flipMode)?x.flipMode:'keep',arp:validArp(x.arp)?x.arp:{...ARP_DEFAULT},slice:validSlice(x.slice)?x.slice:{...SLICE_DEFAULT},delayBeats:[.25,.5,.75,1].includes(x.delayBeats)?x.delayBeats:.75,steps:x.steps});return true;}catch(_){return false;}}
+function sessionSave(){try{localStorage.setItem('chordon-bleu.session.v1',JSON.stringify({recipeId:state.recipeId,key:state.key,mode:state.mode,wonder:state.wonder,tempo:state.tempo,motion:state.motion,sound:state.sound,dx7Preset:dx7PresetId(),feel:state.feel,flipMode:state.flipMode,arp:state.arp,slice:state.slice,delayBeats:state.delayBeats,steps:state.steps}));}catch(_){}}
+function sessionLoad(){try{const x=JSON.parse(localStorage.getItem('chordon-bleu.session.v1')||localStorage.getItem('elsewhere.session.v2')||'null');if(!x||!MODES[x.mode]||!Number.isInteger(x.key)||x.key<0||x.key>11||!Number.isInteger(x.tempo)||x.tempo<48||x.tempo>160||!Number.isInteger(x.wonder)||x.wonder<0||x.wonder>100||!['hold','pulse','arp','slice'].includes(x.motion)||!Number.isInteger(x.sound)||x.sound<0||x.sound>=SOUNDS.length||!Array.isArray(x.steps)||x.steps.length!==4||!x.steps.every(c=>Number.isInteger(c.root)&&c.root>=0&&c.root<12&&Q[c.quality]&&(c.manualRoot===null||(Number.isInteger(c.manualRoot)&&c.manualRoot>=0&&c.manualRoot<12))&&(c.manualQuality===null||Q[c.manualQuality])))return false;Object.assign(state,{recipeId:RECIPE_CATALOG.some(r=>r.id===x.recipeId)?x.recipeId:'classic',key:x.key,mode:x.mode,wonder:x.wonder,tempo:x.tempo,motion:x.motion==='slice'?'pulse':x.motion,sound:x.sound,dx7Preset:dx7PresetId(x.dx7Preset),feel:FEELS.includes(x.feel)?x.feel:'warm',flipMode:['keep','all'].includes(x.flipMode)?x.flipMode:'keep',arp:validArp(x.arp)?x.arp:{...ARP_DEFAULT},slice:validSlice(x.slice)?x.slice:{...SLICE_DEFAULT},delayBeats:[.25,.5,.75,1].includes(x.delayBeats)?x.delayBeats:.75,steps:x.steps});return true;}catch(_){return false;}}
 function render(){renderStage();renderEditor();renderMeta();renderPads();renderSaved();sessionSave();drawFM1();}
 function renderRecipe(){document.querySelectorAll('[data-recipe]').forEach(b=>{const active=b.dataset.recipe===state.recipeId;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});}
 
 function toast(msg){const box=$('toast');box.textContent=msg;box.classList.add('shown');clearTimeout(toastTimer);toastTimer=setTimeout(()=>box.classList.remove('shown'),2400);}
 function holdButton(id,name){const b=$(id);let held=false;const set=v=>{held=v;state[name]=v;b.classList.toggle('pressed',v);if(ctx){const fx=name==='holdRush'?chorusWet:name==='holdDelay'?delayWet:null;if(fx)fx.gain.setTargetAtTime(v?.35:0,ctx.currentTime,.035);}};b.addEventListener('pointerdown',e=>{if(e.button!==0)return;set(true);b.setPointerCapture(e.pointerId);ensureAudio().then(ok=>{if(!ok||!held)return;set(true);/* While PLAY is running, PUNCH is effect-only: never retrigger the chord. */if(!state.play){const c=state.steps[state.selected];if(c)playVoicing(c,ctx.currentTime+.012,.72,'hold');}});});for(const event of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(event,()=>{if(held)set(false);});b.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){set(true);}});b.addEventListener('keyup',()=>set(false));}
 function setup(){for(let key=0;key<12;key++)for(const mode of ['major','minor']){const opt=document.createElement('option');opt.value=mode+':'+key;opt.textContent=rootName(key)+' '+(mode==='major'?'MAJOR':'MINOR');$('key').appendChild(opt);}let auto=document.createElement('option');auto.value='auto';auto.textContent='AUTO';$('root').appendChild(auto);for(let i=0;i<12;i++){const opt=document.createElement('option');opt.value=String(i);opt.textContent=rootName(i);$('root').appendChild(opt);}auto=document.createElement('option');auto.value='auto';auto.textContent='AUTO';$('quality').appendChild(auto);for(const [id,q] of Object.entries(Q)){const opt=document.createElement('option');opt.value=id;opt.textContent=q.label;$('quality').appendChild(opt);}for(const [i,preset] of SOUNDS.entries()){const opt=document.createElement('option');opt.value=String(i);opt.textContent=preset.name;$('sound').appendChild(opt);}
-  restoreDX7Patch();loadSaved();if(!sessionLoad())startProgression();render();$('play').addEventListener('click',togglePlayback);$('audionudge').addEventListener('click',async()=>{releaseAudio();if(await ensureAudio()){toast('Audio neu gestartet. ▶');if(!state.play)startPlayback();}});$('mutate').addEventListener('click',()=>{if(harmonicVariation()&&!state.play)startPlayback();});$('recipechoices').addEventListener('click',e=>{const b=e.target.closest('[data-recipe]');if(b)selectRecipe(b.dataset.recipe);});$('keepone').addEventListener('click',()=>setFlipMode('keep'));$('allfour').addEventListener('click',()=>setFlipMode('all'));$('feelchoices').addEventListener('click',e=>{const b=e.target.closest('[data-feel]');if(b)setFeel(b.dataset.feel);});$('slicehits').addEventListener('change',e=>setSlice('hits',e.target.value));$('slicerate').addEventListener('change',e=>setSlice('rate',e.target.value));$('slicegate').addEventListener('input',e=>setSlice('gate',e.target.value));$('cb-delay-time').addEventListener('change',e=>{state.delayBeats=Number(e.target.value);if(delayNode&&ctx)delayNode.delayTime.setTargetAtTime(60/state.tempo*state.delayBeats,ctx.currentTime,.02);sessionSave();});$('arprate').addEventListener('change',e=>setArp('rate',e.target.value));$('arpgate').addEventListener('input',e=>setArp('gate',e.target.value));$('arpdirection').addEventListener('change',e=>setArp('direction',e.target.value));$('arporder').addEventListener('change',e=>setArp('order',e.target.value));$('keep').addEventListener('click',saveIdea);$('undo').addEventListener('click',undo);$('newloop').addEventListener('click',newLoop);$('key').addEventListener('change',e=>changeKey(e.target.value));$('root').addEventListener('change',e=>changeEditor('root',e.target.value));$('quality').addEventListener('change',e=>changeEditor('quality',e.target.value));$('wonder').addEventListener('input',e=>{state.wonder=Number(e.target.value);renderMeta();drawFM1();sessionSave();});$('wonder').addEventListener('change',()=>{if(harmonicVariation()){const i=state.flipMode==='keep'?(state.selected+1)%4:state.selected;if(!state.play)audition(state.steps[i]);}});$('sound').addEventListener('change',e=>setSound(e.target.value));$('dx7file').addEventListener('change',async e=>{const file=e.target.files?.[0];e.target.value='';if(!file)return;try{if(file.size!==4104)throw Error('Erwartet wird eine DX7-Bank mit 4104 Bytes.');const bytes=new Uint8Array(await file.arrayBuffer());const patch=await importDX7Bank(bytes);toast('Original '+patch.name+' geladen.');if(!state.play)audition(state.steps[state.selected]);}catch(error){$('dx7status').textContent='Import: '+error.message;toast('DX7-Import nicht möglich.');}});$('tempoSlider').addEventListener('input',e=>setTempo(e.target.value));$('motion').addEventListener('click',e=>{const b=e.target.closest('[data-motion]');if(b)setMotion(b.dataset.motion);});$('rec').addEventListener('click',recToggle);$('export').addEventListener('click',exportIdeas);$('import').addEventListener('change',e=>{importIdeas(e.target.files?.[0]);e.target.value='';});$('help').addEventListener('click',()=>{$('dialogoverlay').classList.add('open');$('closedialog').focus();});$('closedialog').addEventListener('click',()=>{$('dialogoverlay').classList.remove('open');$('help').focus();});$('dialogoverlay').addEventListener('click',e=>{if(e.target===$('dialogoverlay'))$('dialogoverlay').classList.remove('open');});holdButton('lift','holdLift');holdButton('rush','holdRush');holdButton('cb-delay','holdDelay');
+  restoreDX7Patch();loadSaved();if(!sessionLoad())startProgression();render();if(state.sound===3)void ensureDX7Patch();$('dx7preset').addEventListener('change',e=>{void selectDX7Preset(e.target.value);});$('play').addEventListener('click',togglePlayback);$('audionudge').addEventListener('click',async()=>{releaseAudio();if(await ensureAudio()){toast('Audio neu gestartet. ▶');if(!state.play)startPlayback();}});$('mutate').addEventListener('click',()=>{if(harmonicVariation()&&!state.play)startPlayback();});$('recipechoices').addEventListener('click',e=>{const b=e.target.closest('[data-recipe]');if(b)selectRecipe(b.dataset.recipe);});$('keepone').addEventListener('click',()=>setFlipMode('keep'));$('allfour').addEventListener('click',()=>setFlipMode('all'));$('feelchoices').addEventListener('click',e=>{const b=e.target.closest('[data-feel]');if(b)setFeel(b.dataset.feel);});$('slicehits').addEventListener('change',e=>setSlice('hits',e.target.value));$('slicerate').addEventListener('change',e=>setSlice('rate',e.target.value));$('slicegate').addEventListener('input',e=>setSlice('gate',e.target.value));$('cb-delay-time').addEventListener('change',e=>{state.delayBeats=Number(e.target.value);if(delayNode&&ctx)delayNode.delayTime.setTargetAtTime(60/state.tempo*state.delayBeats,ctx.currentTime,.02);sessionSave();});$('arprate').addEventListener('change',e=>setArp('rate',e.target.value));$('arpgate').addEventListener('input',e=>setArp('gate',e.target.value));$('arpdirection').addEventListener('change',e=>setArp('direction',e.target.value));$('arporder').addEventListener('change',e=>setArp('order',e.target.value));$('keep').addEventListener('click',saveIdea);$('undo').addEventListener('click',undo);$('newloop').addEventListener('click',newLoop);$('key').addEventListener('change',e=>changeKey(e.target.value));$('root').addEventListener('change',e=>changeEditor('root',e.target.value));$('quality').addEventListener('change',e=>changeEditor('quality',e.target.value));$('wonder').addEventListener('input',e=>{state.wonder=Number(e.target.value);renderMeta();drawFM1();sessionSave();});$('wonder').addEventListener('change',()=>{if(harmonicVariation()){const i=state.flipMode==='keep'?(state.selected+1)%4:state.selected;if(!state.play)audition(state.steps[i]);}});$('sound').addEventListener('change',e=>setSound(e.target.value));$('dx7file').addEventListener('change',async e=>{const file=e.target.files?.[0];e.target.value='';if(!file)return;try{if(file.size!==4104)throw Error('Erwartet wird eine DX7-Bank mit 4104 Bytes.');const bytes=new Uint8Array(await file.arrayBuffer());const patch=await importDX7Bank(bytes);toast('Original '+patch.name+' geladen.');if(!state.play)audition(state.steps[state.selected]);}catch(error){$('dx7status').textContent='Import: '+error.message;toast('DX7-Import nicht möglich.');}});$('tempoSlider').addEventListener('input',e=>setTempo(e.target.value));$('motion').addEventListener('click',e=>{const b=e.target.closest('[data-motion]');if(b)setMotion(b.dataset.motion);});$('rec').addEventListener('click',recToggle);$('export').addEventListener('click',exportIdeas);$('import').addEventListener('change',e=>{importIdeas(e.target.files?.[0]);e.target.value='';});$('help').addEventListener('click',()=>{$('dialogoverlay').classList.add('open');$('closedialog').focus();});$('closedialog').addEventListener('click',()=>{$('dialogoverlay').classList.remove('open');$('help').focus();});$('dialogoverlay').addEventListener('click',e=>{if(e.target===$('dialogoverlay'))$('dialogoverlay').classList.remove('open');});holdButton('lift','holdLift');holdButton('rush','holdRush');holdButton('cb-delay','holdDelay');
   window.addEventListener('keydown',e=>{if(e.target.matches('input,select,textarea')||e.ctrlKey||e.altKey||e.metaKey)return;if(e.key==='Escape'){$('dialogoverlay').classList.remove('open');return;}const key=e.key.toLowerCase();if(key===' '){e.preventDefault();if(!e.repeat)togglePlayback();}if(key==='w'&&!e.repeat)harmonicVariation();if(key==='k'&&!e.repeat)saveIdea();if(key==='z'&&!e.repeat)undo();if('1234'.includes(key)){state.selected=Number(key)-1;renderStage();renderEditor();audition(state.steps[state.selected]);}const p='asdfghj'.indexOf(key);if(p!==-1&&!e.repeat)padChord(p);});
   document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.play)stopPlayback();});
 }

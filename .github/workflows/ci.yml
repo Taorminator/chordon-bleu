@@ -13,6 +13,10 @@ jobs:
           node-version: "22"
       - name: Validate offline recipe bundle
         run: node tools/build-recipes.mjs --check
+      - name: Validate integrated DX7 presets and browser lifecycle
+        run: |
+          node tools/build-dx7-presets.mjs --check
+          node tests/dx7-presets.test.mjs
       - name: Verify physical FM1 button grid and control dispatch
         run: node tests/fm1-panel.test.mjs
       - name: Validate FM1 browser device surface
