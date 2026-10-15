@@ -8,9 +8,19 @@
 
 A tiny, independent musical idea machine for discovering four-chord loops with no music-theory training and minimal setup. This source tree has its **own Git history, CI workflow, design identity and roadmap**. It does not require FM-XY or any other custom firmware.
 
+## Live browser demo
+
+**[▶ Open the CHORDON BLEU demo](https://taorminator.github.io/chordon-bleu/)** — runs directly in your browser, including iPhone Safari. Tap **PLAY** to start the audio; no installation or account is required.
+
+Build and play four-chord loops, explore variations with **FLIP**, **FEEL** and **SPICE**, set each chord's **ROOT** and **TYPE** independently to manual or AUTO, and try the arpeggiator and recipe palettes. Save favorites locally in your browser and export/import them as JSON.
+
+**Demo status — 2026-10-15:** a playable Web Audio prototype for exploring the instrument's music and interaction design. The FM1 Screen Lab is a 240 × 240 concept simulator. Browser behavior and sounds do not establish native FM1 feature parity or hardware readiness; **FM1 firmware is not approved for installation**.
+
+**Next on the documented roadmap:** consolidate the native CI baseline and verify the resulting `main` commit, improve one bounded native behavior with regression coverage, then establish physical hardware and backup/recovery testing. Native/browser recipe parity, durable flash SAVE and measured device performance remain open work. See [verified project state](docs/PROJECT_STATE.md) and [FM1 acceptance gates](docs/FM1_ACCEPTANCE.md) for details and release requirements.
+
 ## Play
 
-The fully playable Web Audio prototype is a single standalone [`index.html`](index.html). Upload a ZIP of this project to a static HTTPS host (for instance Netlify Drop), open it directly in iPhone Safari, then tap PLAY. No external scripts, login or server is needed for the synthesizer itself.
+The Web Audio prototype is a single standalone [`index.html`](index.html). Use the hosted demo above, or upload a ZIP of this project to a static HTTPS host (for instance Netlify Drop). No external scripts, login or server is needed for the synthesizer itself.
 
 - PLAY: repeat a four-chord loop.
 - FLIP / KEEP 1: keep your selected chord unchanged, then re-harmonize the other slots.
@@ -70,7 +80,7 @@ This is **not installable FM1 firmware yet**. The browser sound engine and porta
 
 ## GitHub
 
-This is the dedicated repository `Taorminator/chordon-bleu`, with its **own** `main` branch. No FM-XY dependency is needed. Publish through Pages with `main` / `/(root)` if desired. The zip can also be uploaded directly to Netlify Drop for iPhone testing.
+This is the dedicated repository `Taorminator/chordon-bleu`, with its **own** `main` branch. No FM-XY dependency is needed. The [live demo](https://taorminator.github.io/chordon-bleu/) is deployed by the repository's [GitHub Pages workflow](.github/workflows/pages.yml). The ZIP can also be uploaded directly to Netlify Drop for iPhone testing.
 
 ## License and acknowledgement
 
