@@ -12,7 +12,7 @@ A tiny, independent musical idea machine for discovering four-chord loops with n
 
 **[▶ Open the CHORDON BLEU demo](https://taorminator.github.io/chordon-bleu/)** — runs directly in your browser, including iPhone Safari. Tap **PLAY** to start the audio; no installation or account is required.
 
-Build and play four-chord loops, explore variations with **FLIP**, **FEEL** and **SPICE**, set each chord's **ROOT** and **TYPE** independently to manual or AUTO, and try the arpeggiator and recipe palettes. Save favorites locally in your browser and export/import them as JSON.
+Build and play four-chord loops, explore variations with **FLIP**, **FEEL** and **SPICE**, set each chord's **ROOT** and **TYPE** independently to manual or AUTO, and try the arpeggiator and recipe palettes. Save favorites locally in your browser and download them as MIDI or import a compatible MIDI into the same list.
 
 **Demo status — 2026-10-15:** a playable Web Audio prototype for exploring the instrument's music and interaction design. The FM1 Screen Lab is a 240 × 240 concept simulator. Browser behavior and sounds do not establish native FM1 feature parity or hardware readiness; **FM1 firmware is not approved for installation**.
 
@@ -29,7 +29,16 @@ The Web Audio prototype is a single standalone [`index.html`](index.html). Use t
 - SPICE: adjust how surprising suggested chords may be.
 - ROOT and TYPE: freely chosen or AUTO, independently, for each chord.
 - ARP: direct RATE, GATE, DIRECTION and ORDER controls (four FM1 hardware knobs planned).
-- SAVE: store favorites in the browser; JSON export and import protect your ideas.
+- SAVE: store favorites in the browser; each row has MIDI download and × delete actions.
+- MIDI: download the current four-chord loop as a `.mid` file for a DAW (also available in FM1 device view).
+
+## MIDI download and import
+
+Tap **↓ MIDI** next to the chord cards to download the current loop, including a progression entered with REC. Each saved favorite has its own **↓ MIDI** button: export it directly using its stored tempo, notes and HOLD/PULSE/ARP settings without loading it or interrupting playback. Its **×** button deletes just that favorite from browser storage; the current playing loop remains unchanged. The file contains two bars in 4/4, the current tempo, voice-led chord notes and bass on separate MIDI channels (1 and 2), plus the current HOLD, PULSE or ARP rhythm, gates and swing. It is a standard format-0 MIDI file at 960 PPQ and requires no Web MIDI permission, server or active audio.
+
+This exports one cycle of the current loop, not a recording of your complete live session, keyboard solos or earlier FLIPs. Random ARP makes a new random pass at export time. Notes and velocities are included; browser sounds, audio effect tails and automation are not. The redundant JSON export/import controls have been removed; existing browser favorites remain intact. CHORDON MIDI exports additionally contain validated app-specific metadata so re-import can restore chord identities and HOLD/PULSE/ARP settings even for sparse or random ARPs. Other MIDI software can ignore these standard sequencer-specific metadata events.
+
+Use **↑ MIDI IMPORTIEREN** below the favorites list. Own CHORDON exports restore tempo, chord identities and motion settings. Foreign standard MIDI type 0/1 files are accepted as four two-beat chord slots in two bars of 4/4, at 48–160 BPM, with one tempo and no sustain-pedal events. Their pitch-class sets are matched against supported chord qualities, preferring the bass as root when several matches exist: this is a possible harmonic interpretation, not unique music-theory analysis. Recognized foreign loops use HOLD; arbitrary performance rhythm, solos, drums and longer arrangements are not recreated. Incompatible files report a reason and do not replace existing ideas. Imports add one favorite without changing live playback. The 16-idea limit is checked before import; no existing favorite is evicted.
 
 ## RECIPES · CHORDON BLEU 0.5
 
