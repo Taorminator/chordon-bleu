@@ -20,10 +20,16 @@ jobs:
       - uses: actions/checkout@v4
       - name: Validate bundled recipes
         run: node tools/build-recipes.mjs --check
+      - name: Validate bundled DX7 sounds
+        run: node tools/build-dx7-presets.mjs --check
       - name: Assemble standalone HTML site
         run: |
           mkdir -p _site/install _site/docs
           cp index.html _site/index.html
+          cp -R vendor _site/vendor
+          mkdir -p _site/assets/dx7
+          cp assets/dx7/aquanode-presets.js _site/assets/dx7/
+          cp -R assets/dx7/aquanode _site/assets/dx7/aquanode
           cp install/index.html _site/install/index.html
           if [ -f install/release-manifest.json ]; then cp install/release-manifest.json _site/install/; fi
           if [ -f docs/fm1-four-screens.png ]; then cp docs/fm1-four-screens.png _site/docs/; fi
