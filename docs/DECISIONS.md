@@ -23,6 +23,21 @@ Decisions below consolidate existing README, project instructions and earlier do
 ## D-007 — Short, validated increments
 **Status: Active.** Resolve red CI from job logs first; after green baseline develop one small scoped native improvement, run tests again, and record exact branch/commit/run. No claim of autonomous background development without automation.
 
+## D-008 — Explained harmonic freedom, not unchecked randomness
+**Status: Active product requirement; implementation pending.** Recorded 2026-10-15
+following the user's request that generated progressions stay musically connected
+while permitting root changes, tonal changes and meaningful dissonance.
+See [Harmony contract](HARMONY_CONTRACT.md) for sources, audited gaps and test cases.
+AUTO proposals must have a supported harmonic/schema/voice-leading explanation,
+including the loop seam. SPICE expands supported exploration, never bypasses
+coherence; FEEL must not invalidate an accepted result through post-processing.
+Preserve independent manual fields and KEEP 1. Existing ALL 4 remains an explicit
+reset, but failure to find a coherent full replacement must leave the loop unchanged.
+User-fixed combinations cannot be guaranteed coherent and must not be silently
+rewritten. No additional menus, hardware claims or release approval follow from
+this documentation. Implement in small tested increments, starting with correct
+diatonic baseline masks.
+
 ## Pending decisions
 - Exact hardware test and recovery plan, including a recoverable FM1 unit and validated backup procedure.
 - Target CPU/RAM/audio/LCD budgets based on real measurements.
