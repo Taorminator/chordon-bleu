@@ -4,12 +4,12 @@ import vm from 'node:vm';
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const extract=(a,b)=>html.slice(html.indexOf(a),html.indexOf(b,html.indexOf(a)));
 const state={tempo:120,motion:'hold',selected:0,holdLift:false,arp:{rate:8,gate:74,direction:'up',order:'pitch'},slice:{rate:8,gate:40,hits:4},steps:[0,5,9,7].map(root=>({root,quality:'maj'}))};
-const sandbox={state,Uint8Array,Math,clamp:(v,a,b)=>Math.max(a,Math.min(b,v)),mod:n=>(n%12+12)%12,tone(){throw Error('Export must not start audio');}};
+const sandbox={state,Uint8Array,TextEncoder,Math,clamp:(v,a,b)=>Math.max(a,Math.min(b,v)),mod:n=>(n%12+12)%12,tone(){throw Error('Export must not start audio');}};
 vm.createContext(sandbox);
 vm.runInContext(extract('const Q={','const QUALITY_IDS='),sandbox);
 vm.runInContext(extract('function noteToMidi(c){','// iPhone Safari'),sandbox);
 vm.runInContext(extract('function arpBaseNotes(','async function audition(c){'),sandbox);
-vm.runInContext(extract('function buildLoopMidi(){','function exportLoopMidi(){'),sandbox);
+vm.runInContext(extract('function buildLoopMidi(source=state){','function exportLoopMidi(){'),sandbox);
 // Independent SMF decoder: checks actual bytes, lengths, deltas and note balance.
 function parse(bytes){
  const b=Buffer.from(bytes);assert.equal(b.toString('ascii',0,4),'MThd');assert.equal(b.readUInt32BE(4),6);
@@ -48,9 +48,26 @@ console.log('PASS MIDI: SMF structure, tempo, 2 bars, playback voicings/bass/str
 let downloadedBlob,clicked=false,removed=false,revoked=false,message='';
 const link={click(){clicked=true;},remove(){removed=true;}};
 Object.assign(sandbox,{Blob,URL:{createObjectURL(blob){downloadedBlob=blob;return 'blob:midi-test';},revokeObjectURL(url){assert.equal(url,'blob:midi-test');revoked=true;}},document:{body:{appendChild(a){assert.equal(a,link);}},createElement(tag){assert.equal(tag,'a');return link;}},setTimeout(fn,ms){assert.equal(ms,10000);fn();},toast(text){message=text;}});
-vm.runInContext(extract('function exportLoopMidi(){','function exportIdeas(){'),sandbox);
+vm.runInContext(extract('function exportLoopMidi(){','// Bounded SMF parser.'),sandbox);
 sandbox.exportLoopMidi();
 assert.equal(downloadedBlob.type,'audio/midi');parse(new Uint8Array(await downloadedBlob.arrayBuffer()));
 assert.equal(link.href,'blob:midi-test');assert.match(link.download,/^chordon-bleu-160bpm-arp\.mid$/);
 assert.ok(clicked&&removed&&revoked);assert.match(message,/MIDI/);
 console.log('PASS MIDI download: Blob MIME, filename, click, cleanup and valid downloaded bytes.');
+// Saved MIDI must use its own snapshot while a different live loop is playing.
+sandbox.validArp=()=>true;sandbox.validSlice=()=>true;
+const saved={id:'favorite',tempo:76,motion:'hold',steps:[2,4,9,7].map(root=>({root,quality:'m7'})),arp:{rate:4,gate:25,direction:'down',order:'outside'},slice:{hits:2,rate:4,gate:15}};
+state.saved=[saved];state.play=true;state.holdLift=true;
+let before=JSON.stringify(state);sandbox.exportSavedMidi('favorite');
+let savedEvents=parse(new Uint8Array(await downloadedBlob.arrayBuffer()));
+assert.equal(link.download,'chordon-bleu-76bpm-hold.mid');
+assert.equal(savedEvents.find(e=>e.type===81).data.readUIntBE(0,3),Math.round(60000000/76));
+assert.equal(savedEvents.filter(e=>e.on).length,20);assert.equal(JSON.stringify(state),before);
+saved.motion='arp';before=JSON.stringify(state);sandbox.exportSavedMidi('favorite');
+savedEvents=parse(new Uint8Array(await downloadedBlob.arrayBuffer()));
+assert.equal(link.download,'chordon-bleu-76bpm-arp.mid');
+assert.equal(savedEvents.filter(e=>e.on).length,12,'Saved ARP rate 4, not live rate 32');
+const firstOn=savedEvents.find(e=>e.on&&(e.status&15)===0);
+const firstOff=savedEvents.find(e=>e.on===false&&(e.status&15)===0&&e.pitch===firstOn.pitch);
+assert.equal(firstOff.tick-firstOn.tick,240,'Saved ARP 25% gate');assert.equal(JSON.stringify(state),before);
+console.log('PASS saved MIDI: snapshot tempo/notes/motion/rate/gate; live playback and stored favorite unchanged.');

@@ -1,24 +1,45 @@
-# DX7 E.PIANO 1 in CHORDON BLEU (Browser)
+# Integrated DX7 sounds (Browser)
 
-The Yamaha DX7 factory preset **E.PIANO 1** is voice **11 (index 10)** in **ROM1A**, algorithm **5** (zero-based value 4). The original FM1 factory preset **PIANO 1** is reported byte-identical to this voice in the FM1 factory-preset provenance analysis.
+Choose **DX7 · AQUANODE** in PERFORM, then select a named sound. The 153 selectable
+presets are bundled locally in five bank groups; no preset download, upload or
+third-party network request is required. `Aqua Zone · DX Fast 1` is the default.
+SAVE, session restore and exported/imported ideas retain the stable preset ID.
+Existing WARM/GLASS/DUSK/GRAND/90s HOUSE sounds and recipe independence remain intact.
 
-Sources:
+The original Aquanode banks are CC0-1.0. See the pinned source, license, SHA-256
+manifest and exclusions in [preset provenance](../assets/dx7/aquanode/README.md).
+`node tools/build-dx7-presets.mjs --check` verifies the generated local bundle.
+Placeholder voices and the malformed `Klick` slot are not offered in the selector.
+The published site includes the catalog, parameter banks, engine and license files.
+
+## Audio behavior and verification scope
+
+The existing MIT-licensed [OpenDX7](https://github.com/keithadler/opendx7) AudioWorklet
+renders six operators. Initial playback awaits the selected preset and engine.
+Changing presets panics/disconnects old nodes, cancels pending note timers and
+invalidates obsolete async loads. Each AudioContext registers the processor once.
+Unsupported or failed AudioWorklet startup explicitly reports **FM-Preview**;
+that two-operator fallback is not the selected Aquanode sound.
+
+Tests render all selectable patches for finite, bounded DSP output and verify
+rapid-switch lifecycle, panic, fallback and preset persistence. They do not prove
+subjective sound quality, bit-identical Dexed/DX7 reproduction, or real Safari/FM1
+behavior. Presets are parameter data, not samples. Native FM1 integration and its
+resource/voice budgets are unchanged and require a separate port and verification.
+
+## Optional existing E.PIANO 1 import
+
+The previous import remains under **Eigene E.PIANO 1 laden**. Users who want the
+specific Yamaha factory E.PIANO 1 can still import their own complete ROM1A or
+matching FM1 bank (4104 bytes). Header/checksum and preset identity are checked.
+No Yamaha ROM patch data is distributed here. A previously stored user patch is
+retained and selectable as **Eigene · E.PIANO 1**. Exported ideas store only its
+`user` identifier, not private patch data; another browser needs its own import.
+
+Factory preset provenance references:
 - https://yamahablackboxes.com/collection/yamaha-dx7-synthesizer/patches/
-- https://github.com/KingParamount/fm1-factory-presets/blob/main/docs/protocol-and-provenance.md
-- https://github.com/asb2m10/dexed
+- https://github.com/keithadler/opendx7
 
-## Browser
-
-1. Choose `DX7 EP · PREVIEW` as the instrument.
-2. Choose **ORIGINAL E.PIANO 1 LADEN (.SYX)**.
-3. Import **your own** full Yamaha DX7 32-voice `ROM1A.syx` or recovered FM1 factory bank 1 (4104 bytes).
-4. The voice is validated (SysEx header, length, checksum, algorithm and name). The selected patch parameters are cached locally in the browser. The Yamaha bank is **not** bundled or uploaded anywhere.
-5. A local, six-operator FM AudioWorklet renders it using the MIT-licensed [OpenDX7](https://github.com/keithadler/opendx7) engine, whose own documentation compares output with Dexed/msfa.
-
-The Yamaha original preset parameters are used **only after import**. The built-in `DX7 EP` is a deliberately labeled **two-operator approximation** until then. Some older Safari/WebKit builds may not support loading the six-operator AudioWorklet: in that case the approximation remains audible.
-
-The original hardware's DAC / analog output chain and exact performance controls are not emulated; matching patch parameters and using a DX7-calibrated engine is substantially closer than the built-in approximation, but not a guarantee of bit-identical hardware sound.
-
-## Third-party notices
-
-`vendor/opendx7/dx7-processor.js` and `vendor/opendx7/dx7-patch.js` are copied from Keith Adler's OpenDX7 (MIT, © 2026 Keith Adler). The required license text is at `vendor/opendx7/LICENSE`. No Yamaha ROM patch data is distributed in CHORDON BLEU.
+`vendor/opendx7/dx7-processor.js` and `dx7-patch.js` retain their MIT license
+(© 2026 Keith Adler); required text remains at `vendor/opendx7/LICENSE`.
+Aquanode patch licensing is separate from the engine license and project GPL.

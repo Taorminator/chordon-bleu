@@ -37,3 +37,13 @@ See [architecture](ARCHITECTURE.md) and [decision log](DECISIONS.md).
 - Branch `feat/browser-midi-export`: one-cycle MIDI download in browser and FM1 concept views, with tempo, bass, voice leading and HOLD/PULSE/ARP timing; see README and D-008. No native firmware changes.
 - Local validation: recipe bundle, all 11 Node regression files including MIDI decoding, C harmony and device host tests passed. Storage and voice ASan/UBSan checks passed with leak detection disabled: this container cannot run LeakSanitizer under its process restrictions. Full leak-enabled CI remains the authoritative check.
 - Download handler tested with substituted browser I/O (Blob, link click and cleanup). A real browser/iPhone download was not verified: Chromium installation failed because the browser archive download was invalid.
+
+### Saved-loop follow-up — 2026-10-15
+- Reconciled the MIDI changes with `main` `1c92b1407909af22056d83e462a474ccc98cf0bb` (integrated DX7 presets retained), green CHORDON run [38683881757](https://github.com/Taorminator/chordon-bleu/actions/runs/38683881757).
+- Each favorite now offers direct snapshot MIDI export and × deletion, with stored tempo/motion shown. Export/delete do not modify the live loop or its playback.
+- Regression coverage includes a saved 76 BPM ARP against a different playing loop, stored gate/rate, byte-level MIDI decoding, deletion persistence calls, empty state and focus. Real iPhone/browser download remains unverified locally.
+
+### MIDI-first import follow-up — 2026-10-15
+- Removed the redundant JSON export/import UI. MIDI file-picker import adds to the same saved list; existing local favorites are retained.
+- Own exports now preserve app-specific four-chord and motion metadata for re-import. Foreign two-bar files support bounded chord interpretation, with limitations and error feedback documented in README.
+- `tests/midi-import.test.mjs` covers all supported chord-quality/mode round trips, type 0/1 foreign chord recognition, invalid/unsupported files, full-list handling and unchanged live playback. Real browser/iPhone file-picker/download remains unverified locally.

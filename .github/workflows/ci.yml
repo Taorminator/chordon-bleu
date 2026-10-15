@@ -13,6 +13,10 @@ jobs:
           node-version: "22"
       - name: Validate offline recipe bundle
         run: node tools/build-recipes.mjs --check
+      - name: Validate integrated DX7 presets and browser lifecycle
+        run: |
+          node tools/build-dx7-presets.mjs --check
+          node tests/dx7-presets.test.mjs
       - name: Verify physical FM1 button grid and control dispatch
         run: node tests/fm1-panel.test.mjs
       - name: Validate FM1 browser device surface
@@ -34,7 +38,10 @@ jobs:
           node tests/harmony.test.mjs
           node tests/recipes.test.mjs
       - name: MIDI loop export structure and playback timing
-        run: node tests/midi-export.test.mjs
+        run: |
+          node tests/midi-export.test.mjs
+          node tests/saved-actions.test.mjs
+          node tests/midi-import.test.mjs
       - name: C99 harmony research core
         run: |
           cc -std=c99 -O2 -Wall -Wextra -Werror -pedantic core/chordon_harmony.c tests/core_test.c -o /tmp/chordon-harmony-test
