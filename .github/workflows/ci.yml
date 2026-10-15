@@ -13,6 +13,8 @@ jobs:
           node-version: "22"
       - name: Validate offline recipe bundle
         run: node tools/build-recipes.mjs --check
+      - name: Bass-track model and legacy playback compatibility
+        run: node tests/bass-track.test.mjs
       - name: Validate integrated DX7 presets and browser lifecycle
         run: |
           node tools/build-dx7-presets.mjs --check
