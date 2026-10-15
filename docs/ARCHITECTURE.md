@@ -26,4 +26,14 @@ This is a high-level map of the existing repository, not a claim of completed ha
 - 240×240 readability and hardware input mapping require physical validation.
 - Browser implementation is allowed to differ from embedded implementation and must never be mistaken for a device validation rig.
 
+## Planned harmonic-coherence layer
+
+[Harmony contract](HARMONY_CONTRACT.md) defines the researched musical requirements
+for future portable generation: full chord membership, supported contextual routes,
+directed tension, cyclic voice leading and bounded four-voice playback. This is a
+design contract, **not implemented feature parity or an aesthetic guarantee**.
+FEEL/SPICE may vary coherent proposals but must not bypass validation. Respect
+independent manual fields and KEEP 1; return unchanged when no coherent alternative
+fits the constraints. See D-008 and the contract's staged regression plan.
+
 Detailed specifications: [identity](IDENTITY.md), [port roadmap](FM1_PORT.md), [button mapping](FM1-BUTTONS.md), [knobs](FM1-KNOBS.md), [acceptance](FM1_ACCEPTANCE.md).
