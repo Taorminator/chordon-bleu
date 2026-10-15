@@ -33,6 +33,8 @@ jobs:
         run: |
           node tests/harmony.test.mjs
           node tests/recipes.test.mjs
+      - name: MIDI loop export structure and playback timing
+        run: node tests/midi-export.test.mjs
       - name: C99 harmony research core
         run: |
           cc -std=c99 -O2 -Wall -Wextra -Werror -pedantic core/chordon_harmony.c tests/core_test.c -o /tmp/chordon-harmony-test

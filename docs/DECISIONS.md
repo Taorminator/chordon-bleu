@@ -29,3 +29,6 @@ Decisions below consolidate existing README, project instructions and earlier do
 - Prioritization of browser/native recipe parity versus SAVE integration after existing native reliability issues.
 
 Update this record when decisions change; include rationale, date, and commit/issue reference.
+
+## D-008 — Browser MIDI loop export
+**Status: Active. Date: 2026-10-15.** One-tap MIDI download exports the current four-slot progression as two bars, including tempo, voice leading, bass and HOLD/PULSE/ARP timing. The offline exporter uses the same note scheduler as playback through an optional note sink; it does not start audio or change the progression. Standard format 0, 960 PPQ, chord/bass channels 1/2. Live-session capture, audio effects and native FM1 export are outside this increment. Random ARP generates a fresh pass. Validation: `tests/midi-export.test.mjs` decodes the actual bytes and checks timing, gate balance and state preservation.

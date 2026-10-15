@@ -30,6 +30,13 @@ The Web Audio prototype is a single standalone [`index.html`](index.html). Use t
 - ROOT and TYPE: freely chosen or AUTO, independently, for each chord.
 - ARP: direct RATE, GATE, DIRECTION and ORDER controls (four FM1 hardware knobs planned).
 - SAVE: store favorites in the browser; JSON export and import protect your ideas.
+- MIDI: download the current four-chord loop as a `.mid` file for a DAW (also available in FM1 device view).
+
+## MIDI export
+
+Tap **↓ MIDI** next to the chord cards to download the current loop, including a progression entered with REC. To export a saved favorite, load it first, then tap MIDI. The file contains two bars in 4/4, the current tempo, voice-led chord notes and bass on separate MIDI channels (1 and 2), plus the current HOLD, PULSE or ARP rhythm, gates and swing. It is a standard format-0 MIDI file at 960 PPQ and requires no Web MIDI permission, server or active audio.
+
+This exports one cycle of the current loop, not a recording of your complete live session, keyboard solos or earlier FLIPs. Random ARP makes a new random pass at export time. Notes and velocities are included; browser sounds, audio effect tails and automation are not. JSON export/import remains available for editable CHORDON BLEU ideas.
 
 ## RECIPES · CHORDON BLEU 0.5
 

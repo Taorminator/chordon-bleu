@@ -31,3 +31,9 @@ Last checked: 2026-10-14. This is a snapshot, not a live CI dashboard.
 4. Keep [FM1 acceptance gates](FM1_ACCEPTANCE.md) up to date; treat earlier status claims in [FM1_PORT.md](FM1_PORT.md) as historical when they conflict with dated evidence above.
 
 See [architecture](ARCHITECTURE.md) and [decision log](DECISIONS.md).
+
+## Browser MIDI export increment — 2026-10-15
+- Based on `main` `c244dfc30e24e815b7169d8d2e81ea6eefc8d1ea`, whose CHORDON checks passed in [run 38680100080](https://github.com/Taorminator/chordon-bleu/actions/runs/38680100080).
+- Branch `feat/browser-midi-export`: one-cycle MIDI download in browser and FM1 concept views, with tempo, bass, voice leading and HOLD/PULSE/ARP timing; see README and D-008. No native firmware changes.
+- Local validation: recipe bundle, all 11 Node regression files including MIDI decoding, C harmony and device host tests passed. Storage and voice ASan/UBSan checks passed with leak detection disabled: this container cannot run LeakSanitizer under its process restrictions. Full leak-enabled CI remains the authoritative check.
+- Download handler tested with substituted browser I/O (Blob, link click and cleanup). A real browser/iPhone download was not verified: Chromium installation failed because the browser archive download was invalid.
