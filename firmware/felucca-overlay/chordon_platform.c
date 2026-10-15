@@ -58,11 +58,18 @@ static void chordon_input(void) {
     if(edges&(1u<<panel.btn[B_SEQ]))cb_fm1_button(&cbh_device,CB_B_FLIP,&cbh_host);
     if(edges&(1u<<panel.btn[B_SAVE]))cb_fm1_button(&cbh_device,CB_B_SAVE,&cbh_host);
     if(edges&(1u<<panel.btn[B_HOME]))cb_fm1_button(&cbh_device,CB_B_HOME,&cbh_host);
+    /* Physical FM1 keys, upper row FX SEL ENV LFO EDIT GLO,
+       lower row HOME SAVE ARP SEQ PLAY/STOP REC.
+       Felucca B_SCL is the legacy internal alias for printed SEL. */
+    if(edges&(1u<<panel.btn[B_ENV]))cb_fm1_button(&cbh_device,CB_B_FEEL,&cbh_host);
+    if(edges&(1u<<panel.btn[B_LFO]))cb_fm1_button(&cbh_device,CB_B_MOTION,&cbh_host);
     if(edges&(1u<<panel.btn[B_GLO]))cb_fm1_button(&cbh_device,CB_B_RECIPE,&cbh_host);
     if(edges&(1u<<panel.btn[B_SCL]))cb_fm1_button(&cbh_device,CB_B_CHORD,&cbh_host);
     if(edges&(1u<<panel.btn[B_ARP]))cb_fm1_button(&cbh_device,CB_B_ARP,&cbh_host);
     if(edges&(1u<<panel.btn[B_EDIT]))cb_fm1_button(&cbh_device,CB_B_KEEP_ALL,&cbh_host);
-    if(edges&(1u<<panel.btn[B_OCTDN]))cb_fm1_button(&cbh_device,CB_B_UNDO,&cbh_host);
+    /* FX sound choice, REC capture and OCT- / OCT+ transpose are not
+       yet ported to the native controller: don't alias them to unrelated
+       actions or silently claim parity with the browser. */
     s=panel_enc(EN_SELECT);
     if(s)cbh_dirty=1;
     /* Limit work for an encoder jump: refuse to spend >16 iterations in UI. */

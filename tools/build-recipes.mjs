@@ -5,7 +5,7 @@ import {resolve,dirname,join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const files=readdirSync(join(root,'recipes')).filter(f=>f.endsWith('.json')).sort();
-const qualities=new Set(['maj','min','maj7','m7','dom7','m9','maj9','add9','sus2','sus4','six','m6','dim','halfDim']);
+const qualities=new Set(['maj','min','maj7','m7','dom7','m9','maj9','add9','sus2','sus4','six','m6','dim','halfDim','m11','maj7sharp11','dom13','sus9','mMaj7','dom7b9']);
 const catalog=[];
 for(const name of files){
  const r=JSON.parse(readFileSync(join(root,'recipes',name),'utf8'));
