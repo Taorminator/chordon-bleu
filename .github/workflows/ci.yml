@@ -46,6 +46,8 @@ jobs:
           node tests/midi-export.test.mjs
           node tests/saved-actions.test.mjs
           node tests/midi-import.test.mjs
+      - name: Shareable idea links and disclosure preview
+        run: node tests/share-idea.test.mjs
       - name: C99 harmony research core
         run: |
           cc -std=c99 -O2 -Wall -Wextra -Werror -pedantic core/chordon_harmony.c tests/core_test.c -o /tmp/chordon-harmony-test

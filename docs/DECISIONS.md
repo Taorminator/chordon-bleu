@@ -53,3 +53,7 @@ Update this record when decisions change; include rationale, date, and commit/is
 
 ## D-010 — MIDI-first favorites and bounded import
 **Status: Active. Date: 2026-10-15.** Replace redundant JSON backup controls with a native file-picker MIDI import. Own MIDI files carry a non-commercial sequencer-specific snapshot to restore four chords, tempo and motion settings. Foreign SMF type 0/1 files are interpreted as four two-beat chord slots in 4/4, 48–160 BPM; full unsupported pitch-class sets, long files, changing tempo, sustain and malformed data are rejected with feedback. Multiple valid chord readings prefer the bass root and are explicitly described as a possible interpretation; imported foreign rhythm starts in HOLD. Import appends a favorite, never alters live playback and never evicts an existing favorite from the full 16-item list. Input is bounded to 1 MB, 64 tracks and 100,000 events. Local favorite storage remains unchanged.
+
+## D-011 — Shareable idea links with disclosure
+
+**Status: Active. Date: 2026-10-16.** LINK TEILEN shows an explicit, complete settings preview before using the share sheet or clipboard. A bounded, versioned, allowlisted URL-fragment snapshot restores the four-chord browser setup without autoplay or replacement of favorites. Integrated sound presets only; active uploaded DX7 patches are rejected rather than silently substituted. Live gestures/audio and random-ARP realizations are not shared. See [format, behavior and verification](SHARE_LINKS.md). Native FM1 firmware is unchanged.

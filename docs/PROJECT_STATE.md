@@ -1,5 +1,12 @@
 # CHORDON BLEU — verified project state
 
+## Browser idea-link increment — 2026-10-16
+
+- Branch `feat/share-idea-links`, based on `main` `ee8f18b9ff498abbbbbe039c3af24791d65ce945`; baseline CHORDON checks passed in [run 38719693406](https://github.com/Taorminator/chordon-bleu/actions/runs/38719693406).
+- Added LINK TEILEN in both browser views, with complete settings disclosure before native sharing or clipboard access. Versioned fragment links restore the four-chord setup without autoplay or replacing favorites. No native firmware changes.
+- Local recipe/DX7 bundle checks and all 17 Node regression files passed. New coverage verifies round trips, frozen snapshots, bounds, independent locks, preset-catalog parity, preserved favorites, no autoplay, disclosure, clipboard/native-share failure paths and modal keyboard/focus behavior.
+- Actual iPhone share-sheet, clipboard and visual/accessibility behavior remain unverified. See [share-link specification](SHARE_LINKS.md) and D-011 for limitations.
+
 Last checked: 2026-10-14. This is a snapshot, not a live CI dashboard.
 
 ## Identity and scope

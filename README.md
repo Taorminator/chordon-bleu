@@ -32,6 +32,14 @@ The Web Audio prototype is a single standalone [`index.html`](index.html). Use t
 - SAVE: store favorites in the browser; each row has MIDI download and × delete actions.
 - MIDI: download the current four-chord loop as a `.mid` file for a DAW (also available in FM1 device view).
 
+## Share an idea by link
+
+Tap **LINK TEILEN** next to the loop actions (also available in FM1 device view). Before any sharing, the preview lists all four chords and their independent root/type locks, instrument and integrated DX7 preset, tempo, motion, ARP/PULSE settings (including prepared inactive settings), recipe, key/scale, FEEL, SPICE, selected chord, FLIP mode and prepared echo time. Choose **Teilen …** for the device share sheet, or **Link kopieren**. If clipboard access is unavailable, the link is selected for manual copying.
+
+The versioned snapshot lives in the URL fragment; no account, upload service or extra database is required. Anyone with the link can read the settings. Editing the instrument later does not change the already generated link. Opening a valid link takes priority over the receiving browser's last session, leaves its favorite collection intact and waits for PLAY before audio. SAVE explicitly adds the received idea to favorites. An invalid/unsupported link leaves the previous state intact.
+
+This shares a four-chord loop, not an audio recording, saved collection, undo history, live keyboard performance, held MELT/CHORUS/DELAY gestures or uploaded sound files. Random ARP remains random rather than replaying a captured note sequence. Sharing an active custom DX7 patch is blocked with an explanation; choose an integrated preset first. Native share-sheet, clipboard and iPhone UI behavior still require real-browser verification. See [share-link format](docs/SHARE_LINKS.md).
+
 ## MIDI download and import
 
 Tap **↓ MIDI** next to the chord cards to download the current loop, including a progression entered with REC. Each saved favorite has its own **↓ MIDI** button: export it directly using its stored tempo, notes and HOLD/PULSE/ARP settings without loading it or interrupting playback. Its **×** button deletes just that favorite from browser storage; the current playing loop remains unchanged. The file contains two bars in 4/4, the current tempo, voice-led chord notes and bass on separate MIDI channels (1 and 2), plus the current HOLD, PULSE or ARP rhythm, gates and swing. It is a standard format-0 MIDI file at 960 PPQ and requires no Web MIDI permission, server or active audio.
