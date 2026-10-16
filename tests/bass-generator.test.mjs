@@ -5,7 +5,7 @@ import {generateBassTrack,MAX_BASS_CANDIDATES,BASS_REGISTER} from '../core/bass-
 import {resolveBassTrack,validBassTrack,legacyBassTrack,MAX_BASS_EVENTS} from '../core/bass-track.js';
 
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
-const script=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].at(-1)[1].replace(/\nsetup\(\);[\s\S]*$/,'');
+const script=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].at(-1)[1].replace(/\n\/\/ BROWSER_STARTUP[\s\S]*$/,'');
 const env=vm.createContext({console,Math,Date,setTimeout,clearTimeout});vm.runInContext(script,env);
 const Q=JSON.parse(vm.runInContext('JSON.stringify(Q)',env));
 for(const q of Object.values(Q)){Object.freeze(q.notes);Object.freeze(q);}Object.freeze(Q);
