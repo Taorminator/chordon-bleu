@@ -40,6 +40,7 @@
 
 ## Critical evidence gaps and conflicts
 - The community reverse-engineering page contains **generic 4/8 MB JieLi flash-capacity guidance**, whereas FM1-focused unbricker/transporter documentation specifically describes a **1 MiB FM1 flash**. These are NOT interchangeable; device-specific reads and pinned Felucca layout win. Never hard-code generic addresses from the index for CHORDON flash writes.
+- **Protocol documentation is internally inconsistent:** `aroum/REVERSE_ENGINEERING.md` describes the OTA device-pull transport with continuous 8-to-7 LSB-first packing and complemented checksum, whereas the repository's own `fm1_flasher.py` implements 7-data-byte MSB packing and a different checksum. Its flashing path is explicitly marked non-functional. Validate any fixture against `AL-255/FM-1-RE` and the pinned Felucca transport; **never** treat either snippet as authoritative for flashing.
 - ROM `WL82 UBOOT1.00` (VID:PID 4c4a:8057) is a *possible* recovery state, **not a guarantee** that a bricked FM1 enumerates or can safely recover. The RP2040 approach is a separate hardware risk/approval decision.
 - Boot PLL/CPU clock must remain as initialized by Felucca's pinned path. No new retuning, additional core startup, unreviewed bootloader patch, USB update implementation, flashing instruction or installable image.
 - Different firmware families may be GPL-3.0 or other licenses and may include separately licensed assets. **Research behavior and tests first; no source or preset copying** without license/provenance review.
