@@ -80,6 +80,6 @@ const bassOns=bassEvents.filter(e=>e.on&&(e.status&15)===1);
 assert.equal(bassOns.length,4,'Bassline events use their own MIDI channel');
 assert.equal(bassEvents.filter(e=>e.on&&(e.status&15)===0).length,12,'Chord notes remain on channel 1');
 const meta=bassEvents.find(e=>e.type===127);
-const own=JSON.parse(new TextDecoder().decode(meta.data.subarray(1)).slice('CHORDONBLEU1\\n'.length));
+const own=JSON.parse(new TextDecoder().decode(meta.data.subarray(1)).slice(13));
 assert.deepEqual(own.bassTrack,bassTrack,'Own MIDI metadata preserves the bass event model');
 console.log('PASS two-track MIDI: separate bass channel and bass model metadata.');
