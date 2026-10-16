@@ -5,7 +5,7 @@
 - Draft PR #21: [connect generated bassline to browser demo](https://github.com/Taorminator/chordon-bleu/pull/21), based on `main` `8822eb67eb698ecf40ada882f342c35e51abea33`.
 - Adds CHORDS/BASS editing focus. Bass FLIP generates a phrase from the current chord progression; chord FLIP keeps the bass rhythm and resolves ROOT/FIFTH roles against the changed chords.
 - Bass events are scheduled in the shared two-bar browser loop, using the existing dedicated bass synthesis path. Saved loops and MIDI export include the track; MIDI bass events use channel 2. Share links disclose and carry the track when present; old links remain valid.
-- Host harnesses use a marked browser startup boundary. CI must be checked on the exact latest PR head before merge.
+- Host harnesses use a marked browser startup boundary. CHORDON checks passed on exact head `dc15e93cd46ff78be23a7df93edfaa82196f38f2` in [run 38943514602](https://github.com/Taorminator/chordon-bleu/actions/runs/38943514602).
 - Browser listening, bass UI visual review, MIDI own-export re-import, and FM1 hardware behavior are not verified. The browser work does not modify native firmware or FM-XY. This PR is not firmware approval.
 
 
