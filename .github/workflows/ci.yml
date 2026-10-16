@@ -15,6 +15,8 @@ jobs:
         run: node tools/build-recipes.mjs --check
       - name: Prevent unreviewed boot/PLL changes and firmware release
         run: node tests/boot-safety.test.mjs
+      - name: Refuse mismatched Felucca checkout before overlay writes
+        run: python3 tests/overlay_preflight.test.py
       - name: Bass-track model and legacy playback compatibility
         run: |
           node tests/bass-track.test.mjs
