@@ -1524,7 +1524,7 @@ function setupShareIdea(){
  $('share-dialog').addEventListener('close',()=>shareReturnFocus?.focus());
  window.addEventListener('hashchange',()=>{if(loadSharedIdea(location.hash)){render();if(state.sound===3)void ensureDX7Patch();}});
 }
-function bassNoteName(midi){return rootName(midi)+' '+(Math.floor(midi/12)-1);}
+function bassNoteName(midi){return rootName(midi)+(Math.floor(midi/12)-1);}
 function bassBeatLabel(slot,time,tempo){
  const beatPosition=time*tempo/60;
  const eighth=Math.round((beatPosition-slot*2)*2);
