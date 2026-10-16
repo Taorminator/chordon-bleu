@@ -1425,7 +1425,7 @@ function validateShareIdea(x){
   return {root:c.root,quality:c.quality,manualRoot:c.manualRoot,manualQuality:c.manualQuality};
  });
  const result={v:1,key:x.key,mode:x.mode,tempo:x.tempo,wonder:x.wonder,sound:x.sound,dx7Preset:x.dx7Preset,selected:x.selected,motion:x.motion,feel:x.feel,flipMode:x.flipMode,recipeId:x.recipeId,delayBeats:x.delayBeats,arp:{rate:x.arp.rate,gate:x.arp.gate,direction:x.arp.direction,order:x.arp.order},slice:{rate:x.slice.rate,gate:x.slice.gate,hits:x.slice.hits},steps};
- if(x.bassTrack!==undefined){if(!bassApi||!bassApi.validBassTrack(x.bassTrack))throw Error('Ungültige Bassspur im Ideen-Link.');result.bassTrack=JSON.parse(JSON.stringify(x.bassTrack));}
+ if(x.bassTrack!==undefined&&x.bassTrack!==null){if(!bassApi||!bassApi.validBassTrack(x.bassTrack))throw Error('Ungültige Bassspur im Ideen-Link.');result.bassTrack=JSON.parse(JSON.stringify(x.bassTrack));}
  return result;
 }
 function captureShareIdea(){
