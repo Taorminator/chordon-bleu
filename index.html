@@ -598,7 +598,7 @@ body.fm1-mode>.app{display:none}
 
 .track-focus{display:flex;align-items:center;gap:6px;margin:0 0 12px;padding:4px;background:#e3e0d8;border-radius:100px;width:max-content}.track-focus button{border:0;border-radius:100px;background:transparent;color:var(--muted);padding:8px 14px;font-size:11px;font-weight:800;letter-spacing:.06em}.track-focus button[aria-pressed=true]{background:var(--ink);color:white}.bass-hint{font-size:11px;color:var(--muted);margin-left:4px}
 </style>
-<script type="module">import {legacyBassTrack,resolveBassTrack,validBassTrack} from './core/bass-track.js';import {generateBassTrack} from './core/bass-generator.js';window.CHORDON_BASS_API={legacyBassTrack,resolveBassTrack,validBassTrack,generateBassTrack};window.dispatchEvent(new Event('chordon-bass-ready'));</script>
+<script type="module" src="./core/browser-bass-bootstrap.js"></script>
 </head>
 <body>
 
