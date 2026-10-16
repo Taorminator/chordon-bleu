@@ -1247,7 +1247,7 @@ function buildLoopMidi(source=state){
    add(on,[0x90|channel,pitch,clamp(Math.round(velocity*127),1,127)],2);
    add(off,[0x80|channel,pitch,0],1);
  };
- const snapshot={tempo:source.tempo,motion:source.motion,arp:source.arp||{...ARP_DEFAULT},slice:source.slice||{...SLICE_DEFAULT},steps:source.steps.map(c=>({root:c.root,quality:c.quality}))};
+ const snapshot={tempo:source.tempo,motion:source.motion,arp:source.arp||{...ARP_DEFAULT},slice:source.slice||{...SLICE_DEFAULT},steps:source.steps.map(c=>({root:c.root,quality:c.quality})),...(source.bassTrack?{bassTrack:source.bassTrack}:{})};
  const metadata=[125,...new TextEncoder().encode('CHORDONBLEU1\n'+JSON.stringify(snapshot))];
  const variable=n=>{const out=[n&127];while((n=Math.floor(n/128))>0)out.unshift((n&127)|128);return out;};
  add(0,[0xff,0x7f,...variable(metadata.length),...metadata],0);
@@ -1328,6 +1328,7 @@ function readMidiLoop(input){
  if(p!==bytes.length)throw Error('Unerwartete Daten nach der MIDI-Datei.');
  if(!notes.length)throw Error('Keine spielbaren Noten gefunden.');
  if(snapshot){
+  if(snapshot.bassTrack!==undefined&&(!bassApi||!bassApi.validBassTrack(snapshot.bassTrack)))throw Error('CHORDON-Bassspur im MIDI-Snapshot ist ungültig.');
   if(!Number.isInteger(snapshot.tempo)||snapshot.tempo<48||snapshot.tempo>160||!['hold','pulse','arp'].includes(snapshot.motion)||!validArp(snapshot.arp)||!validSlice(snapshot.slice)||!Array.isArray(snapshot.steps)||snapshot.steps.length!==4||!snapshot.steps.every(c=>c&&Number.isInteger(c.root)&&c.root>=0&&c.root<12&&Object.hasOwn(Q,c.quality)))throw Error('CHORDON-Snapshot wird nicht unterstützt.');
   return {...snapshot,steps:snapshot.steps.map(c=>({root:c.root,quality:c.quality,manualRoot:c.root,manualQuality:c.quality})),recognized:false};
  }
@@ -1423,11 +1424,13 @@ function validateShareIdea(x){
   if(!c||!integer(c.root,0,11)||!Object.hasOwn(Q,c.quality)||!(c.manualRoot===null||integer(c.manualRoot,0,11))||!(c.manualQuality===null||Object.hasOwn(Q,c.manualQuality)))throw Error('Ungültige Akkorde im Ideen-Link.');
   return {root:c.root,quality:c.quality,manualRoot:c.manualRoot,manualQuality:c.manualQuality};
  });
- return {v:1,key:x.key,mode:x.mode,tempo:x.tempo,wonder:x.wonder,sound:x.sound,dx7Preset:x.dx7Preset,selected:x.selected,motion:x.motion,feel:x.feel,flipMode:x.flipMode,recipeId:x.recipeId,delayBeats:x.delayBeats,arp:{rate:x.arp.rate,gate:x.arp.gate,direction:x.arp.direction,order:x.arp.order},slice:{rate:x.slice.rate,gate:x.slice.gate,hits:x.slice.hits},steps};
+ const result={v:1,key:x.key,mode:x.mode,tempo:x.tempo,wonder:x.wonder,sound:x.sound,dx7Preset:x.dx7Preset,selected:x.selected,motion:x.motion,feel:x.feel,flipMode:x.flipMode,recipeId:x.recipeId,delayBeats:x.delayBeats,arp:{rate:x.arp.rate,gate:x.arp.gate,direction:x.arp.direction,order:x.arp.order},slice:{rate:x.slice.rate,gate:x.slice.gate,hits:x.slice.hits},steps};
+ if(x.bassTrack!==undefined){if(!bassApi||!bassApi.validBassTrack(x.bassTrack))throw Error('Ungültige Bassspur im Ideen-Link.');result.bassTrack=JSON.parse(JSON.stringify(x.bassTrack));}
+ return result;
 }
 function captureShareIdea(){
  if(state.sound===3&&dx7PresetId()==='user')throw Error('Eigene DX7-Sounds lassen sich nicht per Link teilen. Bitte ein integriertes Preset wählen.');
- return validateShareIdea({...state,v:1,dx7Preset:dx7PresetId()==='user'?'aquazone:1':dx7PresetId()});
+ const idea={...state,v:1,dx7Preset:dx7PresetId()==='user'?'aquazone:1':dx7PresetId()};if(state.bassTrack)idea.bassTrack=clone(state.bassTrack);return validateShareIdea(idea);
 }
 function encodeShareIdea(idea){
  const json=JSON.stringify(validateShareIdea(idea)),bytes=new TextEncoder().encode(json);
@@ -1459,7 +1462,7 @@ function loadSharedIdea(fragment){
 }
 function shareIdeaSummary(idea){
  const recipe=RECIPE_CATALOG.find(r=>r.id===idea.recipeId),rows=[];
- idea.steps.forEach((c,i)=>rows.push(['Akkord '+(i+1),label(c)+' · Root '+(c.manualRoot===null?'AUTO':'fixiert')+' · Type '+(c.manualQuality===null?'AUTO':'fixiert')]));
+ idea.steps.forEach((c,i)=>rows.push(['Akkord '+(i+1),label(c)+' · Root '+(c.manualRoot===null?'AUTO':'fixiert')+' · Type '+(c.manualQuality===null?'AUTO':'fixiert')]));if(idea.bassTrack)rows.push(['Bassspur',idea.bassTrack.enabled?'aktiv · '+idea.bassTrack.events.length+' Noten · '+idea.bassTrack.sound:'deaktiviert']);
  const picker=$('dx7preset'),preset=picker?.value===idea.dx7Preset?picker.selectedOptions?.[0]?.textContent:null;
  rows.push(['Instrument',SOUNDS[idea.sound].name+(idea.sound===3?' · '+(preset||idea.dx7Preset)+' ['+idea.dx7Preset+']':'')]);
  rows.push(['Tempo & Spielweise',idea.tempo+' BPM · '+idea.motion.toUpperCase()]);
