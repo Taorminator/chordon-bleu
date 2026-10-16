@@ -74,7 +74,7 @@ assert.equal(firstOff.tick-firstOn.tick,240,'Saved ARP 25% gate');assert.equal(J
 console.log('PASS saved MIDI: snapshot tempo/notes/motion/rate/gate; live playback and stored favorite unchanged.');
 
 const bassTrack=legacyBassTrack({tempo:92,motion:'hold'});
-const bassSource={...state,tempo:92,motion:'hold',steps:[0,5,9,7].map(root=>({root,quality:'maj'})),bassTrack};
+const bassSource={...state,holdLift:false,tempo:92,motion:'hold',steps:[0,5,9,7].map(root=>({root,quality:'maj'})),bassTrack};
 const bassEvents=parse(sandbox.buildLoopMidi(bassSource));
 const bassOns=bassEvents.filter(e=>e.on&&(e.status&15)===1);
 assert.equal(bassOns.length,4,'Bassline events use their own MIDI channel');
