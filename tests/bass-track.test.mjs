@@ -6,7 +6,7 @@ import {legacyBassTrack,resolveBassTrack,validBassTrack,MAX_BASS_EVENTS} from '.
 // Compare with actual current playback code, not a duplicate migration formula.
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const script=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].at(-1)[1]
- .replace(/\nsetup\(\);[\s\S]*$/,'');
+ .replace(/\n\/\/ BROWSER_STARTUP[\s\S]*$/,'');
 const cx=vm.createContext({console,Math,Date,setTimeout,clearTimeout});
 vm.runInContext(script,cx);
 const Q=JSON.parse(vm.runInContext('JSON.stringify(Q)',cx));
