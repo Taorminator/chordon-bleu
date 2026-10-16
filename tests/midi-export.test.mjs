@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
+import {legacyBassTrack,resolveBassTrack} from '../core/bass-track.js';
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const extract=(a,b)=>html.slice(html.indexOf(a),html.indexOf(b,html.indexOf(a)));
 const state={tempo:120,motion:'hold',selected:0,holdLift:false,arp:{rate:8,gate:74,direction:'up',order:'pitch'},slice:{rate:8,gate:40,hits:4},steps:[0,5,9,7].map(root=>({root,quality:'maj'}))};
-const sandbox={state,Uint8Array,TextEncoder,Math,clamp:(v,a,b)=>Math.max(a,Math.min(b,v)),mod:n=>(n%12+12)%12,tone(){throw Error('Export must not start audio');}};
+const sandbox={state,Uint8Array,TextEncoder,Math,bassApi:{resolveBassTrack},clamp:(v,a,b)=>Math.max(a,Math.min(b,v)),mod:n=>(n%12+12)%12,tone(){throw Error('Export must not start audio');}};
 vm.createContext(sandbox);
 vm.runInContext(extract('const Q={','const QUALITY_IDS='),sandbox);
 vm.runInContext(extract('function noteToMidi(c){','// iPhone Safari'),sandbox);
@@ -21,7 +22,7 @@ function parse(bytes){
   if(status===255){const type=b[pos++],length=vlq(),data=b.subarray(pos,pos+length);pos+=length;events.push({tick,type,data});if(type===47){assert.equal(length,0);assert.equal(pos,b.length);}continue;}
   assert.ok([128,144].includes(status&240));const pitch=b[pos++],velocity=b[pos++];assert.ok(pitch<128&&velocity<128);
   const key=(status&15)+':'+pitch,on=(status&240)===144;
-  if(on){assert.ok(velocity>0);assert.ok(!active.has(key),'No overlapping same-channel note-ons');active.add(key);}else{assert.ok(active.has(key),'Every note-off has a note-on');active.delete(key);}
+  if(on){assert.ok(velocity>0);assert.ok(!active.has(key),`No overlapping same-channel note-ons: ${key} at tick ${tick}`);active.add(key);}else{assert.ok(active.has(key),'Every note-off has a note-on');active.delete(key);}
   events.push({tick,status,pitch,velocity,on});
  }
  assert.equal(active.size,0);assert.equal(events.at(-1).type,47);assert.equal(events.at(-1).tick,7680);return events;
@@ -71,3 +72,14 @@ const firstOn=savedEvents.find(e=>e.on&&(e.status&15)===0);
 const firstOff=savedEvents.find(e=>e.on===false&&(e.status&15)===0&&e.pitch===firstOn.pitch);
 assert.equal(firstOff.tick-firstOn.tick,240,'Saved ARP 25% gate');assert.equal(JSON.stringify(state),before);
 console.log('PASS saved MIDI: snapshot tempo/notes/motion/rate/gate; live playback and stored favorite unchanged.');
+
+const bassTrack=legacyBassTrack({tempo:92,motion:'hold'});
+const bassSource={...state,holdLift:false,tempo:92,motion:'hold',steps:[0,5,9,7].map(root=>({root,quality:'maj'})),bassTrack};
+const bassEvents=parse(sandbox.buildLoopMidi(bassSource));
+const bassOns=bassEvents.filter(e=>e.on&&(e.status&15)===1);
+assert.equal(bassOns.length,4,'Bassline events use their own MIDI channel');
+assert.equal(bassEvents.filter(e=>e.on&&(e.status&15)===0).length,12,'Chord notes remain on channel 1');
+const meta=bassEvents.find(e=>e.type===127);
+const own=JSON.parse(new TextDecoder().decode(meta.data.subarray(1)).slice(13));
+assert.deepEqual(own.bassTrack,bassTrack,'Own MIDI metadata preserves the bass event model');
+console.log('PASS two-track MIDI: separate bass channel and bass model metadata.');

@@ -4,7 +4,7 @@ import vm from 'node:vm';
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
 let source=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 assert.ok(source);
-source=source.replace(/\nsetup\(\);[\s\S]*$/,'');
+source=source.replace(/\n\/\/ BROWSER_STARTUP[\s\S]*$/,'');
 new vm.Script(source);
 const c=vm.createContext({console,Math,Date,setTimeout,clearTimeout,localStorage:{getItem(){return null},setItem(){}}});
 vm.runInContext(source,c);

@@ -4,7 +4,7 @@ import vm from 'node:vm';
 import {banks} from '../assets/dx7/aquanode-presets.js';
 
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
-const source=html.match(/<script>([\s\S]*?)<\/script>/)[1].replace(/\nsetup\(\);[\s\S]*$/,'');
+const source=html.match(/<script>([\s\S]*?)<\/script>/)[1].replace(/\n\/\/ BROWSER_STARTUP[\s\S]*$/,'');
 class Element{
  constructor(){this.children=[];this.events={};this.textContent='';this.value='';}
  replaceChildren(){this.children=[];}

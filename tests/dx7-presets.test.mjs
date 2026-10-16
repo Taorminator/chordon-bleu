@@ -75,7 +75,7 @@ assert.equal(await run('ensureDX7Engine()'),false);assert.match(status.textConte
 
 // Preset identity travels with saved/exported ideas and sessions; old sessions
 // without a preset remain readable by the existing migration path.
-let inline=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].at(-1)[1].replace(/\nsetup\(\);[\s\S]*$/,'');
+let inline=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].at(-1)[1].replace(/\n\/\/ BROWSER_STARTUP[\s\S]*$/,'');
 const stored=new Map(),full={console,Math,Date,setTimeout,clearTimeout,localStorage:{getItem:k=>stored.get(k)||null,setItem:(k,v)=>stored.set(k,v)}};
 vm.createContext(full);vm.runInContext(inline,full);
 const call=s=>vm.runInContext(s,full);
