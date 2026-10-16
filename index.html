@@ -586,6 +586,15 @@ body.fm1-mode>.app{display:none}
 .app .saved-meta{font-size:12px;color:#bfc8e2}
 .app .saved-midi,.app .saved-delete{min-height:44px;padding:10px 13px;border-radius:999px;background:#40517a;color:#f0f4ff;font-size:12px;font-weight:800}
 .app .saved-delete{min-width:44px;font-size:22px;background:#593448;color:#ffe3eb}
+.share-dialog{width:min(92vw,540px);max-height:88dvh;overflow:auto;background:#202846;color:#f0f4ff;border:0;border-radius:24px;padding:24px;font:14px/1.5 system-ui,sans-serif}
+.share-dialog::backdrop{background:#050916b8}
+.share-dialog h2{margin:0 40px 18px 0;font-size:23px;line-height:1.2}
+.share-dialog dl{margin:0}.share-dialog dt{font-weight:800;margin-top:12px;color:#c3ceff}.share-dialog dd{margin:3px 0;overflow-wrap:anywhere}
+.share-dialog input{width:100%;min-height:44px;margin-top:6px;padding:10px;background:#111a31;color:#f0f4ff;border:0;border-radius:9px;font:12px monospace}
+.share-dialog button{min-height:44px;border:0;border-radius:999px;background:#bdc7ff;color:#182144;padding:10px 16px;font-weight:750;cursor:pointer}
+.share-dialog :is(button,input):focus-visible{outline:3px solid #fff;outline-offset:3px}
+.share-close{float:right;font-size:22px}.share-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
+#share-note,#share-feedback{color:#c1cce9;font-size:12px}#share-feedback{min-height:1.5em}
 </style>
 </head>
 <body>
@@ -608,7 +617,7 @@ body.fm1-mode>.app{display:none}
   </div><aside class="cb-hw-inspector">
     <div class="cb-hw-caption">LIVE HARMONY / 4 CHORDS</div><div class="cb-hw-chords" id="cb-hw-chords" aria-label="Vier Akkord-Slots"></div>
     <div class="cb-hw-caption">PLAY YOUR CHORDS</div><div class="cb-hw-modes" role="group" aria-label="Keyboard-Spielmodus"><button type="button" data-hw-perf="chords" aria-pressed="true">◉ CHORDS</button><button type="button" data-hw-perf="notes" aria-pressed="false">NOTES</button></div><div class="cb-hw-quick"><button type="button" data-hw-action="PLAY" id="cb-hw-play">▶ PLAY</button><button type="button" data-hw-action="FLIP">⤨ FLIP</button><button type="button" data-hw-action="SAVE">♡ SAVE</button></div>
-    <div class="cb-hw-quick"><button type="button" id="hw-midi-export" aria-label="Aktuellen Vier-Akkord-Loop als MIDI herunterladen">↓ MIDI · 2 TAKTE</button></div>
+    <div class="cb-hw-quick"><button type="button" id="hw-midi-export" aria-label="Aktuellen Vier-Akkord-Loop als MIDI herunterladen">↓ MIDI · 2 TAKTE</button><button type="button" id="hw-share-idea">↗ LINK TEILEN</button></div>
     <div class="cb-hw-caption">ACTIVE SCREEN</div><div class="cb-hw-tabs"><button type="button" data-hw-action="HOME" aria-pressed="false">HOME</button><button type="button" data-hw-action="RECIPES" aria-pressed="false">RECIPES</button><button type="button" data-hw-action="CHORD" aria-pressed="false">CHORD</button><button type="button" data-hw-action="ARP" aria-pressed="false">ARP</button></div>
     <p class="cb-hw-status" id="cb-hw-status" role="status" aria-live="polite">Ready to play. Tap PLAY for sound.</p>
     <div class="cb-hw-helper"><strong>Sofort spielen:</strong> Die vier ersten weißen Tasten spielen deine vier Loop-Akkorde. Alle weiteren Tasten transponieren die aktuell gewählte Akkordform. NOTES schaltet auf Einzeltöne. <strong>REC:</strong> Vier Akkorde über die ersten weißen Tasten aufnehmen.<br><strong>Regler:</strong> drehen per Ziehen, Scrollrad oder Pfeiltasten. HOME: Spice / Feel / Motion / Tempo. CHORD: Root / Type / Auswahl / Flip Mode. ARP: Rate / Gate / Direction / Order.</div>
@@ -624,7 +633,7 @@ body.fm1-mode>.app{display:none}
 <section class="chord-workspace" aria-label="CHORDS und Transport">
  <div class="station-heading"><span class="micro">CHORDS</span></div>
 <div class="maincontrols"><button id="play" class="bigbtn primary" aria-label="Play chord loop"><b aria-hidden="true">▶</b><span>PLAY</span></button><button id="mutate" class="bigbtn surprise" aria-label="Generate new harmonically fitting chords"><b aria-hidden="true"><svg width="23" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h3c5 0 7 12 12 12h3"/><path d="m18 15 3 3-3 3"/><path d="M3 18h3c5 0 7-12 12-12h3"/><path d="m18 3 3 3-3 3"/></svg></b><span>FLIP</span></button><button id="keep" class="bigbtn keep" aria-label="Save this loop"><b aria-hidden="true">↓</b><span>SAVE</span></button></div>
- <div class="midi-action"><button type="button" id="midi-export" aria-label="Aktuellen Vier-Akkord-Loop als MIDI herunterladen">↓ MIDI</button><span>2 Takte · aktueller Loop</span></div>
+ <div class="midi-action"><button type="button" id="midi-export" aria-label="Aktuellen Vier-Akkord-Loop als MIDI herunterladen">↓ MIDI</button><button type="button" id="share-idea">↗ LINK TEILEN</button><span>2 Takte · aktueller Loop</span></div>
  <div class="stage" aria-label="Your four-chord progression"><div class="stage-top"><span><span class="led" id="led"></span> <span id="runlabel">READY TO PLAY</span></span><span class="right"><span id="stagebpm">92 BPM</span><span>01 — 04</span></span></div><div class="stages" id="steps"></div><div class="stagefooter"><span id="status" aria-live="polite">TIPP: DRÜCK PLAY.</span><span class="thermal-label">◉ <span id="heatname">COZY</span></span><span id="loopindicator">LOOP / 001</span></div><div id="audiohealth" class="audiohealth" role="status" aria-live="polite" hidden><span id="audionote">Audio is not active yet.</span><button id="audionudge" type="button" aria-label="Retry browser audio">↻ RETRY AUDIO</button></div></div>
 
  
@@ -706,6 +715,16 @@ body.fm1-mode>.app{display:none}
 </ul>
 <p class="dialog-keys">KEYS: Space PLAY · W FLIP · K SAVE · Z UNDO · 1–4 SELECT · A/S/D/F/G/H/J PREVIEW</p>
 </div></div>
+<dialog id="share-dialog" class="share-dialog" aria-labelledby="share-title" aria-describedby="share-note">
+ <button type="button" id="share-close" class="share-close" aria-label="Teilen schließen">×</button>
+ <h2 id="share-title">Das steckt in deinem Link</h2>
+ <dl id="share-summary"></dl>
+ <p id="share-note">Keine Audioaufnahme, gespeicherte Sammlung, eigenen Sounds oder gehaltenen Live-Effekte. Wiedergabe startet erst mit PLAY. Zufalls-ARP kann anders ausfallen. Jede Person mit dem Link kann diese Einstellungen öffnen.</p>
+ <label for="share-url">Dein Ideen-Link (Momentaufnahme)</label>
+ <input id="share-url" type="text" readonly spellcheck="false">
+ <div class="share-actions"><button type="button" id="share-native">Teilen …</button><button type="button" id="share-copy">Link kopieren</button></div>
+ <p id="share-feedback" role="status" aria-live="polite"></p>
+</dialog>
 <script>
 'use strict';
 const $=id=>document.getElementById(id);
@@ -1386,13 +1405,102 @@ function renderSaved(){
 }
 function sessionSave(){try{localStorage.setItem('chordon-bleu.session.v1',JSON.stringify({recipeId:state.recipeId,key:state.key,mode:state.mode,wonder:state.wonder,tempo:state.tempo,motion:state.motion,sound:state.sound,dx7Preset:dx7PresetId(),feel:state.feel,flipMode:state.flipMode,arp:state.arp,slice:state.slice,delayBeats:state.delayBeats,steps:state.steps}));}catch(_){}}
 function sessionLoad(){try{const x=JSON.parse(localStorage.getItem('chordon-bleu.session.v1')||localStorage.getItem('elsewhere.session.v2')||'null');if(!x||!MODES[x.mode]||!Number.isInteger(x.key)||x.key<0||x.key>11||!Number.isInteger(x.tempo)||x.tempo<48||x.tempo>160||!Number.isInteger(x.wonder)||x.wonder<0||x.wonder>100||!['hold','pulse','arp','slice'].includes(x.motion)||!Number.isInteger(x.sound)||x.sound<0||x.sound>=SOUNDS.length||!Array.isArray(x.steps)||x.steps.length!==4||!x.steps.every(c=>Number.isInteger(c.root)&&c.root>=0&&c.root<12&&Q[c.quality]&&(c.manualRoot===null||(Number.isInteger(c.manualRoot)&&c.manualRoot>=0&&c.manualRoot<12))&&(c.manualQuality===null||Q[c.manualQuality])))return false;Object.assign(state,{recipeId:RECIPE_CATALOG.some(r=>r.id===x.recipeId)?x.recipeId:'classic',key:x.key,mode:x.mode,wonder:x.wonder,tempo:x.tempo,motion:x.motion==='slice'?'pulse':x.motion,sound:x.sound,dx7Preset:dx7PresetId(x.dx7Preset),feel:FEELS.includes(x.feel)?x.feel:'warm',flipMode:['keep','all'].includes(x.flipMode)?x.flipMode:'keep',arp:validArp(x.arp)?x.arp:{...ARP_DEFAULT},slice:validSlice(x.slice)?x.slice:{...SLICE_DEFAULT},delayBeats:[.25,.5,.75,1].includes(x.delayBeats)?x.delayBeats:.75,steps:x.steps});return true;}catch(_){return false;}}
+// Versioned, bounded allowlist: never serialize favorites, undo or imported sound data.
+function sharePresetAvailable(id){
+ if(!validDX7Preset(id)||id==='user')return false;
+ const [bank,slot]=id.split(':'),n=Number(slot);
+ return bank==='aquazone'?n<28:bank==='presets-1'||bank==='presets-2'?n<31:bank==='presets-3'?n!==30:true;
+}
+function validateShareIdea(x){
+ const integer=(n,a,b)=>Number.isInteger(n)&&n>=a&&n<=b;
+ if(!x||x.v!==1||!integer(x.key,0,11)||!Object.hasOwn(MODES,x.mode)||!integer(x.tempo,48,160)||!integer(x.wonder,0,100)||!integer(x.sound,0,SOUNDS.length-1)||!integer(x.selected,0,3)||!['hold','pulse','arp'].includes(x.motion)||!FEELS.includes(x.feel)||!['keep','all'].includes(x.flipMode)||!validArp(x.arp)||!validSlice(x.slice)||![.25,.5,.75,1].includes(x.delayBeats)||!sharePresetAvailable(x.dx7Preset)||!(x.recipeId==='classic'||RECIPE_CATALOG.some(r=>r.id===x.recipeId))||!Array.isArray(x.steps)||x.steps.length!==4)throw Error('Dieser Ideen-Link ist ungültig oder gehört zu einer anderen Version.');
+ const steps=x.steps.map(c=>{
+  if(!c||!integer(c.root,0,11)||!Object.hasOwn(Q,c.quality)||!(c.manualRoot===null||integer(c.manualRoot,0,11))||!(c.manualQuality===null||Object.hasOwn(Q,c.manualQuality)))throw Error('Ungültige Akkorde im Ideen-Link.');
+  return {root:c.root,quality:c.quality,manualRoot:c.manualRoot,manualQuality:c.manualQuality};
+ });
+ return {v:1,key:x.key,mode:x.mode,tempo:x.tempo,wonder:x.wonder,sound:x.sound,dx7Preset:x.dx7Preset,selected:x.selected,motion:x.motion,feel:x.feel,flipMode:x.flipMode,recipeId:x.recipeId,delayBeats:x.delayBeats,arp:{rate:x.arp.rate,gate:x.arp.gate,direction:x.arp.direction,order:x.arp.order},slice:{rate:x.slice.rate,gate:x.slice.gate,hits:x.slice.hits},steps};
+}
+function captureShareIdea(){
+ if(state.sound===3&&dx7PresetId()==='user')throw Error('Eigene DX7-Sounds lassen sich nicht per Link teilen. Bitte ein integriertes Preset wählen.');
+ return validateShareIdea({...state,v:1,dx7Preset:dx7PresetId()==='user'?'aquazone:1':dx7PresetId()});
+}
+function encodeShareIdea(idea){
+ const json=JSON.stringify(validateShareIdea(idea)),bytes=new TextEncoder().encode(json);
+ if(bytes.length>4096)throw Error('Die Idee ist zu groß für einen Link.');
+ return btoa(String.fromCharCode(...bytes)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function decodeShareIdea(fragment){
+ if(fragment.length>6000||!/^#idea=[A-Za-z0-9_-]+$/.test(fragment))throw Error('Ungültiger Ideen-Link.');
+ const value=fragment.slice(6).replace(/-/g,'+').replace(/_/g,'/');
+ const bytes=Uint8Array.from(atob(value),c=>c.charCodeAt(0));
+ if(bytes.length>4096)throw Error('Der Ideen-Link ist zu groß.');
+ return validateShareIdea(JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes)));
+}
+function makeShareUrl(idea,href=location.href){
+ const url=new URL(href),fm1=url.searchParams.get('view')==='fm1';
+ if(!['http:','https:'].includes(url.protocol))throw Error('Zum Teilen bitte die gehostete Browser-Demo öffnen.');
+ url.username='';url.password='';
+ url.search='';if(fm1)url.searchParams.set('view','fm1');
+ url.hash='idea='+encodeShareIdea(idea);return url.href;
+}
+function loadSharedIdea(fragment){
+ if(!fragment.startsWith('#idea='))return false;
+ try{
+  const {v,...idea}=decodeShareIdea(fragment);
+  if(state.play)stopPlayback();
+  Object.assign(state,idea,{play:false,current:-1,loopCount:1,rec:false,recIdx:0,holdLift:false,holdRush:false,holdDelay:false,undo:[]});
+  toast('Geteilte Idee geladen. PLAY zum Anhören · SAVE zum Behalten.');return true;
+ }catch(_){toast('Der Ideen-Link konnte nicht geladen werden. Dein bisheriger Stand bleibt erhalten.');return false;}
+}
+function shareIdeaSummary(idea){
+ const recipe=RECIPE_CATALOG.find(r=>r.id===idea.recipeId),rows=[];
+ idea.steps.forEach((c,i)=>rows.push(['Akkord '+(i+1),label(c)+' · Root '+(c.manualRoot===null?'AUTO':'fixiert')+' · Type '+(c.manualQuality===null?'AUTO':'fixiert')]));
+ const picker=$('dx7preset'),preset=picker?.value===idea.dx7Preset?picker.selectedOptions?.[0]?.textContent:null;
+ rows.push(['Instrument',SOUNDS[idea.sound].name+(idea.sound===3?' · '+(preset||idea.dx7Preset)+' ['+idea.dx7Preset+']':'')]);
+ rows.push(['Tempo & Spielweise',idea.tempo+' BPM · '+idea.motion.toUpperCase()]);
+ rows.push(['ARP'+(idea.motion==='arp'?'':' (vorbereitet)'), '1/'+idea.arp.rate+' · Gate '+idea.arp.gate+' % · '+idea.arp.direction+' · Reihenfolge '+idea.arp.order]);
+ rows.push(['PULSE'+(idea.motion==='pulse'?'':' (vorbereitet)'),idea.slice.hits+' Hits · 1/'+idea.slice.rate+' · Gate '+idea.slice.gate+' %']);
+ rows.push(['Harmonie',(recipe?.name||'CLASSIC')+' · '+rootName(idea.key)+' '+idea.mode.toUpperCase()+' · '+idea.feel.toUpperCase()+' · SPICE '+idea.wonder+' %']);
+ rows.push(['Auswahl & FLIP','Akkord '+(idea.selected+1)+' · '+(idea.flipMode==='keep'?'KEEP 1':'ALL 4')]);
+ rows.push(['Vorbereitete Echo-Zeit',({.25:'1/16',.5:'1/8',.75:'punktierte 1/8',1:'1/4'})[idea.delayBeats]+' · Live-Effekte nicht enthalten']);
+ return rows;
+}
+let shareReturnFocus=null;
+function openShareIdea(event){
+ try{
+  const idea=captureShareIdea(),url=makeShareUrl(idea),summary=$('share-summary');summary.replaceChildren();
+  for(const [title,value] of shareIdeaSummary(idea)){const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=title;dd.textContent=value;summary.append(dt,dd);}
+  $('share-url').value=url;$('share-feedback').textContent='';$('share-native').hidden=typeof navigator.share!=='function';
+  shareReturnFocus=event?.currentTarget||document.activeElement;$('share-dialog').showModal();
+ }catch(error){toast(error.message);}
+}
+async function copyShareIdea(){
+ const input=$('share-url');
+ try{
+  if(!navigator.clipboard?.writeText)throw Error('Clipboard unavailable');
+  await navigator.clipboard.writeText(input.value);$('share-feedback').textContent='Link kopiert.';
+ }catch(_){input.focus();input.select();$('share-feedback').textContent='Bitte den markierten Link manuell kopieren.';}
+}
+async function nativeShareIdea(){
+ try{await navigator.share({title:'CHORDON BLEU · geteilte Idee',url:$('share-url').value});}
+ catch(error){if(error.name!=='AbortError')$('share-feedback').textContent='Teilen nicht verfügbar. Du kannst den Link kopieren.';}
+}
+function setupShareIdea(){
+ $('share-idea').addEventListener('click',openShareIdea);$('hw-share-idea').addEventListener('click',openShareIdea);
+ $('share-copy').addEventListener('click',copyShareIdea);$('share-native').addEventListener('click',nativeShareIdea);
+ $('share-close').addEventListener('click',()=>$('share-dialog').close());
+ // Keep instrument shortcuts out of the modal; native dialog handles Tab/Escape.
+ $('share-dialog').addEventListener('keydown',e=>e.stopPropagation());
+ $('share-dialog').addEventListener('close',()=>shareReturnFocus?.focus());
+ window.addEventListener('hashchange',()=>{if(loadSharedIdea(location.hash)){render();if(state.sound===3)void ensureDX7Patch();}});
+}
 function render(){renderStage();renderEditor();renderMeta();renderPads();renderSaved();sessionSave();drawFM1();}
 function renderRecipe(){document.querySelectorAll('[data-recipe]').forEach(b=>{const active=b.dataset.recipe===state.recipeId;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});}
 
 function toast(msg){const box=$('toast');box.textContent=msg;box.classList.add('shown');clearTimeout(toastTimer);toastTimer=setTimeout(()=>box.classList.remove('shown'),2400);}
 function holdButton(id,name){const b=$(id);let held=false;const set=v=>{held=v;state[name]=v;b.classList.toggle('pressed',v);if(ctx){const fx=name==='holdRush'?chorusWet:name==='holdDelay'?delayWet:null;if(fx)fx.gain.setTargetAtTime(v?.35:0,ctx.currentTime,.035);}};b.addEventListener('pointerdown',e=>{if(e.button!==0)return;set(true);b.setPointerCapture(e.pointerId);ensureAudio().then(ok=>{if(!ok||!held)return;set(true);/* While PLAY is running, PUNCH is effect-only: never retrigger the chord. */if(!state.play){const c=state.steps[state.selected];if(c)playVoicing(c,ctx.currentTime+.012,.72,'hold');}});});for(const event of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(event,()=>{if(held)set(false);});b.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){set(true);}});b.addEventListener('keyup',()=>set(false));}
 function setup(){for(let key=0;key<12;key++)for(const mode of ['major','minor']){const opt=document.createElement('option');opt.value=mode+':'+key;opt.textContent=rootName(key)+' '+(mode==='major'?'MAJOR':'MINOR');$('key').appendChild(opt);}let auto=document.createElement('option');auto.value='auto';auto.textContent='AUTO';$('root').appendChild(auto);for(let i=0;i<12;i++){const opt=document.createElement('option');opt.value=String(i);opt.textContent=rootName(i);$('root').appendChild(opt);}auto=document.createElement('option');auto.value='auto';auto.textContent='AUTO';$('quality').appendChild(auto);for(const [id,q] of Object.entries(Q)){const opt=document.createElement('option');opt.value=id;opt.textContent=q.label;$('quality').appendChild(opt);}for(const [i,preset] of SOUNDS.entries()){const opt=document.createElement('option');opt.value=String(i);opt.textContent=preset.name;$('sound').appendChild(opt);}
-  restoreDX7Patch();loadSaved();if(!sessionLoad())startProgression();render();if(state.sound===3)void ensureDX7Patch();$('dx7preset').addEventListener('change',e=>{void selectDX7Preset(e.target.value);});$('play').addEventListener('click',togglePlayback);$('audionudge').addEventListener('click',async()=>{releaseAudio();if(await ensureAudio()){toast('Audio neu gestartet. ▶');if(!state.play)startPlayback();}});$('mutate').addEventListener('click',()=>{if(harmonicVariation()&&!state.play)startPlayback();});$('recipechoices').addEventListener('click',e=>{const b=e.target.closest('[data-recipe]');if(b)selectRecipe(b.dataset.recipe);});$('keepone').addEventListener('click',()=>setFlipMode('keep'));$('allfour').addEventListener('click',()=>setFlipMode('all'));$('feelchoices').addEventListener('click',e=>{const b=e.target.closest('[data-feel]');if(b)setFeel(b.dataset.feel);});$('slicehits').addEventListener('change',e=>setSlice('hits',e.target.value));$('slicerate').addEventListener('change',e=>setSlice('rate',e.target.value));$('slicegate').addEventListener('input',e=>setSlice('gate',e.target.value));$('cb-delay-time').addEventListener('change',e=>{state.delayBeats=Number(e.target.value);if(delayNode&&ctx)delayNode.delayTime.setTargetAtTime(60/state.tempo*state.delayBeats,ctx.currentTime,.02);sessionSave();});$('arprate').addEventListener('change',e=>setArp('rate',e.target.value));$('arpgate').addEventListener('input',e=>setArp('gate',e.target.value));$('arpdirection').addEventListener('change',e=>setArp('direction',e.target.value));$('arporder').addEventListener('change',e=>setArp('order',e.target.value));$('keep').addEventListener('click',saveIdea);$('undo').addEventListener('click',undo);$('newloop').addEventListener('click',newLoop);$('key').addEventListener('change',e=>changeKey(e.target.value));$('root').addEventListener('change',e=>changeEditor('root',e.target.value));$('quality').addEventListener('change',e=>changeEditor('quality',e.target.value));$('wonder').addEventListener('input',e=>{state.wonder=Number(e.target.value);renderMeta();drawFM1();sessionSave();});$('wonder').addEventListener('change',()=>{if(harmonicVariation()){const i=state.flipMode==='keep'?(state.selected+1)%4:state.selected;if(!state.play)audition(state.steps[i]);}});$('sound').addEventListener('change',e=>setSound(e.target.value));$('dx7file').addEventListener('change',async e=>{const file=e.target.files?.[0];e.target.value='';if(!file)return;try{if(file.size!==4104)throw Error('Erwartet wird eine DX7-Bank mit 4104 Bytes.');const bytes=new Uint8Array(await file.arrayBuffer());const patch=await importDX7Bank(bytes);toast('Original '+patch.name+' geladen.');if(!state.play)audition(state.steps[state.selected]);}catch(error){$('dx7status').textContent='Import: '+error.message;toast('DX7-Import nicht möglich.');}});$('tempoSlider').addEventListener('input',e=>setTempo(e.target.value));$('motion').addEventListener('click',e=>{const b=e.target.closest('[data-motion]');if(b)setMotion(b.dataset.motion);});$('rec').addEventListener('click',recToggle);$('midi-import').addEventListener('click',()=>$('import').click());$('midi-export').addEventListener('click',exportLoopMidi);$('hw-midi-export').addEventListener('click',exportLoopMidi);$('import').addEventListener('change',e=>{const file=e.target.files?.[0];e.target.value='';void importMidiFile(file);});$('help').addEventListener('click',()=>{$('dialogoverlay').classList.add('open');$('closedialog').focus();});$('closedialog').addEventListener('click',()=>{$('dialogoverlay').classList.remove('open');$('help').focus();});$('dialogoverlay').addEventListener('click',e=>{if(e.target===$('dialogoverlay'))$('dialogoverlay').classList.remove('open');});holdButton('lift','holdLift');holdButton('rush','holdRush');holdButton('cb-delay','holdDelay');
+  restoreDX7Patch();loadSaved();if(!loadSharedIdea(location.hash)&&!sessionLoad())startProgression();setupShareIdea();render();if(state.sound===3)void ensureDX7Patch();$('dx7preset').addEventListener('change',e=>{void selectDX7Preset(e.target.value);});$('play').addEventListener('click',togglePlayback);$('audionudge').addEventListener('click',async()=>{releaseAudio();if(await ensureAudio()){toast('Audio neu gestartet. ▶');if(!state.play)startPlayback();}});$('mutate').addEventListener('click',()=>{if(harmonicVariation()&&!state.play)startPlayback();});$('recipechoices').addEventListener('click',e=>{const b=e.target.closest('[data-recipe]');if(b)selectRecipe(b.dataset.recipe);});$('keepone').addEventListener('click',()=>setFlipMode('keep'));$('allfour').addEventListener('click',()=>setFlipMode('all'));$('feelchoices').addEventListener('click',e=>{const b=e.target.closest('[data-feel]');if(b)setFeel(b.dataset.feel);});$('slicehits').addEventListener('change',e=>setSlice('hits',e.target.value));$('slicerate').addEventListener('change',e=>setSlice('rate',e.target.value));$('slicegate').addEventListener('input',e=>setSlice('gate',e.target.value));$('cb-delay-time').addEventListener('change',e=>{state.delayBeats=Number(e.target.value);if(delayNode&&ctx)delayNode.delayTime.setTargetAtTime(60/state.tempo*state.delayBeats,ctx.currentTime,.02);sessionSave();});$('arprate').addEventListener('change',e=>setArp('rate',e.target.value));$('arpgate').addEventListener('input',e=>setArp('gate',e.target.value));$('arpdirection').addEventListener('change',e=>setArp('direction',e.target.value));$('arporder').addEventListener('change',e=>setArp('order',e.target.value));$('keep').addEventListener('click',saveIdea);$('undo').addEventListener('click',undo);$('newloop').addEventListener('click',newLoop);$('key').addEventListener('change',e=>changeKey(e.target.value));$('root').addEventListener('change',e=>changeEditor('root',e.target.value));$('quality').addEventListener('change',e=>changeEditor('quality',e.target.value));$('wonder').addEventListener('input',e=>{state.wonder=Number(e.target.value);renderMeta();drawFM1();sessionSave();});$('wonder').addEventListener('change',()=>{if(harmonicVariation()){const i=state.flipMode==='keep'?(state.selected+1)%4:state.selected;if(!state.play)audition(state.steps[i]);}});$('sound').addEventListener('change',e=>setSound(e.target.value));$('dx7file').addEventListener('change',async e=>{const file=e.target.files?.[0];e.target.value='';if(!file)return;try{if(file.size!==4104)throw Error('Erwartet wird eine DX7-Bank mit 4104 Bytes.');const bytes=new Uint8Array(await file.arrayBuffer());const patch=await importDX7Bank(bytes);toast('Original '+patch.name+' geladen.');if(!state.play)audition(state.steps[state.selected]);}catch(error){$('dx7status').textContent='Import: '+error.message;toast('DX7-Import nicht möglich.');}});$('tempoSlider').addEventListener('input',e=>setTempo(e.target.value));$('motion').addEventListener('click',e=>{const b=e.target.closest('[data-motion]');if(b)setMotion(b.dataset.motion);});$('rec').addEventListener('click',recToggle);$('midi-import').addEventListener('click',()=>$('import').click());$('midi-export').addEventListener('click',exportLoopMidi);$('hw-midi-export').addEventListener('click',exportLoopMidi);$('import').addEventListener('change',e=>{const file=e.target.files?.[0];e.target.value='';void importMidiFile(file);});$('help').addEventListener('click',()=>{$('dialogoverlay').classList.add('open');$('closedialog').focus();});$('closedialog').addEventListener('click',()=>{$('dialogoverlay').classList.remove('open');$('help').focus();});$('dialogoverlay').addEventListener('click',e=>{if(e.target===$('dialogoverlay'))$('dialogoverlay').classList.remove('open');});holdButton('lift','holdLift');holdButton('rush','holdRush');holdButton('cb-delay','holdDelay');
   window.addEventListener('keydown',e=>{if(e.target.matches('input,select,textarea')||e.ctrlKey||e.altKey||e.metaKey)return;if(e.key==='Escape'){$('dialogoverlay').classList.remove('open');return;}const key=e.key.toLowerCase();if(key===' '){e.preventDefault();if(!e.repeat)togglePlayback();}if(key==='w'&&!e.repeat)harmonicVariation();if(key==='k'&&!e.repeat)saveIdea();if(key==='z'&&!e.repeat)undo();if('1234'.includes(key)){state.selected=Number(key)-1;renderStage();renderEditor();audition(state.steps[state.selected]);}const p='asdfghj'.indexOf(key);if(p!==-1&&!e.repeat)padChord(p);});
   document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.play)stopPlayback();});
 }
