@@ -50,7 +50,9 @@ assert.ok(css.includes('.track-focus button[aria-pressed=true]{background:#4657f
 assert.ok(css.includes('.track-focus button:focus-visible{outline:3px solid #fff!important;'),
  'Track focus keeps a visible keyboard focus ring');
 function luminance(hex){
- const value=hex.slice(1).match(/.{2}/g).map(part=>parseInt(part,16)/255).map(channel=>
+ let raw=hex.slice(1);
+ if(raw.length===3)raw=raw.split('').map(part=>part+part).join('');
+ const value=raw.match(/.{2}/g).map(part=>parseInt(part,16)/255).map(channel=>
   channel<=.04045?channel/12.92:((channel+.055)/1.055)**2.4);
  return .2126*value[0]+.7152*value[1]+.0722*value[2];
 }
