@@ -38,6 +38,6 @@ for (const sourcePath of moduleScriptTags) {
 }
 assert.ok(visited.has('core/browser-bass-bootstrap.js'), 'The bassline bootstrap is not included in the packaged module graph.');
 assert.ok(visited.has('core/bass-track.js'), 'The bassline track module is not included in the packaged module graph.');
-assert.ok(visited.has('core/bass-generator.js'), 'The bassline generator module is not included in the packaged module graph.');
+assert.ok(visited.has('core/bass-generator.js'), 'The bassline generator is not included in the packaged module graph.');
 assert.match(html, /chordon-bass-ready/, 'The browser UI does not wait for the bassline bootstrap event.');
 console.log(`Packaged browser module graph is complete (${visited.size} modules).`);
