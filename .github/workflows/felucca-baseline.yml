@@ -8,6 +8,7 @@ on:
       - "firmware/**"
       - "core/**"
       - "tests/*.c"
+      - "tests/overlay_preflight.test.py"
 permissions:
   contents: read
 # A new firmware commit supersedes earlier full regression runs.
@@ -77,6 +78,8 @@ jobs:
         run: |
           cd upstream
           sh tests/run_tests.sh
+      - name: Verify pinned Felucca source identity before overlay
+        run: python3 firmware/felucca-overlay/apply.py upstream --check-only
       - name: Integrate experimental CHORDON application
         run: |
           python3 firmware/felucca-overlay/apply.py upstream
