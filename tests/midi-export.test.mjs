@@ -22,7 +22,7 @@ function parse(bytes){
   if(status===255){const type=b[pos++],length=vlq(),data=b.subarray(pos,pos+length);pos+=length;events.push({tick,type,data});if(type===47){assert.equal(length,0);assert.equal(pos,b.length);}continue;}
   assert.ok([128,144].includes(status&240));const pitch=b[pos++],velocity=b[pos++];assert.ok(pitch<128&&velocity<128);
   const key=(status&15)+':'+pitch,on=(status&240)===144;
-  if(on){assert.ok(velocity>0);assert.ok(!active.has(key),'No overlapping same-channel note-ons');active.add(key);}else{assert.ok(active.has(key),'Every note-off has a note-on');active.delete(key);}
+  if(on){assert.ok(velocity>0);assert.ok(!active.has(key),`No overlapping same-channel note-ons: ${key} at tick ${tick}`);active.add(key);}else{assert.ok(active.has(key),'Every note-off has a note-on');active.delete(key);}
   events.push({tick,status,pitch,velocity,on});
  }
  assert.equal(active.size,0);assert.equal(events.at(-1).type,47);assert.equal(events.at(-1).tick,7680);return events;
