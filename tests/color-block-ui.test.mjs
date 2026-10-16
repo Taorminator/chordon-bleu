@@ -41,14 +41,18 @@ assert.match(css,/repeating-linear-gradient/,'DELAY gets repeat blue/green color
 assert.match(css,/\.motionbuttons button\[data-motion="arp"\]::before/,'Playful motion symbols');
 assert.match(css,/\.chord-root\{/,'Clear large root name');
 assert.match(css,/\.chordname\{/,'Readable quality label');
-assert.ok(css.includes('.track-focus{display:flex;align-items:center;gap:6px;margin:0 0 12px;padding:4px;background:#141b30;'),
- 'Track focus uses a dark base so both labels stay readable');
-assert.ok(css.includes('.track-focus button{min-height:44px;'),
- 'Track focus controls meet the 44px touch target');
-assert.ok(css.includes('.track-focus button[aria-pressed=true]{background:#4657ff;color:#fff;'),
- 'Selected track has a distinct high-contrast state');
-assert.ok(css.includes('.track-focus button:focus-visible{outline:3px solid #fff!important;'),
- 'Track focus keeps a visible keyboard focus ring');
+assert.ok(main.includes('id="bass-stage"')&&main.includes('id="bass-notes"'),
+ 'Bass pitches have a persistent panel below the chord cards');
+assert.ok(main.indexOf('class="stage"')<main.indexOf('id="bass-stage"'),
+ 'The bass window appears directly below the regular chords');
+assert.doesNotMatch(main,/focus-chords|focus-bass|track-focus/,
+ 'Chord and bass no longer require a mode switch');
+assert.match(main,/id="bass-flip"[^>]*aria-label="Neue Bassline erzeugen, Akkorde beibehalten"/,
+ 'Bass regeneration is independent and clearly labeled');
+assert.ok(css.includes('.bass-note{')&&css.includes('background:#dbe2ff;color:#111831'),
+ 'Bass notes use a light surface with dark high-contrast labels');
+assert.ok(css.includes('.bass-flip{min-height:44px;')&&css.includes('background:#4657ff;color:#fff'),
+ 'Bass FLIP has a 44px target and high-contrast text');
 function luminance(hex){
  let raw=hex.slice(1);
  if(raw.length===3)raw=raw.split('').map(part=>part+part).join('');

@@ -23,6 +23,7 @@ jobs:
         run: |
           node tests/bass-track.test.mjs
           node tests/bass-generator.test.mjs
+          node tests/bass-stage.test.mjs
       - name: Validate integrated DX7 presets and browser lifecycle
         run: |
           node tools/build-dx7-presets.mjs --check
