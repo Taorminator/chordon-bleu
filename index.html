@@ -1708,6 +1708,7 @@ function setupFM1(){
 }
 
 if(typeof location!=="undefined" && /(?:^|[?&])view=fm1(?:&|$)/.test(location.search||""))document.body.classList.add("fm1-mode");
+// BROWSER_STARTUP
 if(window.CHORDON_BASS_API){bassApi=window.CHORDON_BASS_API;setup();}else window.addEventListener('chordon-bass-ready',()=>{bassApi=window.CHORDON_BASS_API;setup();},{once:true});
 setupFM1();
 setupFM1Hardware();
@@ -1891,9 +1892,6 @@ function setupFM1Hardware(){
 }
 
 
-/*
-setup();
-*/
 </script>
 </body>
 </html>
