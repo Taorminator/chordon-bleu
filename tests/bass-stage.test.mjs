@@ -10,6 +10,7 @@ const source=html.slice(start,end);
 
 class Node{
  constructor(tag='div'){this.tagName=tag;this.children=[];this.attributes={};this.className='';this.textContent='';}
+ appendChild(node){this.children.push(node);}
  append(...nodes){this.children.push(...nodes);}
  replaceChildren(...nodes){this.children=[...nodes];}
  setAttribute(name,value){this.attributes[name]=String(value);}
