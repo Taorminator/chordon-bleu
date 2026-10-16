@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
-let source=html.match(/<script>([\s\S]*?)<\/script>/)[1].replace(/\nsetup\(\);[\s\S]*$/,'');
+let source=html.match(/<script>([\s\S]*?)<\/script>/)[1].replace(/\n\/\/ BROWSER_STARTUP[\s\S]*$/,'');
 const c=vm.createContext({console,Math,Date,Uint8Array,TextEncoder,TextDecoder,setTimeout,clearTimeout});
 vm.runInContext(source,c);const run=s=>vm.runInContext(s,c);
 run("renderSaved=()=>{};store=()=>{};toast=msg=>globalThis.lastToast=msg;state.play=true;state.tempo=126;state.motion='pulse';state.steps=[0,5,9,7].map(root=>({root,quality:'maj',manualRoot:null,manualQuality:null}));");
