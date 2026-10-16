@@ -41,6 +41,26 @@ assert.match(css,/repeating-linear-gradient/,'DELAY gets repeat blue/green color
 assert.match(css,/\.motionbuttons button\[data-motion="arp"\]::before/,'Playful motion symbols');
 assert.match(css,/\.chord-root\{/,'Clear large root name');
 assert.match(css,/\.chordname\{/,'Readable quality label');
+assert.ok(css.includes('.track-focus{display:flex;align-items:center;gap:6px;margin:0 0 12px;padding:4px;background:#141b30;'),
+ 'Track focus uses a dark base so both labels stay readable');
+assert.ok(css.includes('.track-focus button{min-height:44px;'),
+ 'Track focus controls meet the 44px touch target');
+assert.ok(css.includes('.track-focus button[aria-pressed=true]{background:#4657ff;color:#fff;'),
+ 'Selected track has a distinct high-contrast state');
+assert.ok(css.includes('.track-focus button:focus-visible{outline:3px solid #fff!important;'),
+ 'Track focus keeps a visible keyboard focus ring');
+function luminance(hex){
+ const value=hex.slice(1).match(/.{2}/g).map(part=>parseInt(part,16)/255).map(channel=>
+  channel<=.04045?channel/12.92:((channel+.055)/1.055)**2.4);
+ return .2126*value[0]+.7152*value[1]+.0722*value[2];
+}
+function contrast(foreground,background){
+ const a=luminance(foreground),b=luminance(background);
+ return (Math.max(a,b)+.05)/(Math.min(a,b)+.05);
+}
+assert.ok(contrast('#e8ecff','#141b30')>=4.5,'Inactive track label meets WCAG AA contrast');
+assert.ok(contrast('#fff','#4657ff')>=4.5,'Active track label meets WCAG AA contrast');
+
 
 class Node{
  constructor(tag='div'){
