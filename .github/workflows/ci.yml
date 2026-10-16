@@ -13,6 +13,8 @@ jobs:
           node-version: "22"
       - name: Validate offline recipe bundle
         run: node tools/build-recipes.mjs --check
+      - name: Verify browser module dependency graph
+        run: node tests/pages-artifact.test.mjs .
       - name: Prevent unreviewed boot/PLL changes and firmware release
         run: node tests/boot-safety.test.mjs
       - name: Refuse mismatched Felucca checkout before overlay writes

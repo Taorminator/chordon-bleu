@@ -26,6 +26,7 @@ jobs:
         run: |
           mkdir -p _site/install _site/docs
           cp index.html _site/index.html
+          cp -R core _site/core
           cp -R vendor _site/vendor
           mkdir -p _site/assets/dx7
           cp assets/dx7/aquanode-presets.js _site/assets/dx7/
@@ -34,9 +35,28 @@ jobs:
           if [ -f install/release-manifest.json ]; then cp install/release-manifest.json _site/install/; fi
           if [ -f docs/fm1-four-screens.png ]; then cp docs/fm1-four-screens.png _site/docs/; fi
           touch _site/.nojekyll
+      - name: Verify packaged browser module graph
+        run: node tests/pages-artifact.test.mjs _site
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
       - id: deployment
         uses: actions/deploy-pages@v4
+      - name: Smoke test deployed browser runtime
+        env:
+          DEMO_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          set -euo pipefail
+          base="${DEMO_URL%/}"
+          tmpdir="$(mktemp -d)"
+          trap 'rm -rf "$tmpdir"' EXIT
+          curl --fail --silent --show-error --retry 5 --retry-delay 3 --retry-connrefused "$base/" -o "$tmpdir/index.html"
+          grep -q 'id="key"' "$tmpdir/index.html"
+          for asset in core/browser-bass-bootstrap.js core/bass-track.js core/bass-generator.js; do
+            curl --fail --silent --show-error --retry 5 --retry-delay 3 --retry-connrefused "$base/$asset" -o "$tmpdir/$(basename "$asset")"
+          done
+          grep -q 'chordon-bass-ready' "$tmpdir/browser-bass-bootstrap.js"
+          grep -q 'bass-track.js' "$tmpdir/browser-bass-bootstrap.js"
+          grep -q 'bass-generator.js' "$tmpdir/browser-bass-bootstrap.js"
+          echo "Deployed browser entrypoint and bassline module dependencies are reachable."
