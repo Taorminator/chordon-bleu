@@ -1,6 +1,24 @@
 # CHORDON BLEU — verified project state
 
-## Browser bassline integration — 2026-10-16
+## Reconciled documentation snapshot — 2026-10-17
+
+Reviewed `main` at `e18d3a8505533e1767a711ae05c27da5814385c8`. The dated branch results below remain evidence for their original commits only.
+
+- Browser bassline integration is merged through [PR #21](https://github.com/Taorminator/chordon-bleu/pull/21), merge `2fb3f7aefa67a4261d0ce1f1b0bc414e44d3d830`: chord-relative generated bass, shared two-bar scheduling, saved snapshots, share links and MIDI channel 2. This is browser integration, not native feature parity.
+- [PR #22](https://github.com/Taorminator/chordon-bleu/pull/22), integrated at `90a7cc0874301ab8148e567223e0071fe937e51d`, corrects Pages packaging of the bass runtime modules and adds the module dependency smoke check. [PR #23](https://github.com/Taorminator/chordon-bleu/pull/23), integrated at `6ecb4aa208a0fb94c50eac4a40780858647606d1`, improved track-toggle contrast.
+- `e18d3a8505533e1767a711ae05c27da5814385c8` supersedes the CHORDS/BASS editing toggle with a persistent bass-note lane below the chords and an independent BASS FLIP control. The lane shows resolved pitches, octaves and beat positions; `tests/bass-stage.test.mjs` exercises the renderer. Historical descriptions of the toggle below describe the earlier branch, not the current UI.
+- These changes are present in the reviewed source. This reconciliation does not claim a fresh live-site listening test, iPhone review, actual download/re-import, or hardware validation. Older run URLs are not evidence for this snapshot or the updated documentation commit.
+
+## FM1 Workbench planning increment — 2026-10-16; reconciled 2026-10-17
+
+- [Prioritized plan, pinned evidence and existing-test inventory](FM1_WORKBENCH_PLAN.md): note lifecycle audit, sound-before-note scheduling, then shared browser/native fixtures and separate physical audio measurements.
+- Controlled sound mutation remains deferred. Stock/FM-1+VA findings require verification on each target and do not establish native Felucca behavior or resource limits.
+- Compared with independent [ecosystem research PR #17](https://github.com/Taorminator/chordon-bleu/pull/17) at `56eb7b15d2d56074dd228575402758c69beb8e91`; that draft is unchanged and remains a separate research step. Its timebase, MIDI, persistence, resource and recovery priorities complement the Workbench lifecycle/scheduling/parity plan.
+- Current next step is a bounded 1a audit/test proposal after exact-commit baseline checks. Existing partial coverage must be reused; do not infer that cross-track ownership, all-note sound ordering or browser/native parity are finished. This documentation PR authorizes no implementation.
+- Native zero-BPM FX/SLICER guards and pre-/post-overlay host stages are present in the reviewed workflow. The older next-action list below is historical; it is not a claim that its branches remain unmerged. No new target build or hardware success is asserted here.
+- Documentation only: no application, firmware, browser demo, installer or preset changes; FM-XY is independent. **No hardware or installation approval.** Release, physical flash/restore and recovery gates remain unchanged.
+
+## Historical browser bassline branch verification — 2026-10-16
 
 - Draft PR #21: [connect generated bassline to browser demo](https://github.com/Taorminator/chordon-bleu/pull/21), based on `main` `8822eb67eb698ecf40ada882f342c35e51abea33`.
 - Adds CHORDS/BASS editing focus. Bass FLIP generates a phrase from the current chord progression; chord FLIP keeps the bass rhythm and resolves ROOT/FIFTH roles against the changed chords.
@@ -16,7 +34,7 @@
 - Local recipe/DX7 bundle checks and all 17 Node regression files passed. New coverage verifies round trips, frozen snapshots, bounds, independent locks, preset-catalog parity, preserved favorites, no autoplay, disclosure, clipboard/native-share failure paths and modal keyboard/focus behavior.
 - Actual iPhone share-sheet, clipboard and visual/accessibility behavior remain unverified. See [share-link specification](SHARE_LINKS.md) and D-011 for limitations.
 
-Last checked: 2026-10-14. This is a snapshot, not a live CI dashboard.
+The sections below retain the 2026-10-14 review snapshot and subsequent dated increments. They are historical evidence, not a live CI dashboard.
 
 ## Identity and scope
 - Independent repository: `Taorminator/chordon-bleu`.
@@ -40,7 +58,7 @@ Last checked: 2026-10-14. This is a snapshot, not a live CI dashboard.
 - Native and browser feature parity is incomplete, especially recipes and persistence.
 - CI status must always be checked against its exact commit. Do not equate a green branch build with a green `main` build.
 
-## Immediate next actions
+## Historical next actions — 2026-10-14
 1. Review the consolidated `fix/native-upstream-zero-bpm-guard` PR (including pre-overlay host baseline), require green CHORDON checks, then consider merge. Re-run native CI on the resulting `main` commit; branch-only results must not be reported as merged-main verification.
 2. Improve one limited native behavior with a regression test only after green baseline checks.
 3. Establish hardware test access and a verified backup/recovery method before any flash or installation proposal.
