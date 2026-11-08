@@ -272,3 +272,43 @@ void cb_fm1_draw(const CbFM1 *m,const CbFM1Graphics *g){
  r(g,0,228,240,12,C_DARK);
  t(g,34,229,"PLAY   FLIP   SAVE",C_MUT,1);
 }
+/* Minimal native prototype. One-step chord undo; no implicit flash writes. */
+static const uint8_t MINIMAL_POOL[][2]={
+ {0,CB_MAJ7},{0,CB_MAJ9},{0,CB_ADD9},{0,CB_SIX},{0,CB_MAJOR},
+ {2,CB_M7},{2,CB_M9},{2,CB_MINOR},{4,CB_M7},{4,CB_MINOR},
+ {5,CB_MAJ7},{5,CB_MAJ9},{5,CB_ADD9},{5,CB_MAJOR},
+ {7,CB_DOM7},{7,CB_SUS4},{7,CB_MAJOR},{9,CB_M7},{9,CB_M9},{9,CB_MINOR}
+};
+void cb_minimal_init(CbFM1 *m,uint32_t seed){
+ static const uint8_t initial[4]={0,17,10,14};
+ cb_fm1_init(m,seed);m->bpm=84;m->gate=88;m->motion=CB_MOTION_HOLD;
+ for(unsigned i=0;i<4;i++){
+  m->loop.steps[i].root=MINIMAL_POOL[initial[i]][0];
+  m->loop.steps[i].quality=MINIMAL_POOL[initial[i]][1];
+  m->loop.steps[i].lock_root=m->loop.steps[i].lock_type=0;
+ }
+}
+void cb_minimal_vary(CbFM1 *m,int8_t turn){
+ if(!turn||m->selected>3)return;
+ CbChord *c=&m->loop.steps[m->selected];
+ unsigned index=0,n=sizeof(MINIMAL_POOL)/sizeof(MINIMAL_POOL[0]);
+ for(unsigned i=0;i<n;i++)if(c->root==MINIMAL_POOL[i][0]&&c->quality==MINIMAL_POOL[i][1]){index=i;break;}
+ save_undo(m);
+ index=(unsigned)imod((int)index+(turn>0?1:-1),(int)n);
+ c->root=MINIMAL_POOL[index][0];c->quality=MINIMAL_POOL[index][1];
+}
+void cb_minimal_draw(const CbFM1 *m,const CbFM1Graphics *g){
+ if(!m||!g||!g->rect)return;
+ const uint16_t bg=RGB(20,21,18),white=RGB(248,248,240),yellow=RGB(244,239,133);
+ r(g,0,0,240,240,bg);
+ t(g,12,12,m->playing?"LOOP":"READY",white,1);
+ const CbChord *c=&m->loop.steps[m->selected];
+ t(g,42,83,NAMES[c->root],white,4);t(g,102,99,TYPES[c->quality],white,2);
+ for(unsigned i=0;i<4;i++){
+  int x=10+(int)i*56;uint16_t fill=m->playing&&i==m->active?yellow:RGB(48,51,43);
+  r(g,x,174,50,52,fill);
+  if(i==m->selected){l(g,x,172,x+49,172,white);l(g,x,227,x+49,227,white);}
+  t(g,x+5,182,NAMES[m->loop.steps[i].root],fill==yellow?bg:white,1);
+  t(g,x+3,203,TYPES[m->loop.steps[i].quality],fill==yellow?bg:white,1);
+ }
+}

@@ -97,3 +97,9 @@ See [architecture](ARCHITECTURE.md) and [decision log](DECISIONS.md).
 - Removed the redundant JSON export/import UI. MIDI file-picker import adds to the same saved list; existing local favorites are retained.
 - Own exports now preserve app-specific four-chord and motion metadata for re-import. Foreign two-bar files support bounded chord interpretation, with limitations and error feedback documented in README.
 - `tests/midi-import.test.mjs` covers all supported chord-quality/mode round trips, type 0/1 foreign chord recognition, invalid/unsupported files, full-list handling and unchanged live playback. Real browser/iPhone file-picker/download remains unverified locally.
+
+## Minimal native port: first controlled increment
+
+Native prototype now initializes Cmaj7 / Am7 / Fmaj7 / G7 at 84 BPM. The first four white keys select/audition, K1 cycles a bounded diatonic palette, EDIT restores the previous chord state, PLAY stops/releases voices. PRESETS uses pinned Felucca's existing preset selector, and the LCD/LED surface is reduced. Legacy controller tests remain separate.
+
+This is not browser parity or installation approval: native variation order is a simple bounded cycle (not the browser ranking), Undo is one step, the selector currently exposes Felucca's factory/user pool rather than the browser's exact six-program/Aquanode catalogue, and no physical persistence is implemented. Firmware-to-WASM, real audio/panel tests, flash/save, recovery and hardware budgets remain open. No installable binary is published. The previous native CI failure was an SDK download reset; its same-commit retry is tracked in run 42499675095.

@@ -61,6 +61,10 @@ jobs:
         run: |
           cc -std=c99 -O2 -Wall -Wextra -Werror -pedantic core/chordon_harmony.c tests/core_test.c -o /tmp/chordon-harmony-test
           /tmp/chordon-harmony-test
+      - name: Minimal native application
+        run: |
+          cc -std=c99 -O2 -Wall -Wextra -Werror -pedantic core/chordon_harmony.c firmware/cb_fm1.c tests/minimal_device_test.c -o /tmp/chordon-minimal
+          /tmp/chordon-minimal
       - name: Portable FM1 application simulation (not a firmware build)
         run: |
           cc -std=c99 -O2 -Wall -Wextra -Werror -pedantic core/chordon_harmony.c firmware/cb_fm1.c tests/device_test.c -o /tmp/chordon-device-test

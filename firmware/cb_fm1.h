@@ -51,4 +51,7 @@ void cb_fm1_knob(CbFM1 *m, uint8_t knob, int8_t turn);
 void cb_fm1_tick(CbFM1 *m, uint16_t elapsed_ms, const CbFM1Host *host);
 void cb_fm1_draw(const CbFM1 *m, const CbFM1Graphics *g);
 uint8_t cb_fm1_chord_notes(const CbChord *c, uint8_t *notes); /* up to four notes */
+void cb_minimal_init(CbFM1 *m, uint32_t seed);
+void cb_minimal_vary(CbFM1 *m, int8_t turn);
+void cb_minimal_draw(const CbFM1 *m, const CbFM1Graphics *g);
 #endif

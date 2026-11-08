@@ -53,17 +53,15 @@ press('OCT_UP');assert.equal(vm.runInContext('hwOctave',cx),1);
 press('OCT_DOWN');assert.equal(vm.runInContext('hwOctave',cx),0);
 
 // Legacy upstream B_SCL is the printed SEL, not a SELECT encoder.
-const bindings=[
- ['B_PLAY','CB_B_PLAY'],['B_SEQ','CB_B_FLIP'],['B_SAVE','CB_B_SAVE'],
- ['B_HOME','CB_B_HOME'],['B_GLO','CB_B_RECIPE'],['B_SCL','CB_B_CHORD'],
- ['B_ARP','CB_B_ARP'],['B_EDIT','CB_B_KEEP_ALL'],
- ['B_ENV','CB_B_FEEL'],['B_LFO','CB_B_MOTION']
-];
+const bindings=[['B_PLAY','CB_B_PLAY'],['B_EDIT','CB_B_UNDO']];
 for(const [physical,semantic] of bindings){
  const escaped=physical.replaceAll('_','_');
  assert.ok(new RegExp('panel\\.btn\\['+escaped+'\\]\\)\\)cb_fm1_button\\(&cbh_device,'+semantic).test(platform),
   physical+' must dispatch to '+semantic+' via calibrated Felucca panel');
 }
+assert.match(platform,/panel_enc\(EN_PRESET\)/);
+assert.match(platform,/preset_step\(1\)/);
+assert.match(platform,/white_keys\[4\]=\{0,2,4,6\}/);
 assert.match(controller,/case CB_B_FEEL:m->feel=/);
 assert.match(controller,/case CB_B_MOTION:m->motion=/);
 assert.match(header,/CB_B_FEEL, CB_B_MOTION/);
