@@ -1,5 +1,9 @@
 # CHORDON BLEU — verified project state
 
+## PRESETS correction — 2026-11-08
+
+The user explicitly retains the established sound palette. PRESETS at lower left now selects the six original programs and all 153 bundled Aquanode DX7 presets. K1 remains dedicated to chord variation. Preset persistence is independent of chord undo; async patch loading precedes notes and stale loads/queued notes are cancelled. Eleven minimal behavior/lifecycle tests cover the restored catalogue, local timbres, persistence and six-operator engine races. See MINIMAL_BROWSER.md for secure-context and verification limits. Earlier fixed-sound descriptions below are historical.
+
 ## Minimal browser restart — 2026-11-08
 
 User-approved direction: reduce CHORDON BLEU to four chord slots, a variation dial, Play/Stop and Undo, with quiet feedback and unused controls unlit. No separate bass track in the new experience. This is a focus-friendly design goal, not a clinically validated ADHD intervention.

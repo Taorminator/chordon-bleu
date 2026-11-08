@@ -1,3 +1,4 @@
+import { DEFAULT_SOUND, soundById } from './minimal-sounds.mjs';
 import { Q, label, voiceNotes, alternatives } from './minimal-harmony.mjs';
 
 export const STORAGE_KEY = 'chordon-bleu.minimal.v1';
@@ -7,6 +8,7 @@ const INITIAL = [{ root: 0, quality: 'maj7' }, { root: 9, quality: 'm7' }, { roo
 
 export class Session {
   constructor(saved) {
+    this.soundId = soundById(saved?.soundId||DEFAULT_SOUND).id;
     this.steps = copy(INITIAL);
     this.selected = 0;
     this.history = [];
@@ -40,7 +42,7 @@ export class Session {
     this.deck = null;
     return true;
   }
-  snapshot() { return { version: 1, steps: copy(this.steps) }; }
+  snapshot() { return { version: 1, soundId:this.soundId, steps: copy(this.steps) }; }
   names() { return this.steps.map(label); }
   voices() {
     let previous;

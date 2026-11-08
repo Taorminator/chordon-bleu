@@ -35,3 +35,13 @@ Build: `node tools/build-browser.mjs`; validate `node tests/pages-artifact.test.
 ## FM1 physical browser surface
 
 The default surface now uses the existing FM1 panel topology: four left knobs, 240×240 LCD, four right knobs, the unchanged printed 2×6 function labels, OCT buttons and 27 chromatic keys. K1 is the variation encoder; EDIT is Undo; PLAY/STOP is transport; the first four white keys play/select slots. Unused controls are disabled and dark. K2–K4 are physically represented, deliberately without extra features. The on-screen pads remain touch shortcuts. Narrow screens horizontally scroll the full device rather than rearrange the physical controls. This is a browser simulation using the existing sound engine, not a CPU/firmware emulator.
+
+## Existing sounds restored on PRESETS — 2026-11-08
+
+User correction: simplification must preserve the established sounds. PRESETS (lower-left encoder) selects the six original programs WARM, GLASS, DUSK, DX7 EP (local two-operator preview), GRAND and 90s HOUSE, followed by all 153 bundled Aquanode presets on the existing six-operator OpenDX7 worklet. The original sound parameter definitions are retained and tested against Classic; no new sound palette is invented. The sound name remains on the LCD and the ID is saved separately from chord history. K1 still varies chords; changing sounds never changes harmony and chord Undo never resets the instrument.
+
+The left printed controls are MASTER / SELECT above PRESETS / ALGORITHM. Position is grounded in pinned Felucca's photo-coordinate table in `tools/gen_panel_diagram.py` at `9f6a8858afd71b4faed9dfea3a5f94d3ecfdf002`. Unused knobs remain dark. PRESETS supports drag, wheel and focused arrow keys, including cancellation on interrupted drags.
+
+Sound loading is guarded against stale async selections and occurs before note emission. Changing programs and stopping playback cancel queued DX7 note timers and panic the worklet. Worklet modules are registered once per audio context. Unsupported/insecure browsers give an explicit error for DX7 voices rather than silently changing their timbre; local synth programs remain usable. The published HTTPS preview is required for AudioWorklet. The local HTTP preview cannot exercise the worklet in cloud Chromium; its selection/error path and local synth switching were reviewed there. The original DSP regression exercises all 153 actual patches; new controlled lifecycle tests verify load races and cancellation.
+
+Product direction: a fun, inviting chord instrument in the spirit of the user's HiChord/Telepathic Orchid references. Sound first, few decisions, immediate exploration, easy undo. Minimalism should preserve musical personality and established useful sounds.

@@ -1,3 +1,4 @@
+import { SOUND_CATALOG, soundById } from '../core/minimal-sounds.mjs';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { readFileSync } from 'node:fs';
@@ -97,11 +98,12 @@ function harness() {
   const notes=[];
   class FakePiano {
     constructor(){this.context={get currentTime(){return clock;}};}
+    setSound(id){this.soundId=id;}
     ready(){return new Promise(resolve=>{pendingReady=resolve;});}
     chord(...args){notes.push(args);}
     silence(){notes.length=0;}
   }
-  const context = vm.createContext({Session,STORAGE_KEY,TEMPO,label,alternatives,Piano:FakePiano,document,
+  const context = vm.createContext({Session,STORAGE_KEY,TEMPO,label,alternatives,SOUND_CATALOG,soundById,Piano:FakePiano,document,
     window:{addEventListener(){}},localStorage:{getItem(){return null;},setItem(){}},console,
     setTimeout:(fn,ms)=>{timers.set(++id,{fn,ms,type:'timeout'});return id;},clearTimeout:i=>timers.delete(i),
     setInterval:(fn,ms)=>{timers.set(++id,{fn,ms,type:'interval'});return id;},clearInterval:i=>timers.delete(i),
@@ -109,7 +111,7 @@ function harness() {
   const source = readFileSync(new URL('../core/minimal-app.mjs',import.meta.url),'utf8').replace(/^import .*;\n/gm,'');
   vm.runInContext(source,context);
   return { elements,pads,notes,timers,document, run:s=>vm.runInContext(s,context),
-    resolve:async()=>{pendingReady();await Promise.resolve();await Promise.resolve();}, clock:v=>{clock=v;} };
+    resolve:async()=>{pendingReady();await new Promise(resolve=>setImmediate(resolve));}, clock:v=>{clock=v;} };
 }
 test('rapid Play/Stop cannot launch late; live editing preserves playing slot, stop clears every schedule', async () => {
   const h=harness(), click=id=>h.elements.get(id).listeners.click();
@@ -148,4 +150,52 @@ test('old idea and FM1 links keep their fragment/query when routed to Classic', 
     vm.runInNewContext(code,{location,URL,URLSearchParams});
     assert.equal(target,expected?'https://example.org/chordon-bleu/'+expected:null);
   }
+});
+test('sound catalogue preserves all six original programs and 153 DX7 presets', async () => {
+  const { SOUNDS } = await import('../core/minimal-sounds.mjs');
+  const html=readFileSync(new URL('../classic.html',import.meta.url),'utf8');
+  const old=vm.runInNewContext(html.slice(html.indexOf('const SOUNDS='),html.indexOf('// Local synth programs'))+';JSON.stringify(SOUNDS)');
+  assert.deepEqual(SOUNDS,JSON.parse(old));
+  assert.equal(SOUND_CATALOG.length,159);
+  assert.equal(new Set(SOUND_CATALOG.map(s=>s.id)).size,159);
+  const s=new Session();s.soundId='dx7:aquazone:1';s.vary(1);s.undo();
+  assert.equal(s.soundId,'dx7:aquazone:1','chord undo must not change instrument');
+  assert.equal(new Session(s.snapshot()).soundId,s.soundId);
+  assert.equal(new Session({soundId:'broken'}).soundId,'local:3');
+  for(let i=0;i<6;i++){
+    const f=fakeAudio(),p=new Piano(f.environment);await p.ready();p.setSound('local:'+i);
+    p.chord([60,64,67],.01,1.2,0);assert.equal(p.voices.size,3);
+    assert.ok(f.sources.slice(1).every(osc=>Number.isFinite(osc.end)));
+    p.silence();for(const osc of f.sources)osc.onended();assert.equal(p.voices.size,0);
+  }
+});
+test('DX7 preparation discards stale preset loads; sound changes and Stop cancel queued MIDI', async () => {
+  const f=fakeAudio();let load,loads=0;const messages=[],timers=new Map();let n=0;
+  f.environment.AudioWorkletNode=class{constructor(context){this.context=context;this.port={postMessage:m=>messages.push(m)};}connect(){}disconnect(){}};
+  f.environment.setTimeout=fn=>{timers.set(++n,fn);return n;};f.environment.clearTimeout=id=>timers.delete(id);
+  const p=new Piano(f.environment);await p.ready();
+  p.context.audioWorklet={addModule:()=>{loads++;return new Promise(resolve=>{load=resolve;});}};
+  p.setSound('dx7:aquazone:1');const a=p.prepareSound();
+  p.setSound('dx7:aquazone:2');const b=p.prepareSound();load();
+  assert.equal(await a,false);assert.equal(await b,true);assert.equal(loads,1);
+  assert.equal(messages.filter(m=>m.type==='patch').length,1);
+  assert.equal(messages.find(m=>m.type==='patch').patch.name.trim(),'DX Fast 2');
+  p.chord([60,64,67],1,1.2,0);assert.equal(timers.size,6);
+  p.setSound('local:4');assert.equal(timers.size,0);assert.equal(messages.at(-1).type,'panic');
+  p.setSound('dx7:aquazone:1');await p.prepareSound();assert.equal(loads,1);
+  p.chord([60,64,67],1,1.2,0);p.silence();assert.equal(timers.size,0);
+});
+test('PRESETS changes only the instrument and persists it independently of chord history', async()=>{
+  const h=harness(),before=h.run('JSON.stringify(session.steps)');
+  h.run('chooseSound(1)');await h.resolve();
+  assert.equal(h.run('session.soundId'),'local:4');
+  assert.equal(h.run('JSON.stringify(session.steps)'),before);
+  assert.equal(h.run('session.history.length'),0);
+  h.run('chooseSound(-1)');await h.resolve();assert.equal(h.run('session.soundId'),'local:3');
+});
+test('changing PRESETS during pending Play preserves the requested loop start', async()=>{
+  const h=harness();h.run('togglePlay()');h.run('chooseSound(1)');await h.resolve();
+  assert.equal(h.run('playing'),true);assert.equal(h.run('launching'),false);
+  assert.equal(h.run('session.soundId'),'local:4');assert.equal(h.notes.length,1);
+  h.run('stop()');assert.equal(h.notes.length,0);
 });

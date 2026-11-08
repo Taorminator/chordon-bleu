@@ -1,3 +1,4 @@
+import { SOUND_CATALOG, soundById } from './minimal-sounds.mjs';
 import { Session, STORAGE_KEY, TEMPO } from './minimal-session.mjs';
 import { label, alternatives } from './minimal-harmony.mjs';
 import { Piano } from './minimal-audio.mjs';
@@ -6,6 +7,7 @@ const $ = id => document.getElementById(id);
 let saved;
 try { saved = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch { /* First visit or unavailable storage. */ }
 const session = new Session(saved), piano = new Piano();
+piano.setSound?.(session.soundId);
 const pads = [...document.querySelectorAll('[data-slot]')];
 const seconds = 60 / TEMPO * 2;
 let playing = false, launching = false, sounding = -1, token = 0;
@@ -22,6 +24,14 @@ function persist() {
 }
 function render(status) {
   const names = session.names();
+  const sound=soundById(session.soundId),preset=$('preset');
+  $('preset-name').textContent=sound.name;
+  if(preset){
+    preset.setAttribute('aria-valuemax',SOUND_CATALOG.length-1);
+    preset.setAttribute('aria-valuenow',SOUND_CATALOG.findIndex(s=>s.id===sound.id));
+    preset.setAttribute('aria-valuetext',sound.name+(sound.bank?' · '+sound.bank:''));
+    preset.style.setProperty('--preset-turn',`${SOUND_CATALOG.findIndex(s=>s.id===sound.id)*22}deg`);
+  }
   $('chord-name').textContent = names[session.selected];
   $('slot-indicator').textContent = `0${session.selected + 1} / 04`;
   if (status) $('status').textContent = status;
@@ -55,6 +65,7 @@ async function withAudio(action) {
   try {
     // ready() starts/resumes audio synchronously before its first await.
     await piano.ready();
+    if(await piano.prepareSound?.()===false)return;
     if (request !== token || document.hidden) return;
     action();
   } catch (error) {
@@ -86,6 +97,17 @@ function vary(direction) {
   persist();
   if (!playing && !launching) audition('VORSCHLAG');
 }
+function chooseSound(direction) {
+  if(direction!==1 && direction!==-1)return;
+  const index=SOUND_CATALOG.findIndex(s=>s.id===session.soundId);
+  session.soundId=SOUND_CATALOG[(index+direction+SOUND_CATALOG.length)%SOUND_CATALOG.length].id;
+  piano.setSound(session.soundId);render('SOUND');persist();
+  feedback(soundById(session.soundId).name);
+  if(launching){stop();togglePlay();}
+  else if(playing)void withAudio(()=>render('LOOP'));
+  else audition('SOUND');
+}
+window.addEventListener('fm1-preset',event=>chooseSound(event.detail));
 function undo() {
   if (!session.undo()) return;
   feedback('Letzte Änderung zurückgenommen.'); persist(); render('ZURÜCK');

@@ -24,3 +24,23 @@ for (let midi = 60; midi < 87; midi++) {
   }
   keyboard.append(key);
 }
+
+// The physical PRESETS encoder (lower left) selects sounds, independently of K1.
+const preset=document.getElementById('preset');
+const turn=direction=>window.dispatchEvent(new CustomEvent('fm1-preset',{detail:direction}));
+preset.addEventListener('keydown',event=>{
+  if(['ArrowUp','ArrowRight','ArrowDown','ArrowLeft'].includes(event.key)){
+    event.preventDefault();event.stopPropagation();turn(['ArrowUp','ArrowRight'].includes(event.key)?1:-1);
+  }
+});
+let drag=null,scroll=0;
+preset.addEventListener('pointerdown',event=>{if(event.button!==0)return;preset.focus();preset.setPointerCapture(event.pointerId);drag={x:event.clientX,y:event.clientY};});
+preset.addEventListener('pointermove',event=>{
+  if(!drag)return;const delta=event.clientX-drag.x+drag.y-event.clientY;
+  if(Math.abs(delta)>=18){turn(delta>0?1:-1);drag={x:event.clientX,y:event.clientY};}
+});
+for(const event of ['pointerup','pointercancel','lostpointercapture'])preset.addEventListener(event,()=>{drag=null;});
+preset.addEventListener('wheel',event=>{
+  if(event.ctrlKey||event.metaKey)return;event.preventDefault();scroll+=event.deltaY||event.deltaX;
+  if(Math.abs(scroll)>24){turn(scroll>0?1:-1);scroll=0;}
+},{passive:false});

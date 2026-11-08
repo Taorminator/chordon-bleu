@@ -1,11 +1,12 @@
-/* The existing browser FM-preview E-piano, isolated from Classic's tracks/effects.
- * Two-operator synthesis; this is not the six-operator DX7 backend. GPL-3.0-only. */
+import { SOUNDS, soundById, presetById, DEFAULT_SOUND } from './minimal-sounds.mjs';
+/* Classic sound programs and bundled six-operator DX7 backend. GPL-3.0-only. */
 export class Piano {
   constructor(environment = globalThis) {
     this.environment = environment;
     this.context = null;
     this.master = null;
     this.voices = new Set();
+    this.soundId=DEFAULT_SOUND; this.dxNode=null; this.dxReady=null; this.dxLoading=null; this.dxTimers=new Set(); this.moduleContext=null;
     this.onInterrupt = () => {};
   }
   async ready() {
@@ -41,29 +42,72 @@ export class Piano {
     }
     if (ctx.state !== 'running') throw new Error('Ton ist pausiert. Bitte erneut tippen.');
   }
+  setSound(id) {
+    const next=soundById(id).id;
+    if(next===this.soundId)return;
+    this.silence(); this.soundId=next; this.dxReady=null;
+  }
+  async prepareSound() {
+    const sound=soundById(this.soundId), ctx=this.context;
+    if(!sound.patch)return true;
+    const id=this.soundId;
+    if(this.dxReady===id && this.dxNode?.context===ctx)return true;
+    if(!ctx.audioWorklet || !this.environment.AudioWorkletNode)throw new Error('Dieser Browser unterstützt die DX7-Engine nicht. Bitte einen lokalen Klang wählen.');
+    if(this.moduleContext!==ctx){
+      this.moduleContext=ctx;
+      this.dxLoading=ctx.audioWorklet.addModule(new URL('../vendor/opendx7/dx7-processor.js',import.meta.url).href);
+      this.dxLoading.catch(()=>{if(this.moduleContext===ctx)this.moduleContext=null;});
+    }
+    await this.dxLoading;
+    if(id!==this.soundId || ctx!==this.context)return false;
+    if(!this.dxNode || this.dxNode.context!==ctx){
+      this.dxNode?.disconnect();
+      this.dxNode=new this.environment.AudioWorkletNode(ctx,'dx7-processor',{outputChannelCount:[2]});
+      this.dxNode.connect(this.master);
+    }
+    this.dxNode.port.postMessage({type:'panic'});
+    this.dxNode.port.postMessage({type:'patch',patch:presetById(sound.patch)});
+    this.dxReady=id;return true;
+  }
   chord(notes, at, duration, slot) {
+    const sound=soundById(this.soundId);
+    if(sound.patch){
+      if(this.dxReady!==this.soundId)return;
+      const node=this.dxNode, id=this.soundId;
+      const queue=(when,message)=>{
+        const timer=this.environment.setTimeout(()=>{
+          this.dxTimers.delete(timer);
+          if(this.soundId===id && this.dxNode===node)node.port.postMessage(message);
+        },Math.max(0,(when-this.context.currentTime)*1000));
+        this.dxTimers.add(timer);
+      };
+      for(const note of notes){queue(at,{type:'noteOn',note,velocity:81});queue(at+duration,{type:'noteOff',note});}
+      return;
+    }
     for (const note of notes) this.tone(note, at, duration, slot);
   }
   tone(midi, at, duration, slot) {
     const ctx = this.context, sources = [], nodes = [];
+    const sound=SOUNDS[soundById(this.soundId).program],kind=sound.kind;
     const frequency = 440 * 2 ** ((midi - 69) / 12);
     const envelope = ctx.createGain(), filter = ctx.createBiquadFilter();
     nodes.push(envelope, filter);
-    filter.type = 'lowpass'; filter.frequency.value = 4900; filter.Q.value = .45;
+    filter.type = 'lowpass'; filter.frequency.value = sound.cut; filter.Q.value = .45;
     envelope.connect(filter); filter.connect(this.master);
-    const level = .108 * .72, bodyEnd = at + Math.max(.426, duration), end = bodyEnd + .95;
+    const level = (kind==='house'?.080:kind==='grand'?.11:kind==='fm'?.108:.105)*.72, bodyEnd = at + Math.max(sound.a+sound.dec, duration), end = bodyEnd + sound.rel;
     envelope.gain.setValueAtTime(.0001, at);
-    envelope.gain.exponentialRampToValueAtTime(level, at + .006);
-    envelope.gain.exponentialRampToValueAtTime(level * .26, at + .426);
-    envelope.gain.setValueAtTime(level * .26, bodyEnd);
+    envelope.gain.exponentialRampToValueAtTime(level, at + Math.max(.005,sound.a));
+    envelope.gain.exponentialRampToValueAtTime(level * sound.sus, at + sound.a+sound.dec);
+    envelope.gain.setValueAtTime(level * sound.sus, bodyEnd);
     envelope.gain.exponentialRampToValueAtTime(.0001, end);
-    const voice = (hz, volume, detune = 0) => {
+    const voice = (hz, volume, detune = 0, type = 'sine') => {
       const osc = ctx.createOscillator(), mix = ctx.createGain();
-      osc.type = 'sine'; osc.frequency.setValueAtTime(hz, at); osc.detune.value = detune;
+      osc.type = type; osc.frequency.setValueAtTime(hz, at); osc.detune.value = detune;
       mix.gain.value = volume; osc.connect(mix); mix.connect(envelope);
       nodes.push(mix); sources.push(osc);
       return osc;
     };
+    if(kind==='fm'){
     const carrier = voice(frequency, .92);
     const modulator = ctx.createOscillator(), index = ctx.createGain();
     modulator.frequency.setValueAtTime(frequency * 3, at);
@@ -72,6 +116,17 @@ export class Piano {
     modulator.connect(index); index.connect(carrier.frequency);
     sources.push(modulator); nodes.push(index);
     voice(frequency * 2, .16, 3);
+    }else if(kind==='grand'){
+      voice(frequency,.85);voice(frequency*2.005,.30,0,'triangle');voice(frequency*3.012,.16);voice(frequency*4.026,.10);voice(frequency*5.065,.045,0,'triangle');
+    }else if(kind==='house'){
+      voice(frequency,.66,0,'sawtooth');voice(frequency*2,.31,4,'triangle');voice(frequency*3,.15);
+    }else{voice(frequency,1,0,sound.wave);voice(frequency,.22,sound.detune,sound.second);}
+    if(kind==='grand'||kind==='house'){
+      const hammer=ctx.createOscillator(),snap=ctx.createGain();
+      hammer.type='triangle';hammer.frequency.setValueAtTime(frequency*4.5,at);hammer.frequency.exponentialRampToValueAtTime(frequency*2.3,at+.022);
+      snap.gain.setValueAtTime((kind==='grand'?.034:.020)*.72,at);snap.gain.exponentialRampToValueAtTime(.0001,at+.035);
+      hammer.connect(snap);snap.connect(filter);hammer.shortEnd=at+.042;sources.push(hammer);nodes.push(snap);
+    }
     const entry = { slot, sources, nodes, envelope };
     this.voices.add(entry);
     let remaining = sources.length;
@@ -80,10 +135,12 @@ export class Piano {
         osc.disconnect();
         if (--remaining === 0) { for (const node of nodes) node.disconnect(); this.voices.delete(entry); }
       };
-      osc.start(at); osc.stop(end + .02);
+      osc.start(at); osc.stop(osc.shortEnd || end + .02);
     }
   }
   silence(slot) {
+    for(const timer of this.dxTimers)this.environment.clearTimeout(timer);this.dxTimers.clear();
+    this.dxNode?.port.postMessage({type:'panic'});
     if (!this.context) return;
     const now = this.context.currentTime;
     for (const entry of this.voices) {
