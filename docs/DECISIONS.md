@@ -57,3 +57,11 @@ Update this record when decisions change; include rationale, date, and commit/is
 ## D-011 — Shareable idea links with disclosure
 
 **Status: Active. Date: 2026-10-16.** LINK TEILEN shows an explicit, complete settings preview before using the share sheet or clipboard. A bounded, versioned, allowlisted URL-fragment snapshot restores the four-chord browser setup without autoplay or replacement of favorites. Integrated sound presets only; active uploaded DX7 patches are rejected rather than silently substituted. Live gestures/audio and random-ARP realizations are not shared. See [format, behavior and verification](SHARE_LINKS.md). Native FM1 firmware is unchanged.
+
+## D-012 — Minimal four-chord browser restart
+
+**Status: Active for the minimal browser view. Date: 2026-11-08.** User approved the six-state concept and requested a playable simplification of the existing browser basis. Default view: four pads, one variation dial, Play/Stop and Undo. Unused Undo is disabled/dim. Selection is an outline, playback is a filled yellow pad with a dot; neither relies on hue alone. The large chord name always follows editing selection, while playback may be on another slot.
+
+No bass track, recipe/feel/spice controls, ARP, sound picker, MIDI library or secondary editing pages in the minimal surface. Independent manual root and quality controls from D-003 are deferred here after the user's explicit simplification approval, and remain available in Classic; this does not implement or redefine native parity. Fixed 84 BPM and a small diatonic C-major/A-minor palette make the first prototype immediately playable. Broader harmonic exploration is a later product decision.
+
+Retain old implementation as `classic.html` with its regression suite and distinct local storage. Root `#idea=` links continue to Classic to preserve previously shared setups. Minimal code reuses the existing vocabulary, voice leading, movement scoring and FM-preview E-piano. It does not claim the six-operator DX7 backend. Audio only begins on gesture; stop/background/interruption cancels scheduling and gates. No firmware/hardware/release change is authorized by this decision.

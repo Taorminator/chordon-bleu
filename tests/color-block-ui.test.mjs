@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 
-const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
+const html=readFileSync(new URL('../classic.html',import.meta.url),'utf8');
 function fragment(a,b){
  const i=html.indexOf(a),j=html.indexOf(b,i+a.length);
  assert.ok(i>=0&&j>i,'Missing UI block '+a);

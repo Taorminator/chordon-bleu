@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
-const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
+const html=readFileSync(new URL('../classic.html',import.meta.url),'utf8');
 const text=(a,b)=>{const i=html.indexOf(a),j=html.indexOf(b,i+1);assert.ok(i>=0&&j>i,'Source anchors: '+a);return html.slice(i,j)};
 const calls=[];
 const state={tempo:120,arp:{rate:8,gate:70,direction:'up',order:'pitch'},slice:{hits:4,rate:8,gate:40},motion:'hold',holdLift:false,steps:[{root:0,quality:'maj'}],selected:0};

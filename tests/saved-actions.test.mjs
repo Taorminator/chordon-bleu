@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
-const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
+const html=readFileSync(new URL('../classic.html',import.meta.url),'utf8');
 const extract=(a,b)=>html.slice(html.indexOf(a),html.indexOf(b,html.indexOf(a)));
 class Element{
  constructor(tag){this.tag=tag;this.children=[];this.listeners={};this.attributes={};}

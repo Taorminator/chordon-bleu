@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
-const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
+const html=readFileSync(new URL('../classic.html',import.meta.url),'utf8');
 function extract(a,b){const i=html.indexOf(a),j=html.indexOf(b,i+a.length);assert.ok(i>=0&&j>i,'Source '+a);return html.slice(i,j);}
 const harmony=extract('<section class="harmony-station"','</section>');
 const order=['id="recipechoices"','id="wonder"','id="feelchoices"','id="keepone"'].map(x=>harmony.indexOf(x));

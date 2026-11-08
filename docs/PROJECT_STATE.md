@@ -1,5 +1,17 @@
 # CHORDON BLEU — verified project state
 
+## Minimal browser restart — 2026-11-08
+
+User-approved direction: reduce CHORDON BLEU to four chord slots, a variation dial, Play/Stop and Undo, with quiet feedback and unused controls unlit. No separate bass track in the new experience. This is a focus-friendly design goal, not a clinically validated ADHD intervention.
+
+Implementation branch: `feat/minimal-chord-browser`, based on `main` `d1c1c7e208b34b57a4f42de738f49159e877e09b`. Exact baseline GitHub CHORDON checks: [run 39025043285](https://github.com/Taorminator/chordon-bleu/actions/runs/39025043285); Pages: [run 39025043254](https://github.com/Taorminator/chordon-bleu/actions/runs/39025043254), both successful. No fresh native Felucca cross-build is asserted for this browser change.
+
+- `index.html` is the minimal browser surface; `classic.html` retains the previous implementation and its storage/share semantics.
+- New modular session/audio/harmony/controller code reuses Classic's chord vocabulary, movement scoring, voice leading and two-operator FM-preview sound. No runtime loading of the Classic UI/bass module.
+- Local persistence stores only four chords in `chordon-bleu.minimal.v1`; no automatic audio start. Existing favorites remain untouched.
+- See [implementation, controls, limitations and verification](MINIMAL_BROWSER.md) and decision D-012. The historical sections below describe Classic/earlier evidence and are not the current product scope for the minimal browser view.
+
+
 ## Reconciled documentation snapshot — 2026-10-17
 
 Reviewed `main` at `e18d3a8505533e1767a711ae05c27da5814385c8`. The dated branch results below remain evidence for their original commits only.

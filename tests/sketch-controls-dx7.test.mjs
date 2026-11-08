@@ -3,7 +3,7 @@ import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 import {parseSyxBank} from '../vendor/opendx7/dx7-patch.js';
 
-const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
+const html=readFileSync(new URL('../classic.html',import.meta.url),'utf8');
 function between(a,b){
  const i=html.indexOf(a),j=html.indexOf(b,i+a.length);
  assert.ok(i>=0&&j>i,'Missing boundaries: '+a);

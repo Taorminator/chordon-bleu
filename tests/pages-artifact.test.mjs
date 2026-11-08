@@ -2,30 +2,30 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const siteRoot = path.resolve(process.argv[2] || repositoryRoot);
-const htmlPath = path.join(siteRoot, 'index.html');
-assert.ok(existsSync(htmlPath), `Missing deployed entrypoint: ${htmlPath}`);
-
-const html = readFileSync(htmlPath, 'utf8');
-assert.ok(
-  html.includes('<script type="module" src="./core/browser-bass-bootstrap.js">'),
-  'The browser entrypoint must load the bassline bootstrap module.'
-);
-
-const modulePaths = [
-  'core/browser-bass-bootstrap.js',
-  'core/bass-track.js',
-  'core/bass-generator.js'
-];
-for (const relativePath of modulePaths) {
-  const filePath = path.join(siteRoot, relativePath);
-  assert.ok(existsSync(filePath), `Missing browser module: ${relativePath}`);
+const read = relative => {
+  const file = path.join(siteRoot, relative);
+  assert.ok(existsSync(file), `Missing packaged browser file: ${relative}`);
+  return readFileSync(file, 'utf8');
+};
+const html = read('index.html');
+assert.ok(html.includes('src="./core/minimal-app.mjs"'), 'Minimal instrument must be the entrypoint.');
+assert.ok(!html.includes('browser-bass-bootstrap'), 'Minimal instrument must not start the bass track.');
+read('minimal.css');
+const visited = new Set();
+function visit(relative) {
+  if (visited.has(relative)) return;
+  visited.add(relative);
+  const code = read(relative);
+  for (const match of code.matchAll(/(?:from\s*|import\s*)['"](\.\.?\/[^'"]+)['"]/g)) {
+    visit(path.posix.normalize(path.posix.join(path.posix.dirname(relative), match[1])));
+  }
 }
-const bootstrap = readFileSync(path.join(siteRoot, modulePaths[0]), 'utf8');
-assert.ok(bootstrap.includes('./bass-track.js'), 'Bassline bootstrap is missing its track dependency.');
-assert.ok(bootstrap.includes('./bass-generator.js'), 'Bassline bootstrap is missing its generator dependency.');
-assert.ok(html.includes('chordon-bass-ready'), 'The browser UI does not wait for the bassline bootstrap event.');
-
-console.log('Packaged browser entrypoint and bassline modules are present.');
+visit('core/minimal-app.mjs');
+assert.equal(visited.size, 4, 'Package the app, session, harmony and audio modules.');
+const classic = read('classic.html');
+assert.ok(classic.includes('src="./core/browser-bass-bootstrap.js"'));
+assert.ok(classic.includes('chordon-bass-ready'));
+for (const file of ['core/browser-bass-bootstrap.js','core/bass-track.js','core/bass-generator.js', 'assets/dx7/aquanode-presets.js','vendor/opendx7/dx7-processor.js','vendor/opendx7/dx7-patch.js']) read(file);
+console.log('PASS Minimal entrypoint, recursive module graph and retained Classic dependencies.');
