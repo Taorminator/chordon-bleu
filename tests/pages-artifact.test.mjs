@@ -13,6 +13,10 @@ const html = read('index.html');
 assert.ok(html.includes('src="./core/minimal-app.mjs"'), 'Minimal instrument must be the entrypoint.');
 assert.ok(!html.includes('browser-bass-bootstrap'), 'Minimal instrument must not start the bass track.');
 read('minimal.css');
+read('core/fm1-surface.mjs');
+assert.ok(html.includes('./core/fm1-surface.mjs'));
+assert.equal((html.match(/class="encoder"/g)||[]).length,4,'Four right-side encoders');
+assert.equal((html.match(/class="physical-knob unused"/g)||[]).length,7,'Seven unused encoders stay dark');
 const visited = new Set();
 function visit(relative) {
   if (visited.has(relative)) return;

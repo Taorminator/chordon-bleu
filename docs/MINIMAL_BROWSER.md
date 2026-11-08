@@ -31,3 +31,7 @@ Current branch checks:
 - C99 harmony (52,800 mutation cases) and device simulation (256 scenarios) passed locally. Store and voice ASan/UBSan passed with leak detection disabled: this container blocks LeakSanitizer under ptrace. Leak-enabled GitHub CI is required for that coverage. No new Felucca target build, measured FM1 latency, physical flash, recovery or hardware test is claimed.
 
 Build: `node tools/build-browser.mjs`; validate `node tests/pages-artifact.test.mjs dist`. GitHub Pages packages this same output and checks the deployed entrypoint and every minimal module after publication. A private preview can be published before the GitHub PR is merged; GitHub remains the development source of truth.
+
+## FM1 physical browser surface
+
+The default surface now uses the existing FM1 panel topology: four left knobs, 240×240 LCD, four right knobs, the unchanged printed 2×6 function labels, OCT buttons and 27 chromatic keys. K1 is the variation encoder; EDIT is Undo; PLAY/STOP is transport; the first four white keys play/select slots. Unused controls are disabled and dark. K2–K4 are physically represented, deliberately without extra features. The on-screen pads remain touch shortcuts. Narrow screens horizontally scroll the full device rather than rearrange the physical controls. This is a browser simulation using the existing sound engine, not a CPU/firmware emulator.

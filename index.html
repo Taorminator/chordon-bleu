@@ -16,16 +16,17 @@
   </script>
   <link rel="stylesheet" href="./minimal.css">
   <script type="module" src="./core/minimal-app.mjs"></script>
+  <script type="module" src="./core/fm1-surface.mjs"></script>
 </head>
 <body>
   <main>
     <header class="page-head">
       <p class="eyebrow">MIDDLE AGE ENGINEERING</p>
       <h1>CHORDON BLEU<span class="brand-dot" aria-hidden="true">.</span></h1>
-      <p class="tagline">Vier Akkorde. Ein Gedanke.</p>
+      <p class="tagline">Vier Akkorde. Ein Gedanke. Auf dem FM1.</p>
     </header>
     <section class="instrument" aria-label="Akkord-Instrument">
-      <div class="screen">
+<div class="fm1-scroll"><div class="fm1-device"><div class="fm1-top"><div class="fm1-left"><strong>M·VAVE <small>FM1</small></strong><div class="left-encoders"><button class="physical-knob unused" disabled aria-label="Linker Regler 1 unbenutzt"></button><button class="physical-knob unused" disabled aria-label="Linker Regler 2 unbenutzt"></button><button class="physical-knob unused" disabled aria-label="Linker Regler 3 unbenutzt"></button><button class="physical-knob unused" disabled aria-label="Linker Regler 4 unbenutzt"></button></div><div class="octave"><button disabled>OCT −</button><button disabled>OCT +</button></div></div><div class="lcd">      <div class="screen">
         <div class="screen-top"><span id="status">BEREIT</span><span class="slot-indicator" id="slot-indicator">01 / 04</span></div>
         <div class="chord-display" aria-hidden="true"><span id="chord-name">Cmaj7</span><span class="display-caption">DEIN AKKORD</span></div>
         <div class="chord-pads" role="group" aria-label="Vier Akkorde auswählen und spielen">
@@ -35,19 +36,7 @@
           <button class="chord-pad" type="button" data-slot="3" aria-pressed="false" aria-label="Akkord 4: G7 spielen"><span class="pad-top"><span>4</span><span class="sound-dot" aria-hidden="true"></span></span><span class="pad-name">G7</span></button>
         </div>
       </div>
-      <div class="controls">
-        <div class="variation-control">
-          <div class="dial-row">
-            <button type="button" class="nudge" id="previous" aria-label="Vorherige Akkordalternative" title="Vorherige Alternative">−</button>
-            <div class="dial" id="variation" role="slider" tabindex="0" aria-label="Akkordalternative" aria-valuemin="0" aria-valuemax="20" aria-valuenow="0" aria-valuetext="Cmaj7" aria-describedby="dial-hint"><span class="dial-pointer" aria-hidden="true"></span></div>
-            <button type="button" class="nudge" id="next" aria-label="Nächste Akkordalternative" title="Nächste Alternative">+</button>
-          </div>
-          <span class="control-label">ENTDECKEN</span>
-        </div>
-        <button type="button" class="action play" id="play" aria-pressed="false" aria-label="Loop starten"><svg viewBox="0 0 32 32" aria-hidden="true"><path id="play-icon" d="M10 6L26 16 10 26Z"/></svg><span id="play-label">PLAY</span></button>
-        <button type="button" class="action undo" id="undo" disabled aria-label="Letzte Akkordänderung rückgängig machen"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M12 7L5 14 12 21M6 14H21C29 14 29 27 21 27"/></svg><span>ZURÜCK</span></button>
-      </div>
-      <p class="hint" id="dial-hint">Akkord antippen. Am Regler Neues finden.</p>
+</div><div class="fm1-right"><div class="right-encoders"><div class="encoder"><span>K1</span>            <div class="dial" id="variation" role="slider" tabindex="0" aria-label="Akkordalternative" aria-valuemin="0" aria-valuemax="20" aria-valuenow="0" aria-valuetext="Cmaj7" aria-describedby="dial-hint"><span class="dial-pointer" aria-hidden="true"></span></div><small>ENTDECKEN</small></div><div class="encoder"><span>K2</span><button class="physical-knob unused" disabled aria-label="K2 unbenutzt"></button><small>—</small></div><div class="encoder"><span>K3</span><button class="physical-knob unused" disabled aria-label="K3 unbenutzt"></button><small>—</small></div><div class="encoder"><span>K4</span><button class="physical-knob unused" disabled aria-label="K4 unbenutzt"></button><small>—</small></div></div><div class="function-grid"><button class="physical-button unused" disabled>FX</button><button class="physical-button unused" disabled>SEL</button><button class="physical-button unused" disabled>ENV</button><button class="physical-button unused" disabled>LFO</button>        <button type="button" class="action undo" id="undo" disabled aria-label="Letzte Akkordänderung rückgängig machen"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M12 7L5 14 12 21M6 14H21C29 14 29 27 21 27"/></svg><span>EDIT</span><small>ZURÜCK</small></button><button class="physical-button unused" disabled>GLO</button><button class="physical-button unused" disabled>HOME</button><button class="physical-button unused" disabled>SAVE</button><button class="physical-button unused" disabled>ARP</button><button class="physical-button unused" disabled>SEQ</button>        <button type="button" class="action play" id="play" aria-pressed="false" aria-label="Loop starten"><svg viewBox="0 0 32 32" aria-hidden="true"><path id="play-icon" d="M10 6L26 16 10 26Z"/></svg><span id="play-label">PLAY</span></button><button class="physical-button unused" disabled>REC</button></div></div></div><div class="fm1-keys" id="fm1-keyboard" aria-label="27 FM1 keyboard keys"></div><div class="device-credit">CHORDON BLEU <span>FM1 BROWSER SIMULATION</span></div></div></div><div class="tap-alternatives"><button id="previous" aria-label="Vorherige Akkordalternative">−</button><span>K1: ziehen · scrollen · Pfeiltasten</span><button id="next" aria-label="Nächste Akkordalternative">+</button></div>      <p class="hint" id="dial-hint">Akkord antippen. Am Regler Neues finden.</p>
       <p class="feedback" id="feedback" role="status" aria-live="polite">Deine vier Akkorde bleiben auf diesem Gerät.</p>
     </section>
     <p class="legend"><span><i class="outline-symbol" aria-hidden="true"></i> ausgewählt</span><span><i class="fill-symbol" aria-hidden="true"></i> hörbar</span></p>
