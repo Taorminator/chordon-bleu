@@ -173,8 +173,16 @@ static void cbh_line(void *u,int x,int y,int xx,int yy,uint16_t color){
 static void cbh_text(void *u,int x,int y,const char *str,uint16_t color,uint8_t sz){
     (void)u;
     const aafont_t *f=sz>=3u?&AF_L:sz==2u?&AF_M:&AF_S;
+    uint16_t background=0x10a2u; /* cb_minimal_draw's RGB(20,21,18) */
+    uint32_t width=(uint32_t)(240-x);
+    if(y==182||y==203){
+        unsigned slot=(unsigned)(x-10)/56u;
+        unsigned edge=10u+slot*56u+50u;
+        width=edge>(unsigned)x?edge-(unsigned)x:0u;
+        background=cbh_device.playing&&cbh_device.active==slot?0xf770u:0x3185u;
+    }
     if(x>=0&&x<240&&y>=0&&y+f->h<=240)
-        draw_text_line((uint32_t)x,(uint32_t)y,(uint32_t)(240-x),f,str,color,0x0844u,0);
+        draw_text_line((uint32_t)x,(uint32_t)y,width,f,str,color,background,0);
 }
 static void chordon_draw(void){
     static const CbFM1Graphics g={0,cbh_rect,cbh_line,cbh_text};
@@ -182,6 +190,6 @@ static void chordon_draw(void){
     if(fm1_ms-cbh_last_draw<50u)return; /* 20 FPS maximum */
     cbh_last_draw=fm1_ms;cbh_dirty=0;
     cb_minimal_draw(&cbh_device,&g);
-    draw_text_line(12,42,216,&AF_S,CB_SOUND_NAMES[cbh_sound],0xffffu,0x0844u,0);
+    draw_text_line(12,42,216,&AF_S,CB_SOUND_NAMES[cbh_sound],0xffffu,0x10a2u,0);
     if(ui.uboot)draw_text_line(20,114,200,&AF_M,"HOLD FOR UBOOT",0xffffu,0x0844u,1);
 }

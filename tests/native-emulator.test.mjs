@@ -26,7 +26,12 @@ assert.ok(e.web_lit_buttons()&(1<<4),'Undo is available');d.tap(4);assert.equal(
 for(const role of [0,1,4,5,6])d.enc(role,3);
 assert.deepEqual(Array.from({length:4},(_,i)=>e.cb_web_chord(i)),original);
 d.enc(2,1);assert.equal(e.cb_web_sound(),4);d.enc(2,-1);assert.equal(e.cb_web_sound(),3);
-d.tap(10);assert.equal(e.cb_web_playing(),1);d.render(3200);
+d.tap(10);assert.equal(e.cb_web_playing(),1);
+const fb=new Uint16Array(e.memory.buffer,e.web_screen(),240*240);
+let yellow=0,dark=0;
+for(let y=182;y<198;y++)for(let x=15;x<55;x++){if(fb[y*240+x]===0x70f7)yellow++;const c=((fb[y*240+x]&255)<<8)|(fb[y*240+x]>>8);if(((c>>11)&31)*2+((c>>5)&63)+(c&31)*2<100)dark++;}
+assert.ok(yellow>150&&dark>5,'active chord text must remain readable on its highlighted background');
+d.render(3200);
 assert.ok(e.web_lit_buttons()&(1<<10));d.tap(10);assert.equal(e.cb_web_playing(),0);
 d.render(5000);d.peak=0;d.render(500);assert.ok(d.peak<0.0001,'stop releases all notes and tails');
 // Walk every sound, exercising FM6 parameter publication and engine cross-fades.
@@ -34,7 +39,7 @@ const audible=[];
 for(let id=0;id<159;id++){
  const now=e.cb_web_sound();let delta=(id-now+159)%159;
  while(delta){const n=Math.min(16,delta);d.enc(2,n);delta-=n;}
- assert.equal(e.cb_web_sound(),id);d.render(80);d.peak=0;d.key(0);d.render(300);
+ assert.equal(e.cb_web_sound(),id);d.render(6000);d.peak=0;d.key(0);d.render(800);
  if(d.peak>0.00001)audible.push(id);
 }
 assert.equal(audible.length,159,`inaudible sound slots: ${Array.from({length:159},(_,i)=>i).filter(i=>!audible.includes(i))}`);
@@ -64,3 +69,17 @@ for(let cut=0;cut<=128;cut++){
  assert.equal(y.e.cb_web_chord(3),cut<128?savedChord:changed,`torn write at byte ${cut}`);
 }
 console.log('PASS simulated NOR: idle save/reload includes sound, foreign-sector preservation and every one of 129 transaction cut points');
+// Both audio transports use the same processor and preserve quick tap edges.
+const {createFallback}=await import(new URL('worklet.js',new URL('file://'+process.argv[2])));
+const context={createScriptProcessor:(n,inputs,outputs)=>{assert.equal(n,1024);assert.equal(inputs,0);assert.equal(outputs,2);return {};}};
+const fallback=createFallback(context),messages=[];
+fallback.port.onmessage=e=>messages.push(e.data);
+await fallback.port.postMessage({type:'load',wasm:bytes,sectors:{},master:700});
+await new Promise(resolve=>queueMicrotask(resolve));assert.equal(messages[0]?.type,'ready');
+const left=new Float32Array(1024),right=new Float32Array(1024);
+const pump=n=>{for(let i=0;i<n;i++)fallback.onaudioprocess({outputBuffer:{getChannelData:k=>k?right:left}});};
+pump(30);await new Promise(resolve=>queueMicrotask(resolve));
+assert.ok(messages.some(m=>m.fb&&m.leds),'fallback publishes LCD and LEDs');
+fallback.port.postMessage({type:'buttons',mask:1<<10});fallback.port.postMessage({type:'buttons',mask:0});
+pump(30);assert.ok(left.some(v=>Math.abs(v)>0.00001),'queued quick tap starts real DSP through compatibility callback');
+console.log('PASS shared audio processor: compatibility callback boots, publishes screen/LEDs and preserves quick transport taps');

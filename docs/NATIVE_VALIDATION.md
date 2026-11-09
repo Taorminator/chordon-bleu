@@ -74,6 +74,9 @@ node tests/native-emulator.test.mjs /tmp/chordon-native-emu/felucca.wasm
 ```
 
 Serve the generated directory through a local HTTP server to play the emulator.
+HTTPS uses AudioWorklet; HTTP local previews or browsers without it use the same
+WASM processor through a ScriptProcessor compatibility callback (higher latency).
+The preview does not request MIDI permission automatically.
 The native emulator CI also saves this browser-only directory as an artifact.
 Its WASM is **not** an FM1 firmware image and cannot flash a device.
 The private prototype site can serve it under `/native/` without replacing the
@@ -102,7 +105,7 @@ behaviour sanitizer store and voice tests pass with LeakSanitizer disabled:
 this executor prevents LeakSanitizer from reading `/proc` under its tracing
 sandbox. CI retains `detect_leaks=1`; local results do not substitute for it.
 
-The local JieLi target build passes: application 404200 bytes, RAM data/BSS
+The local JieLi target build passes: application 404272 bytes, RAM data/BSS
 52932 of 73728 bytes, pool 324924 of 368640 bytes. RAM text has 916 instructions
 with no calls; register-access audit passes. These are software/target results,
 not measurements of physical CPU utilisation or audio latency. Device image and
