@@ -56,6 +56,8 @@ shutil.copytree(repo / "core", ch / "core")
 for f in ("cb_fm1.c", "cb_fm1.h", "cb_libc.h", "cb_voice.c", "cb_voice.h", "cb_store.c", "cb_store.h"):
     shutil.copy2(repo / "firmware" / f, ch / "firmware" / f)
 shutil.copy2(repo / "firmware/felucca-overlay/chordon_platform.c", ch / "platform.c")
+shutil.copy2(repo / "firmware/felucca-overlay/chordon_sounds.h", ch / "sounds.h")
+shutil.copy2(repo / "firmware/felucca-overlay/chordon_disk.h", ch / "disk.h")
 
 def patch(path, old, new):
     p = upstream / path
@@ -91,7 +93,12 @@ patch(main, "        ui_input();\n        settings_poll();",
 patch(main, "        autosave_poll();                              /* (1.2) the music, stopped and idle: project.c */",
       "        /* No Felucca project-autosave writes from experimental CHORDON mode. */")
 patch(main, "        ui_leds();\n        ui_draw();",
-      "        ui_leds();\n        chordon_draw();")
+      "        chordon_leds();\n        chordon_draw();")
 patch(main, "            ui_input();\n#if FELUCCA_OTA",
       "            chordon_input();\n#if FELUCCA_OTA")
+# The app owns chord-key notes. Leaving the stock keyboard enabled would
+# double-trigger a single note alongside the chord and sound unused keys.
+patch(main, "    kb_boot_hold = 0;", "    kb_boot_hold = 1; /* CHORDON owns chord-key note dispatch. */")
+# No startup sweep over unavailable controls; this changes LEDs only.
+patch(main, "    boot_leds();", "    boot_leds();\n    fm1_led_anim_stop();\n    chordon_leds();")
 print(f"CHORDON BLEU experimental native overlay staged: Felucca {PIN}. NOT INSTALLABLE.")

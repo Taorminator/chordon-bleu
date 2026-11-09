@@ -25,6 +25,7 @@ typedef struct {
  uint8_t pattern_index, saved_count;
  uint16_t clock16, arp_clock;
  uint8_t arp_pos;
+ uint8_t sound; /* stable minimal catalogue index, 0..158 */
 } CbFM1;
 
 typedef struct {

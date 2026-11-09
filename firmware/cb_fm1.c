@@ -47,7 +47,7 @@ static void seed_recipe(CbFM1 *m){
 }
 void cb_fm1_init(CbFM1 *m,uint32_t seed){
  memset(m,0,sizeof(*m));cb_init(&m->loop,0,0,seed);
- m->bpm=92;m->gate=62;m->arp_rate=2;m->view=CB_VIEW_HOME;
+ m->sound=3u;m->bpm=92;m->gate=62;m->arp_rate=2;m->view=CB_VIEW_HOME;
 }
 static void save_undo(CbFM1 *m){m->undo=m->loop;m->undo_valid=1;}
 /* A tiny native FEEL palette: hints from music, never a music-theory menu.

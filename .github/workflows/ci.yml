@@ -13,6 +13,8 @@ jobs:
           node-version: "22"
       - name: Validate offline recipe bundle
         run: node tools/build-recipes.mjs --check
+      - name: Validate identical native DX7 catalogue
+        run: node tools/build-native-sounds.mjs --check
       - name: Verify browser module dependency graph
         run: node tests/pages-artifact.test.mjs .
       - name: Prevent unreviewed boot/PLL changes and firmware release

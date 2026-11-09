@@ -1,3 +1,18 @@
+## Native completion work — 2026-11-09
+
+The native application now has a real firmware-to-WASM emulator and the same
+159 sound positions as the browser: 153 original packed Aquanode DX7 voices plus
+six explicitly documented native adaptations. PRESETS remains the physical
+preset knob. Unused stock keyboard notes and the startup light sweep are
+suppressed while retaining Felucca boot diagnostics and update/recovery paths.
+
+The shared C adapter has idle saving with sound selection, a versioned A/B
+snapshot, occupied-sector protection and simulated transaction fault tests.
+**Real-device persistence remains compiled OFF pending physical flash and
+recovery qualification.** In the emulator it is enabled against simulated NOR.
+No device firmware is published or approved for flashing. See
+[NATIVE_VALIDATION.md](NATIVE_VALIDATION.md) for exact verification boundaries.
+
 # CHORDON BLEU — verified project state
 
 ## PRESETS correction — 2026-11-08

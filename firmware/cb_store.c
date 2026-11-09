@@ -15,7 +15,7 @@ void cb_store_encode(uint8_t o[CB_STORE_LEN],const CbFM1 *m,uint32_t seq){
  o[12]=m->loop.key;o[13]=m->loop.minor;o[14]=m->loop.wonder;
  o[15]=m->selected;o[16]=m->recipe;o[17]=m->feel;o[18]=m->motion;
  o[19]=m->bpm;o[20]=m->gate;o[21]=m->arp_rate;o[22]=m->arp_dir;o[23]=m->arp_order;
- o[24]=m->all_four;o[25]=m->view;
+ o[24]=m->all_four;o[25]=m->view;o[48]=m->sound;
  w32(o+28,m->loop.random);
  for(unsigned i=0;i<4;i++){
   const CbChord *c=&m->loop.steps[i];unsigned at=32+4*i;
@@ -26,13 +26,13 @@ void cb_store_encode(uint8_t o[CB_STORE_LEN],const CbFM1 *m,uint32_t seq){
  o[92]='D';o[93]='O';o[94]='N';o[95]='E';
 }
 int cb_store_decode(const uint8_t in[CB_STORE_LEN],CbFM1 *out,uint32_t *seq){
- if(!in||!out||in[0]!='C'||in[1]!='B'||in[2]!='L'||in[3]!='U'||in[4]!=CB_STORE_VERSION||
+ if(!in||!out||in[0]!='C'||in[1]!='B'||in[2]!='L'||in[3]!='U'||(in[4]!=1u&&in[4]!=CB_STORE_VERSION)||
     in[92]!='D'||in[93]!='O'||in[94]!='N'||in[95]!='E'||r32(in+88)!=crc32(in,88))return 0;
  CbFM1 m;cb_fm1_init(&m,1);
  m.loop.key=in[12];m.loop.minor=in[13];m.loop.wonder=in[14];
  m.selected=in[15];m.recipe=in[16];m.feel=in[17];m.motion=in[18];
  m.bpm=in[19];m.gate=in[20];m.arp_rate=in[21];m.arp_dir=in[22];m.arp_order=in[23];
- m.all_four=in[24];m.view=in[25];m.loop.random=r32(in+28);
+ m.all_four=in[24];m.view=in[25];m.sound=in[4]==1u?3u:in[48];m.loop.random=r32(in+28);
  for(unsigned i=0;i<4;i++){
   CbChord *c=&m.loop.steps[i];unsigned at=32+4*i;
   c->root=in[at];c->quality=in[at+1];c->lock_root=in[at+2];c->lock_type=in[at+3];
@@ -40,7 +40,7 @@ int cb_store_decode(const uint8_t in[CB_STORE_LEN],CbFM1 *out,uint32_t *seq){
  if(!cb_valid(&m.loop)||m.loop.random==0||m.selected>=4||m.recipe>CB_RECIPE_GHIBLI||
    m.feel>CB_FEEL_CHEESY||m.motion>CB_MOTION_ARP||m.bpm<48||m.bpm>160||
    m.gate<15||m.gate>100||m.arp_rate>=4||m.arp_dir>=4||m.arp_order>=4||
-   m.all_four>1||m.view>CB_VIEW_ARP)return 0;
+   m.all_four>1||m.view>CB_VIEW_ARP||m.sound>=159u)return 0;
  for(unsigned i=0;i<4;i++)if(m.loop.steps[i].lock_root>1||m.loop.steps[i].lock_type>1)return 0;
  m.playing=0;m.active=0;m.clock16=0;m.arp_clock=0;m.arp_pos=0;
  m.undo_valid=0;m.saved_count=0;

@@ -56,11 +56,11 @@ press('OCT_DOWN');assert.equal(vm.runInContext('hwOctave',cx),0);
 const bindings=[['B_PLAY','CB_B_PLAY'],['B_EDIT','CB_B_UNDO']];
 for(const [physical,semantic] of bindings){
  const escaped=physical.replaceAll('_','_');
- assert.ok(new RegExp('panel\\.btn\\['+escaped+'\\]\\)\\)cb_fm1_button\\(&cbh_device,'+semantic).test(platform),
+ assert.ok(new RegExp(String.raw`panel\.btn\[${escaped}\]\)\)\s*\{?\s*cb_fm1_button\(&cbh_device,${semantic}`).test(platform),
   physical+' must dispatch to '+semantic+' via calibrated Felucca panel');
 }
 assert.match(platform,/panel_enc\(EN_PRESET\)/);
-assert.match(platform,/preset_step\(1\)/);
+assert.match(platform,/cbh_sound_load/);
 assert.match(platform,/white_keys\[4\]=\{0,2,4,6\}/);
 assert.match(controller,/case CB_B_FEEL:m->feel=/);
 assert.match(controller,/case CB_B_MOTION:m->motion=/);
