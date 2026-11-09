@@ -288,6 +288,15 @@ void cb_minimal_init(CbFM1 *m,uint32_t seed){
   m->loop.steps[i].lock_root=m->loop.steps[i].lock_type=0;
  }
 }
+void cb_minimal_tempo(CbFM1 *m,int16_t turn){
+ if(!m||m->bpm<48u||m->bpm>160u)return;
+ int32_t next=(int32_t)m->bpm+turn;
+ if(next<48)next=48;
+ if(next>160)next=160;
+ const uint32_t old_ms=120000u/m->bpm,new_ms=120000u/(uint32_t)next;
+ m->clock16=(uint16_t)(((uint32_t)m->clock16*new_ms)/old_ms);
+ m->bpm=(uint8_t)next;
+}
 void cb_minimal_vary(CbFM1 *m,int8_t turn){
  if(!turn||m->selected>3)return;
  CbChord *c=&m->loop.steps[m->selected];
@@ -302,6 +311,8 @@ void cb_minimal_draw(const CbFM1 *m,const CbFM1Graphics *g){
  const uint16_t bg=RGB(20,21,18),white=RGB(248,248,240),yellow=RGB(244,239,133);
  r(g,0,0,240,240,bg);
  t(g,12,12,m->playing?"LOOP":"READY",white,1);
+ char bpm[8]={(char)('0'+m->bpm/100),(char)('0'+m->bpm/10%10),(char)('0'+m->bpm%10),' ','B','P','M',0};
+ t(g,156,12,m->bpm>=100?bpm:bpm+1,white,1);
  const CbChord *c=&m->loop.steps[m->selected];
  t(g,42,83,NAMES[c->root],white,4);t(g,102,99,TYPES[c->quality],white,2);
  for(unsigned i=0;i<4;i++){

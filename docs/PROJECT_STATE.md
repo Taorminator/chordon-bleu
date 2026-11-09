@@ -1,3 +1,9 @@
+## SELECT tempo — 2026-11-09
+
+SELECT now changes tempo in 1 BPM steps, bounded to 48–160 BPM. Both browser
+and native display BPM and persist the value. Live changes preserve the
+remaining chord phase and keep playback running; PRESETS remains sound selection.
+
 ## Native completion work — 2026-11-09
 
 The native application now has a real firmware-to-WASM emulator and the same

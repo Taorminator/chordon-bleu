@@ -11,6 +11,7 @@ prototype. Neither browser execution nor a target build establishes hardware saf
 | Physical control | Action |
 | --- | --- |
 | First four white keys, F/G/A/B | Select a chord and audition it while stopped |
+| SELECT | Tempo, 1 BPM per detent, 48–160 BPM; displayed at top right |
 | KNOB 1 | Change the selected chord; preview while stopped |
 | EDIT | Undo the last chord change; preview while stopped |
 | PRESETS, lower-left knob | Choose a sound from the existing 159-position catalogue |

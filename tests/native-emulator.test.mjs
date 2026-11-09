@@ -23,7 +23,7 @@ d.key(4);assert.equal(e.cb_web_selected(),2);assert.ok(d.peak>0.001,'audition mu
 d.enc(3,1);assert.notEqual(e.cb_web_chord(2),original[2]);
 assert.deepEqual([0,1,3].map(i=>e.cb_web_chord(i)),[0,1,3].map(i=>original[i]));
 assert.ok(e.web_lit_buttons()&(1<<4),'Undo is available');d.tap(4);assert.equal(e.cb_web_chord(2),original[2]);
-for(const role of [0,1,4,5,6])d.enc(role,3);
+for(const role of [1,4,5,6])d.enc(role,3);
 assert.deepEqual(Array.from({length:4},(_,i)=>e.cb_web_chord(i)),original);
 d.enc(2,1);assert.equal(e.cb_web_sound(),4);d.enc(2,-1);assert.equal(e.cb_web_sound(),3);
 d.tap(10);assert.equal(e.cb_web_playing(),1);
@@ -83,3 +83,15 @@ assert.ok(messages.some(m=>m.fb&&m.leds),'fallback publishes LCD and LEDs');
 fallback.port.postMessage({type:'buttons',mask:1<<10});fallback.port.postMessage({type:'buttons',mask:0});
 pump(30);assert.ok(left.some(v=>Math.abs(v)>0.00001),'queued quick tap starts real DSP through compatibility callback');
 console.log('PASS shared audio processor: compatibility callback boots, publishes screen/LEDs and preserves quick transport taps');
+
+const tempo=await boot();tempo.enc(0,1);assert.equal(tempo.e.cb_web_bpm(),85);
+assert.equal(tempo.e.cb_web_sound(),3);assert.equal(tempo.e.cb_web_undo(),0);assert.equal(tempo.peak,0);
+for(let i=0;i<8;i++)tempo.enc(0,16);assert.equal(tempo.e.cb_web_bpm(),160);
+for(let i=0;i<8;i++)tempo.enc(0,-16);assert.equal(tempo.e.cb_web_bpm(),48);
+tempo.tap(10);tempo.render(1400);tempo.enc(0,16);assert.equal(tempo.e.cb_web_playing(),1);
+assert.equal(tempo.e.cb_web_active(),0,'a tempo turn preserves the current chord');
+tempo.render(1700);assert.notEqual(tempo.e.cb_web_active(),0,'new tempo advances normally');
+tempo.tap(10);tempo.render(2500);const tempoSave=flashOf(tempo).slice();
+const tempoRestore=await boot();flashOf(tempoRestore).set(tempoSave);tempoRestore.e.cb_web_restore();
+assert.equal(tempoRestore.e.cb_web_bpm(),64);
+console.log('PASS SELECT tempo: 1 BPM steps, 48..160 limits, silent editing, live phase continuity and persistence');

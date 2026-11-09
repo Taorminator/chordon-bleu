@@ -1,5 +1,5 @@
 import { SOUND_CATALOG, soundById } from './minimal-sounds.mjs';
-import { Session, STORAGE_KEY, TEMPO } from './minimal-session.mjs';
+import { Session, STORAGE_KEY, TEMPO, retimeBoundary } from './minimal-session.mjs';
 import { label, alternatives } from './minimal-harmony.mjs';
 import { Piano } from './minimal-audio.mjs';
 
@@ -9,7 +9,7 @@ try { saved = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch { /* First 
 const session = new Session(saved), piano = new Piano();
 piano.setSound?.(session.soundId);
 const pads = [...document.querySelectorAll('[data-slot]')];
-const seconds = 60 / TEMPO * 2;
+let seconds = 120 / session.bpm;
 let playing = false, launching = false, sounding = -1, token = 0;
 let interval, frame, auditionTimer, statusTimer;
 let nextTime = 0, nextSlot = 0, visualQueue = [], dialAngle = 0;
@@ -24,6 +24,11 @@ function persist() {
 }
 function render(status) {
   const names = session.names();
+  $('tempo-display').textContent=`${session.bpm} BPM`;
+  const tempo=$('tempo');
+  tempo.setAttribute('aria-valuenow',session.bpm);
+  tempo.setAttribute('aria-valuetext',`${session.bpm} BPM`);
+  tempo.style.setProperty('--preset-turn',`${(session.bpm-84)*8}deg`);
   const sound=soundById(session.soundId),preset=$('preset');
   $('preset-name').textContent=sound.name;
   if(preset){
@@ -108,6 +113,18 @@ function chooseSound(direction) {
   else audition('SOUND');
 }
 window.addEventListener('fm1-preset',event=>chooseSound(event.detail));
+function chooseTempo(direction){
+  const before=session.bpm;
+  if(!session.tempo(direction))return;
+  if(playing){
+    const now=piano.context.currentTime;
+    const committed=visualQueue.length?visualQueue[visualQueue.length-1].at:now;
+    nextTime=retimeBoundary(nextTime,now,before,session.bpm,committed);
+  }
+  seconds=120/session.bpm;render();persist();
+  feedback(`${session.bpm} BPM`);
+}
+window.addEventListener('fm1-tempo',event=>chooseTempo(event.detail));
 function undo() {
   if (!session.undo()) return;
   feedback('Letzte Änderung zurückgenommen.'); persist(); render('ZURÜCK');
@@ -187,7 +204,7 @@ document.addEventListener('keydown', event => {
   if (event.ctrlKey || event.metaKey) return;
   if (/^[1-4]$/.test(event.key)) { event.preventDefault(); select(Number(event.key) - 1); }
   if (event.code === 'Space') { event.preventDefault(); togglePlay(); }
-  if (event.target.id !== 'variation' && ['ArrowLeft','ArrowRight'].includes(event.key)) {
+  if (!['variation','tempo','preset'].includes(event.target.id) && ['ArrowLeft','ArrowRight'].includes(event.key)) {
     event.preventDefault(); vary(event.key === 'ArrowRight' ? 1 : -1);
   }
 });
