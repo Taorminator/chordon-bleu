@@ -30,7 +30,7 @@ class OverlayPreflight(unittest.TestCase):
         root = Path(self.tmp.name)
         self.upstream = root / "felucca"
         self.upstream.mkdir()
-        for rel in ("firmware/src/felucca.c", "firmware/src/main.c"):
+        for rel in ("firmware/src/felucca.c", "firmware/src/main.c", "firmware/src/perform.c"):
             dest = self.upstream / rel
             dest.parent.mkdir(parents=True, exist_ok=True)
             dest.write_text("/* Synthetic clean upstream boot file */\n")
@@ -45,7 +45,7 @@ class OverlayPreflight(unittest.TestCase):
         self.script.write_text(SOURCE.replace('PIN = "' + PIN.group(1) + '"',
                                                'PIN = "' + self.fake_sha + '"'))
         self.original = {rel: (self.upstream / rel).read_bytes()
-                         for rel in ("firmware/src/felucca.c", "firmware/src/main.c")}
+                         for rel in ("firmware/src/felucca.c", "firmware/src/main.c", "firmware/src/perform.c")}
 
     def check_untouched(self):
         for rel, expected in self.original.items():

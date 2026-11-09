@@ -105,11 +105,19 @@ behaviour sanitizer store and voice tests pass with LeakSanitizer disabled:
 this executor prevents LeakSanitizer from reading `/proc` under its tracing
 sandbox. CI retains `detect_leaks=1`; local results do not substitute for it.
 
-The local JieLi target build passes: application 404272 bytes, RAM data/BSS
+The local JieLi target build passes: application 404296 bytes, RAM data/BSS
 52932 of 73728 bytes, pool 324924 of 368640 bytes. RAM text has 916 instructions
 with no calls; register-access audit passes. These are software/target results,
 not measurements of physical CPU utilisation or audio latency. Device image and
 package remain confined to the disposable build directory.
+
+The overlay keeps `perf_avail` out of line using `noinline`. Removing the stock
+FX UI otherwise leaves one call site, causing JieLi to inline its loop into
+`perf_begin` and raise that function's static loop cost from 28 to 34. With the
+original call boundary retained, its cost is 28 and every original target budget
+passes. No DSP logic, tolerance or budget baseline is relaxed. Overlay preflight
+also verifies the pristine `perform.c` before applying this anchored annotation.
+The SDK fetch retries transient Gitee disconnects and verifies its exact commit.
 
 ## Physical acceptance still required
 

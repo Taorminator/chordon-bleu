@@ -26,7 +26,7 @@ def require_pinned_upstream(path):
     head = git("rev-parse", "HEAD")
     if head != PIN:
         raise SystemExit(f"Wrong Felucca revision: {head}; required {PIN}; no changes made")
-    for name in ("firmware/src/felucca.c", "firmware/src/main.c"):
+    for name in ("firmware/src/felucca.c", "firmware/src/main.c", "firmware/src/perform.c"):
         git("ls-files", "--error-unmatch", "--", name)
         try:
             subprocess.run(
@@ -46,7 +46,7 @@ if not (upstream / "firmware/src/felucca.c").is_file():
     raise SystemExit("not a Felucca checkout")
 require_pinned_upstream(upstream)
 if len(sys.argv) == 3:
-    print(f"PREFLIGHT OK: Felucca {PIN}; two boot source files unmodified. No changes made.")
+    print(f"PREFLIGHT OK: Felucca {PIN}; three target source files unmodified. No changes made.")
     raise SystemExit(0)
 ch = upstream / "firmware/src/chordon"
 if ch.exists():
@@ -80,6 +80,12 @@ includes = '''#include "master.c"              /* the MASTER pot (#137: read bef
 #include "chordon/platform.c"
 #include "main.c"'''
 fel.write_text(fel.read_text().replace(anchor, includes))
+
+# Removing the stock FX UI leaves this helper with one call site. JieLi then
+# inlines its loop into perf_begin, changing the audited hot-loop budget from
+# 28 to 34. Keep the reference call boundary; no DSP logic or budget is changed.
+patch("firmware/src/perform.c", "static uint32_t perf_avail(void)",
+      "static __attribute__((noinline)) uint32_t perf_avail(void)")
 
 main = "firmware/src/main.c"
 patch(main, '    draw_splash();                                      /* ui_draw.c (1.1.5) */',
