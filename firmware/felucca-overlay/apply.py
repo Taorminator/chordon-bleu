@@ -26,7 +26,7 @@ def require_pinned_upstream(path):
     head = git("rev-parse", "HEAD")
     if head != PIN:
         raise SystemExit(f"Wrong Felucca revision: {head}; required {PIN}; no changes made")
-    for name in ("firmware/src/felucca.c", "firmware/src/main.c"):
+    for name in ("firmware/src/felucca.c", "firmware/src/main.c", "firmware/src/perform.c"):
         git("ls-files", "--error-unmatch", "--", name)
         try:
             subprocess.run(
@@ -46,7 +46,7 @@ if not (upstream / "firmware/src/felucca.c").is_file():
     raise SystemExit("not a Felucca checkout")
 require_pinned_upstream(upstream)
 if len(sys.argv) == 3:
-    print(f"PREFLIGHT OK: Felucca {PIN}; two boot source files unmodified. No changes made.")
+    print(f"PREFLIGHT OK: Felucca {PIN}; three target source files unmodified. No changes made.")
     raise SystemExit(0)
 ch = upstream / "firmware/src/chordon"
 if ch.exists():
@@ -56,6 +56,8 @@ shutil.copytree(repo / "core", ch / "core")
 for f in ("cb_fm1.c", "cb_fm1.h", "cb_libc.h", "cb_voice.c", "cb_voice.h", "cb_store.c", "cb_store.h"):
     shutil.copy2(repo / "firmware" / f, ch / "firmware" / f)
 shutil.copy2(repo / "firmware/felucca-overlay/chordon_platform.c", ch / "platform.c")
+shutil.copy2(repo / "firmware/felucca-overlay/chordon_sounds.h", ch / "sounds.h")
+shutil.copy2(repo / "firmware/felucca-overlay/chordon_disk.h", ch / "disk.h")
 
 def patch(path, old, new):
     p = upstream / path
@@ -79,6 +81,12 @@ includes = '''#include "master.c"              /* the MASTER pot (#137: read bef
 #include "main.c"'''
 fel.write_text(fel.read_text().replace(anchor, includes))
 
+# Removing the stock FX UI leaves this helper with one call site. JieLi then
+# inlines its loop into perf_begin, changing the audited hot-loop budget from
+# 28 to 34. Keep the reference call boundary; no DSP logic or budget is changed.
+patch("firmware/src/perform.c", "static uint32_t perf_avail(void)",
+      "static __attribute__((noinline)) uint32_t perf_avail(void)")
+
 main = "firmware/src/main.c"
 patch(main, '    draw_splash();                                      /* ui_draw.c (1.1.5) */',
       '    lcd_fill(0, 0, 240, 240, 0x0844u);\n    draw_text_line(16, 108, 208, &AF_M, "CHORDON BLEU", 0xffffu, 0x0844u, 1);')
@@ -91,7 +99,12 @@ patch(main, "        ui_input();\n        settings_poll();",
 patch(main, "        autosave_poll();                              /* (1.2) the music, stopped and idle: project.c */",
       "        /* No Felucca project-autosave writes from experimental CHORDON mode. */")
 patch(main, "        ui_leds();\n        ui_draw();",
-      "        ui_leds();\n        chordon_draw();")
+      "        chordon_leds();\n        chordon_draw();")
 patch(main, "            ui_input();\n#if FELUCCA_OTA",
       "            chordon_input();\n#if FELUCCA_OTA")
+# The app owns chord-key notes. Leaving the stock keyboard enabled would
+# double-trigger a single note alongside the chord and sound unused keys.
+patch(main, "    kb_boot_hold = 0;", "    kb_boot_hold = 1; /* CHORDON owns chord-key note dispatch. */")
+# No startup sweep over unavailable controls; this changes LEDs only.
+patch(main, "    boot_leds();", "    boot_leds();\n    fm1_led_anim_stop();\n    chordon_leds();")
 print(f"CHORDON BLEU experimental native overlay staged: Felucca {PIN}. NOT INSTALLABLE.")

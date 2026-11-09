@@ -20,14 +20,20 @@ assert.doesNotMatch(installer,/\.fwsc\b.*\b(download|fetch)\b/i);
 
 const overlay=fromRoot('firmware/felucca-overlay/apply.py');
 const platform=fromRoot('firmware/felucca-overlay/chordon_platform.c');
+const disk=fromRoot('firmware/felucca-overlay/chordon_disk.h');
+assert.match(disk,/#ifndef CB_ENABLE_PERSISTENCE\s+#define CB_ENABLE_PERSISTENCE 0/,'Real-device writes stay disabled until physical qualification');
+assert.doesNotMatch(overlay,/#define CB_ENABLE_PERSISTENCE 1/,'The real-target overlay must not enable simulated-NOR writes');
 const build=fromRoot('.github/workflows/felucca-baseline.yml');
 assert.ok(overlay.includes('PIN = "'+mainPin+'"'),'Felucca revision must remain pinned');
 assert.ok(build.includes('ref: '+mainPin),'Native build must use the same pinned Felucca revision');
 assert.match(overlay,/if source\.count\(old\) != 1/,'Patching must reject changed upstream anchors');
 assert.match(overlay,/if ch\.exists\(\):/,'Repeated overlay must be rejected');
-assert.equal((overlay.match(/patch\(main,/g)||[]).length,7,
- 'Changing target startup integration requires explicit safety review');
+assert.equal((overlay.match(/patch\(main,/g)||[]).length,9,
+ 'Nine reviewed application/LED/keyboard anchors; no bootloader, clock or watchdog changes');
 assert.match(platform,/SAVE is RAM ONLY/);
+assert.match(overlay,/chordon_leds\(\)/);
+assert.match(overlay,/kb_boot_hold = 1; \/\* CHORDON owns/);
+assert.doesNotMatch(overlay,/ui_leds\(\);\\n        chordon_draw/);
 assert.match(platform,/cbh_ram_save=\*m/,'SAVE must not silently write flash');
 
 // Deliberately narrow static checks: disallow adding low-level clock/CPU and

@@ -1,0 +1,44 @@
+name: Native firmware emulator
+on:
+  pull_request:
+  workflow_dispatch:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  native-emulator:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/checkout@v4
+        with:
+          repository: hugelton/Felucca
+          ref: 9f6a8858afd71b4faed9dfea3a5f94d3ecfdf002
+          path: upstream
+          persist-credentials: false
+      - name: Install reproducible emulator toolchain
+        run: |
+          python3 -m pip install --break-system-packages Pillow fonttools
+          git clone https://github.com/emscripten-core/emsdk.git /tmp/emsdk
+          git -C /tmp/emsdk checkout 1693ce7359fc9694f198694f902a2cc061239b86
+          /tmp/emsdk/emsdk install 4.0.19
+          /tmp/emsdk/emsdk activate 4.0.19
+      - name: Verify native catalogue, integrate and compile actual C application
+        run: |
+          node tools/build-native-sounds.mjs --check
+          python3 firmware/felucca-overlay/apply.py upstream
+          . /tmp/emsdk/emsdk_env.sh
+          python3 tools/build-native-emulator.py upstream /tmp/chordon-native-emu
+      - name: Audio, LCD, LEDs, physical controls and NOR fault injection
+        run: node tests/native-emulator.test.mjs /tmp/chordon-native-emu/felucca.wasm
+      - name: Save browser-only emulator (no device image)
+        uses: actions/upload-artifact@v4
+        with:
+          name: chordon-native-emulator
+          path: /tmp/chordon-native-emu
+          retention-days: 14

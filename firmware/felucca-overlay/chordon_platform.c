@@ -3,11 +3,15 @@
  * This is included in the Felucca SINGLE compilation unit before main.c.
  * EXPERIMENTAL: SAVE is RAM ONLY. Never distribute as installable firmware.
  */
+#include "sounds.h"
 static CbFM1 cbh_device;
+#define cbh_sound (cbh_device.sound)
 static CbVoice cbh_voices;
 static CbFM1 cbh_ram_save;
 static uint32_t cbh_last_ms, cbh_last_draw;
-static uint8_t cbh_dirty, cbh_ram_saved;
+static uint8_t cbh_dirty, cbh_ram_saved, cbh_save_pending;
+static uint32_t cbh_edit_ms;
+#include "disk.h"
 
 static void cbh_on(void *u, uint8_t pitch, uint8_t velocity) {
     (void)u;trk_note_on(&trk[0], pitch, velocity);
@@ -28,14 +32,54 @@ static void cbh_panic(void *u) {
     fm1_irq_on();
 }
 static void cbh_save(void *u, const CbFM1 *m) {
-    (void)u; cbh_ram_save=*m;cbh_ram_saved=1u;  /* NOR flash integration pending */
+    (void)u; cbh_ram_save=*m;cbh_ram_saved=1u;
+    cbh_disk_save(m);
 }
 static const CbFM1Host cbh_host={0,cbh_notes,cbh_save,cbh_panic};
+/* Felucca's load protocol serialises parameter changes against the audio ISR. */
+static void cbh_sound_load(uint16_t id){
+    track_t *t=&trk[0];
+    cbh_panic(0);song.sel=0;cbh_sound=id%CB_SOUND_COUNT;
+    load_begin(t,UNDO_SOUND);
+    if(cbh_sound>=6u||cbh_sound==3u){
+        uint8_t patch[FP_SIZE+1u];
+        set_engine_of(t,ENGI_FM6);
+        for(unsigned i=0;i<8;i++)t->p[P_E0+i]=0;
+        t->p[P_E7]=FM6_OWN;
+        fm6_unpack(cbh_sound>=6u?CB_DX7_PACKED[cbh_sound-6u]:FM6_FACTORY[1],patch);
+        fm6_set_patch(0,patch);fm6_adopt(0);
+    }else if(cbh_sound==4u||cbh_sound==5u){
+        set_engine_of(t,ENGI_SAMPLE);apply_preset_to(t,0);
+        t->p[P_E0]=0; /* bundled piano, no dependency on user flash samples */
+    }else{
+        set_engine_of(t,0);
+        for(unsigned i=0;i<8;i++)t->p[P_E0+i]=CB_LOCAL_VALUES[cbh_sound][i];
+    }
+    if(cbh_sound<6u&&cbh_sound!=3u){
+        t->p[P_ATK]=CB_LOCAL_VALUES[cbh_sound][8];
+        t->p[P_DEC]=CB_LOCAL_VALUES[cbh_sound][9];
+        t->p[P_SUS]=CB_LOCAL_VALUES[cbh_sound][10];
+        t->p[P_REL]=CB_LOCAL_VALUES[cbh_sound][11];
+    }
+    t->p[P_VOICE]=V_POLY;t->p[P_LEVEL]=92;
+    t->p[P_DIST]=0;t->p[P_CHOR]=0;t->p[P_DLY]=0;t->p[P_REV]=20;
+    load_end(t);cbh_dirty=1;
+}
+static void cbh_audition(void){
+    if(!cbh_device.playing){
+        uint8_t notes[4];cbh_panic(0);
+        uint8_t n=cb_fm1_chord_notes(&cbh_device.loop.steps[cbh_device.selected],notes);
+        cbh_notes(0,notes,n,1100u,0);
+    }
+}
 static void chordon_init(void) {
     CbVoiceOut v={0,cbh_on,cbh_off};
-    cb_fm1_init(&cbh_device,(fm1_ms<<16)^0x43424c55u);
+    cb_minimal_init(&cbh_device,(fm1_ms<<16)^0x43424c55u);
     cb_voice_init(&cbh_voices,v);
     cbh_last_ms=fm1_ms;cbh_last_draw=0;cbh_dirty=1;cbh_ram_saved=0;
+    cbh_disk_restore(&cbh_device);
+    cbh_sound_load(cbh_device.sound);
+    cbh_save_pending=0;cbh_edit_ms=fm1_ms;
 }
 /* Own input surface, using Felucca's hardware-calibrated matrix and encoders. */
 static void chordon_input(void) {
@@ -43,53 +87,58 @@ static void chordon_input(void) {
     uint32_t keys=fm1_input_note_edges();
     uint32_t dt=now-cbh_last_ms;
     int32_t s;
-    /* Four adjacent piano keys become direct chord pads, not a menu. */
-    for(uint8_t i=0;i<4u;i++)if(keys&(1u<<i)){
-        uint8_t notes[4];
-        cbh_device.selected=i;
-        uint8_t count=cb_fm1_chord_notes(&cbh_device.loop.steps[i],notes);
-        cbh_notes(0,notes,count,350u,0);
+    /* First four WHITE keys on F3..G5: F, G, A, B. */
+    static const uint8_t white_keys[4]={0,2,4,6};
+    for(uint8_t i=0;i<4u;i++)if(keys&(1u<<white_keys[i])){
+        cbh_device.selected=i;cbh_save_pending=1;cbh_edit_ms=now;
+        if(!cbh_device.playing){
+            uint8_t notes[4];cbh_panic(0);
+            uint8_t count=cb_fm1_chord_notes(&cbh_device.loop.steps[i],notes);
+            cbh_notes(0,notes,count,1100u,0);
+        }
         cbh_dirty=1;
     }
     cbh_last_ms=now;
     if(dt>200u)dt=200u;
     if(edges)cbh_dirty=1;
     if(edges&(1u<<panel.btn[B_PLAY]))cb_fm1_button(&cbh_device,CB_B_PLAY,&cbh_host);
-    if(edges&(1u<<panel.btn[B_SEQ]))cb_fm1_button(&cbh_device,CB_B_FLIP,&cbh_host);
-    if(edges&(1u<<panel.btn[B_SAVE]))cb_fm1_button(&cbh_device,CB_B_SAVE,&cbh_host);
-    if(edges&(1u<<panel.btn[B_HOME]))cb_fm1_button(&cbh_device,CB_B_HOME,&cbh_host);
-    /* Physical FM1 keys, upper row FX SEL ENV LFO EDIT GLO,
-       lower row HOME SAVE ARP SEQ PLAY/STOP REC.
-       Felucca B_SCL is the legacy internal alias for printed SEL. */
-    if(edges&(1u<<panel.btn[B_ENV]))cb_fm1_button(&cbh_device,CB_B_FEEL,&cbh_host);
-    if(edges&(1u<<panel.btn[B_LFO]))cb_fm1_button(&cbh_device,CB_B_MOTION,&cbh_host);
-    if(edges&(1u<<panel.btn[B_GLO]))cb_fm1_button(&cbh_device,CB_B_RECIPE,&cbh_host);
-    if(edges&(1u<<panel.btn[B_SCL]))cb_fm1_button(&cbh_device,CB_B_CHORD,&cbh_host);
-    if(edges&(1u<<panel.btn[B_ARP]))cb_fm1_button(&cbh_device,CB_B_ARP,&cbh_host);
-    if(edges&(1u<<panel.btn[B_EDIT]))cb_fm1_button(&cbh_device,CB_B_KEEP_ALL,&cbh_host);
-    /* FX sound choice, REC capture and OCT- / OCT+ transpose are not
-       yet ported to the native controller: don't alias them to unrelated
-       actions or silently claim parity with the browser. */
-    s=panel_enc(EN_SELECT);
-    if(s)cbh_dirty=1;
-    /* Limit work for an encoder jump: refuse to spend >16 iterations in UI. */
-    if(s>16)s=16;if(s< -16)s=-16;
-    while(s>0){cb_fm1_button(&cbh_device,CB_B_SELECT,&cbh_host);s--;}
-    while(s<0){cb_fm1_button(&cbh_device,CB_B_SELECT,&cbh_host);s++;}
-    for(uint32_t i=0;i<4u;i++){
-        s=panel_enc(EN_K1+i);
-        if(s)cbh_dirty=1;
-        if(s>16)s=16;if(s< -16)s=-16;
-        while(s>0){cb_fm1_knob(&cbh_device,(uint8_t)i,1);s--;}
-        while(s<0){cb_fm1_knob(&cbh_device,(uint8_t)i,-1);s++;}
-    }
-    (void)panel_enc(EN_ALGO);(void)panel_enc(EN_PRESET);
+    if(edges&(1u<<panel.btn[B_EDIT])){cb_fm1_button(&cbh_device,CB_B_UNDO,&cbh_host);cbh_audition();cbh_save_pending=1;cbh_edit_ms=now;}
+    s=panel_enc(EN_K1);
+    if(s){if(s>16)s=16;if(s< -16)s=-16;cbh_dirty=1;}
+    int32_t vary=s;
+    while(s>0){cb_minimal_vary(&cbh_device,1);s--;}
+    while(s<0){cb_minimal_vary(&cbh_device,-1);s++;}
+    if(vary){cbh_audition();cbh_save_pending=1;cbh_edit_ms=now;}
+    s=panel_enc(EN_PRESET);
+    if(s){cbh_panic(0);if(s>16)s=16;if(s< -16)s=-16;cbh_dirty=1;}
+    if(s){cbh_sound_load((uint16_t)(((int)cbh_sound+s+(int)CB_SOUND_COUNT)%(int)CB_SOUND_COUNT));cbh_audition();cbh_save_pending=1;cbh_edit_ms=now;}
+    (void)panel_enc(EN_SELECT);(void)panel_enc(EN_ALGO);
+    for(uint32_t i=1;i<4;i++)(void)panel_enc(EN_K1+i);
+    panel_moved=0;
     if(dt){
         uint8_t before=cbh_device.active;
         cb_fm1_tick(&cbh_device,(uint16_t)dt,&cbh_host);
         if(cbh_device.active!=before)cbh_dirty=1;
     }
     fm1_irq_off();cb_voice_tick(&cbh_voices,now);fm1_irq_on();
+    if(cbh_save_pending&&!cbh_device.playing&&!cbh_voices.n&&now-cbh_edit_ms>=2000u){
+        cbh_save(0,&cbh_device);cbh_save_pending=0;
+    }
+}
+/* Only available chord pads, transport and available undo are lit. */
+static void chordon_leds(void){
+ uint8_t on[FM1_NCOL]={0},dim[FM1_NCOL]={0};
+ static const uint8_t white_keys[4]={0,2,4,6};
+ led_pos_init();
+ for(unsigned i=0;i<4;i++){
+  led_put(dim,14u+white_keys[i],1);
+  if((cbh_device.playing&&cbh_device.active==i)||(!cbh_device.playing&&cbh_device.selected==i))led_put(on,14u+white_keys[i],1);
+ }
+ led_put(on,panel.btn[B_PLAY],cbh_device.playing);
+ led_put(on,panel.btn[B_EDIT],cbh_device.undo_valid);
+ for(unsigned i=0;i<FM1_NCOL;i++){
+  fm1_led_dim[i]=dim[i];fm1_led_mid[i]=0;fm1_led_breath[i]=0;fm1_led[i]=on[i];
+ }
 }
 /* RGB565 drawing, without a full-screen RAM buffer. */
 static void cbh_rect(void *u,int x,int y,int w,int h,uint16_t color){
@@ -124,14 +173,23 @@ static void cbh_line(void *u,int x,int y,int xx,int yy,uint16_t color){
 static void cbh_text(void *u,int x,int y,const char *str,uint16_t color,uint8_t sz){
     (void)u;
     const aafont_t *f=sz>=3u?&AF_L:sz==2u?&AF_M:&AF_S;
+    uint16_t background=0x10a2u; /* cb_minimal_draw's RGB(20,21,18) */
+    uint32_t width=(uint32_t)(240-x);
+    if(y==182||y==203){
+        unsigned slot=(unsigned)(x-10)/56u;
+        unsigned edge=10u+slot*56u+50u;
+        width=edge>(unsigned)x?edge-(unsigned)x:0u;
+        background=cbh_device.playing&&cbh_device.active==slot?0xf770u:0x3185u;
+    }
     if(x>=0&&x<240&&y>=0&&y+f->h<=240)
-        draw_text_line((uint32_t)x,(uint32_t)y,(uint32_t)(240-x),f,str,color,0x0844u,0);
+        draw_text_line((uint32_t)x,(uint32_t)y,width,f,str,color,background,0);
 }
 static void chordon_draw(void){
     static const CbFM1Graphics g={0,cbh_rect,cbh_line,cbh_text};
     if(!cbh_dirty&&fm1_ms-cbh_last_draw<250u)return;
     if(fm1_ms-cbh_last_draw<50u)return; /* 20 FPS maximum */
     cbh_last_draw=fm1_ms;cbh_dirty=0;
-    cb_fm1_draw(&cbh_device,&g);
+    cb_minimal_draw(&cbh_device,&g);
+    draw_text_line(12,42,216,&AF_S,CB_SOUND_NAMES[cbh_sound],0xffffu,0x10a2u,0);
     if(ui.uboot)draw_text_line(20,114,200,&AF_M,"HOLD FOR UBOOT",0xffffu,0x0844u,1);
 }

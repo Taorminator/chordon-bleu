@@ -13,6 +13,8 @@ jobs:
           node-version: "22"
       - name: Validate offline recipe bundle
         run: node tools/build-recipes.mjs --check
+      - name: Validate identical native DX7 catalogue
+        run: node tools/build-native-sounds.mjs --check
       - name: Verify browser module dependency graph
         run: node tests/pages-artifact.test.mjs .
       - name: Prevent unreviewed boot/PLL changes and firmware release
@@ -61,6 +63,10 @@ jobs:
         run: |
           cc -std=c99 -O2 -Wall -Wextra -Werror -pedantic core/chordon_harmony.c tests/core_test.c -o /tmp/chordon-harmony-test
           /tmp/chordon-harmony-test
+      - name: Minimal native application
+        run: |
+          cc -std=c99 -O2 -Wall -Wextra -Werror -pedantic core/chordon_harmony.c firmware/cb_fm1.c tests/minimal_device_test.c -o /tmp/chordon-minimal
+          /tmp/chordon-minimal
       - name: Portable FM1 application simulation (not a firmware build)
         run: |
           cc -std=c99 -O2 -Wall -Wextra -Werror -pedantic core/chordon_harmony.c firmware/cb_fm1.c tests/device_test.c -o /tmp/chordon-device-test

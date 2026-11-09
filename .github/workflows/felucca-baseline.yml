@@ -37,7 +37,14 @@ jobs:
           test -x "$HOME/.jieli/toolchain/pi32v2/bin/clang"
       - name: JieLi AC79 SDK
         run: |
-          git clone --depth 1 --branch AC79NN_SDK_V1.2.1_2023-12-13 https://gitee.com/Jieli-Tech/fw-AC79_AIoT_SDK.git "$HOME/fw-AC79_AIoT_SDK"
+          for attempt in 1 2 3; do
+            if git clone --depth 1 --branch AC79NN_SDK_V1.2.1_2023-12-13 https://gitee.com/Jieli-Tech/fw-AC79_AIoT_SDK.git "$HOME/fw-AC79_AIoT_SDK"; then
+              break
+            fi
+            # This is this job's partial clone on a fresh ephemeral runner.
+            rm -rf "$HOME/fw-AC79_AIoT_SDK"
+          done
+          test "$(git -C "$HOME/fw-AC79_AIoT_SDK" rev-parse HEAD)" = d179b4484759423312073f5fbb232501aa491047
           test -f "$HOME/fw-AC79_AIoT_SDK/cpu/wl82/tools/uboot.boot"
       - name: Cross-compile native CHORDON modules for pi32v2
         run: |
