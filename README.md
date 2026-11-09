@@ -1,5 +1,20 @@
 # CHORDON BLEU
 
+## Minimal browser instrument — 2026-11-08
+
+The default browser view is now the simplified four-chord instrument: select/play a chord, turn through fitting alternatives, Play/Stop and Undo. A white outline marks the selected chord; yellow fill marks the sounding slot. No bass track, recipes, ARP or sound browser starts in this view. The last four chords are remembered locally under a separate storage key; playback never resumes automatically.
+
+- **New instrument:** `index.html` (on GitHub Pages after this change is merged).
+- **Retained previous demo:** `classic.html`, including old favorites, share links, bass and the FM1 concept view (`classic.html?view=fm1`). Existing `#idea=` links to the root are forwarded to Classic so their setup is preserved.
+- Fixed 84 BPM, two beats per chord, one E-piano sound adapted from the existing two-operator FM preview. This view does not use the six-operator DX7 worklet. Suggestions currently explore a small C-major/A-minor palette; arbitrary root/quality selection is deferred in this view.
+- Keyboard: 1–4 play/select, Space toggles the loop, left/right explore, Ctrl/Cmd+Z undoes. The dial also supports touch drag, scrolling and focused arrow keys; −/+ offer explicit tap controls.
+- During looping, selecting a pad changes the editing target. A variation is heard at the slot's next scheduled onset (up to 80 ms of already scheduled audio stays fixed). Stop cancels scheduled sources and clears playback indicators. Hiding the page pauses playback.
+- Run `node --test tests/minimal.test.mjs`, then `node tools/build-browser.mjs` and `node tests/pages-artifact.test.mjs dist`. Existing Classic regression tests now target `classic.html`.
+
+Browser concept only; native firmware and release gates are unchanged. See [minimal UI decisions and verification](docs/MINIMAL_BROWSER.md).
+
+The older feature documentation below describes **Classic**.
+
 **A pocket-sized harmony kitchen.**
 
 **By Middle Age Engineering (MID Engineering).**

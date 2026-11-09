@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 // Exercise the actual browser harmony and ARP functions, without running setup() or Web Audio.
-const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
+const html=readFileSync(new URL('../classic.html',import.meta.url),'utf8');
 let src=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].at(-1)?.[1];
 assert.ok(src,'Missing inline script');
 src=src.replace(/\n\/\/ BROWSER_STARTUP[\s\S]*$/,'');

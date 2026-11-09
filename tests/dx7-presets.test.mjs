@@ -3,7 +3,7 @@ import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import vm from 'node:vm';
 import {banks,DEFAULT_PRESET,presetById} from '../assets/dx7/aquanode-presets.js';
-const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
+const html=readFileSync(new URL('../classic.html',import.meta.url),'utf8');
 assert.equal(banks.length,5);
 const ids=new Set();
 for(const bank of banks){
@@ -85,5 +85,6 @@ call("state.dx7Preset='aquazone:1';loadIdea(state.saved[0].id)");assert.equal(ca
 call("state.dx7Preset='aquazone:1';sessionLoad()");assert.equal(call('state.dx7Preset'),'presets-4:5');
 const old=JSON.parse(stored.get('chordon-bleu.session.v1'));delete old.dx7Preset;stored.set('chordon-bleu.session.v1',JSON.stringify(old));assert.equal(call('sessionLoad()'),true);
 const pages=readFileSync(new URL('../.github/workflows/pages.yml',import.meta.url),'utf8');
-assert.match(pages,/cp -R vendor _site\/vendor/);assert.match(pages,/aquanode-presets\.js/);
+assert.match(pages,/node tools\/build-browser\.mjs/);
+assert.match(pages,/node tests\/pages-artifact\.test\.mjs dist/); // Validates the assembled DX7 dependencies.
 console.log('PASS 153 local DX7 presets, DSP/panic, async switching, fallback, persistence and deployment');

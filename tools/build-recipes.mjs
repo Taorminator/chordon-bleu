@@ -18,7 +18,7 @@ for(const name of files){
  for(const p of r.palette)if(!Number.isInteger(p.semi)||p.semi<0||p.semi>11||!qualities.has(p.quality)||!Number.isFinite(p.weight)||p.weight<0||!Number.isInteger(p.minSpice)||p.minSpice<0||p.minSpice>100)throw Error('Bad palette '+name);
  catalog.push(r);
 }
-const target=join(root,'index.html'),s=readFileSync(target,'utf8');
+const target=join(root,'classic.html'),s=readFileSync(target,'utf8');
 const a='// RECIPE_CATALOG_BEGIN',b='// RECIPE_CATALOG_END';
 const i=s.indexOf(a),j=s.indexOf(b);
 if(i<0||j<i)throw Error('Catalog markers missing');

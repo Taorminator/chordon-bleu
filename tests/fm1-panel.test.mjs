@@ -3,7 +3,7 @@ import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 
 const read = f=>readFileSync(new URL('../'+f,import.meta.url),'utf8');
-const html=read('index.html'),platform=read('firmware/felucca-overlay/chordon_platform.c');
+const html=read('classic.html'),platform=read('firmware/felucca-overlay/chordon_platform.c');
 const controller=read('firmware/cb_fm1.c'),header=read('firmware/cb_fm1.h');
 const wanted=['FX','SEL','ENV','LFO','EDIT','GLO','HOME','SAVE','ARP','SEQ','PLAY_STOP','REC'];
 const match=html.match(/<div class="hardware-buttons"[^>]*>([\s\S]*?)<\/div>/);

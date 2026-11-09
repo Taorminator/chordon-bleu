@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
-const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
+const html=readFileSync(new URL('../classic.html',import.meta.url),'utf8');
 let source=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 assert.ok(source);
 source=source.replace(/\n\/\/ BROWSER_STARTUP[\s\S]*$/,'');

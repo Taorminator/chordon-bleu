@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 import {legacyBassTrack,resolveBassTrack} from '../core/bass-track.js';
-const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
+const html=readFileSync(new URL('../classic.html',import.meta.url),'utf8');
 const extract=(a,b)=>html.slice(html.indexOf(a),html.indexOf(b,html.indexOf(a)));
 const state={tempo:120,motion:'hold',selected:0,holdLift:false,arp:{rate:8,gate:74,direction:'up',order:'pitch'},slice:{rate:8,gate:40,hits:4},steps:[0,5,9,7].map(root=>({root,quality:'maj'}))};
 const sandbox={state,Uint8Array,TextEncoder,Math,bassApi:{resolveBassTrack},clamp:(v,a,b)=>Math.max(a,Math.min(b,v)),mod:n=>(n%12+12)%12,tone(){throw Error('Export must not start audio');}};

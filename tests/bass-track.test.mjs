@@ -4,7 +4,7 @@ import vm from 'node:vm';
 import {legacyBassTrack,resolveBassTrack,validBassTrack,MAX_BASS_EVENTS} from '../core/bass-track.js';
 
 // Compare with actual current playback code, not a duplicate migration formula.
-const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
+const html=readFileSync(new URL('../classic.html',import.meta.url),'utf8');
 const script=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].at(-1)[1]
  .replace(/\n\/\/ BROWSER_STARTUP[\s\S]*$/,'');
 const cx=vm.createContext({console,Math,Date,setTimeout,clearTimeout});

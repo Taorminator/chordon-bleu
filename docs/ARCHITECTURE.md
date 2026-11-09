@@ -6,7 +6,8 @@ This is a high-level map of the existing repository, not a claim of completed ha
 
 | Layer | Location | Purpose | Verification scope |
 | --- | --- | --- | --- |
-| Web instrument | `index.html`, `recipes/`, `tools/build-recipes.mjs` | Browser audio, four-chord interactions, recipes, UI and screen concept | Node/browser-related CI |
+| Minimal web instrument | `index.html`, `minimal.css`, `core/minimal-*.mjs` | Four-chord UI, bounded session/undo, diatonic alternatives, isolated FM audio | Node model/lifecycle tests and browser interaction review; no hardware proof |
+| Classic web instrument | `classic.html`, `recipes/`, `tools/build-recipes.mjs` | Browser audio, four-chord interactions, recipes, UI and screen concept | Node/browser-related CI |
 | Portable harmony | `core/chordon_harmony.c/.h` | C99 harmony logic for native reuse | Host tests, cross-compiler |
 | Bass event model | `core/bass-track.js` | Bounded relative-role model and legacy bass note-intent conversion; not connected to playback/storage yet | Host JS comparisons with the browser emitter; not native C/hardware |
 | Bass phrase generator | `core/bass-generator.js` | Seeded chord-relative patterns with bounded search; not connected to app controls yet | Host JS harmonic/register/phrase invariants; not listening or hardware proof |
