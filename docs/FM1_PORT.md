@@ -35,3 +35,7 @@ CHORDON BLEU is a distinct project: not a rebrand, branch or submodule of FM-XY.
 - Remaining blockers: JieLi toolchain + AC79 SDK unavailable in current runtime; original Felucca full source not yet integrated; no `.fwsc` build, native WASM, real-device audio/CPU tests, or recovery validation.
 
 **Do not use the C99 host test binary as FM1 firmware.**
+
+## External firmware research and test priorities (2026-10-16)
+
+See [FM1 ecosystem research](FM1_ECOSYSTEM_RESEARCH.md) for the independently linked community firmware landscape, chord/bass workflow references, MIDI/boot/recovery evidence gaps, and a prioritized **offline-first** native regression checklist. Treat external firmware and hardware claims as leads to validate, not as automatically compatible device specifications or install authorization.
