@@ -219,3 +219,16 @@ test('live tempo retimes the pending boundary without retriggering or losing tra
  assert.equal(retimeBoundary(.9,1,80,160),1,'overdue audio never bursts');
  h.elements.get('play').listeners.click();assert.equal(h.notes.length,0);
 });
+
+test('accelerated DX7 chords cannot be cut off by the previous chord sharing a pitch',()=>{
+ const timers=[],messages=[];
+ const environment={setTimeout:(fn,ms)=>{timers.push({fn,ms});return timers.length;},clearTimeout(){}};
+ const p=new Piano(environment);p.soundId='dx7:aquazone:1';p.dxReady=p.soundId;
+ p.context={currentTime:0};p.dxNode={port:{postMessage:m=>messages.push(m)}};
+ p.chord([60],0,1.2,0);p.chord([60],.8,1,1);
+ timers.sort((a,b)=>a.ms-b.ms);
+ timers[0].fn();timers[1].fn();
+ assert.deepEqual(messages.map(m=>m.type),['noteOn','noteOff','noteOn']);
+ timers[2].fn();assert.equal(messages.length,3,'old release must not end the newly retriggered note');
+ timers[3].fn();assert.equal(messages.at(-1).type,'noteOff');assert.equal(p.dxOwners.size,0);
+});

@@ -6,7 +6,7 @@ export class Piano {
     this.context = null;
     this.master = null;
     this.voices = new Set();
-    this.soundId=DEFAULT_SOUND; this.dxNode=null; this.dxReady=null; this.dxLoading=null; this.dxTimers=new Set(); this.moduleContext=null;
+    this.soundId=DEFAULT_SOUND; this.dxNode=null; this.dxReady=null; this.dxLoading=null; this.dxTimers=new Set(); this.moduleContext=null; this.dxOwners=new Map(); this.dxGate=0;
     this.onInterrupt = () => {};
   }
   async ready() {
@@ -74,14 +74,25 @@ export class Piano {
     if(sound.patch){
       if(this.dxReady!==this.soundId)return;
       const node=this.dxNode, id=this.soundId;
-      const queue=(when,message)=>{
+      const queue=(when,action)=>{
         const timer=this.environment.setTimeout(()=>{
           this.dxTimers.delete(timer);
-          if(this.soundId===id && this.dxNode===node)node.port.postMessage(message);
+          if(this.soundId===id && this.dxNode===node)action();
         },Math.max(0,(when-this.context.currentTime)*1000));
         this.dxTimers.add(timer);
       };
-      for(const note of notes){queue(at,{type:'noteOn',note,velocity:81});queue(at+duration,{type:'noteOff',note});}
+      const owner=++this.dxGate;
+      for(const note of notes){
+        queue(at,()=>{
+          if(this.dxOwners.has(note))node.port.postMessage({type:'noteOff',note});
+          this.dxOwners.set(note,owner);
+          node.port.postMessage({type:'noteOn',note,velocity:81});
+        });
+        queue(at+duration,()=>{
+          if(this.dxOwners.get(note)!==owner)return;
+          this.dxOwners.delete(note);node.port.postMessage({type:'noteOff',note});
+        });
+      }
       return;
     }
     for (const note of notes) this.tone(note, at, duration, slot);
@@ -139,7 +150,7 @@ export class Piano {
     }
   }
   silence(slot) {
-    for(const timer of this.dxTimers)this.environment.clearTimeout(timer);this.dxTimers.clear();
+    for(const timer of this.dxTimers)this.environment.clearTimeout(timer);this.dxTimers.clear();this.dxOwners.clear();
     this.dxNode?.port.postMessage({type:'panic'});
     if (!this.context) return;
     const now = this.context.currentTime;
