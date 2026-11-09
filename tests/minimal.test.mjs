@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
-import { Session, STORAGE_KEY, TEMPO } from '../core/minimal-session.mjs';
+import { Session, STORAGE_KEY, TEMPO, retimeBoundary } from '../core/minimal-session.mjs';
 import { label, alternatives } from '../core/minimal-harmony.mjs';
 import { Piano } from '../core/minimal-audio.mjs';
 
@@ -103,7 +103,7 @@ function harness() {
     chord(...args){notes.push(args);}
     silence(){notes.length=0;}
   }
-  const context = vm.createContext({Session,STORAGE_KEY,TEMPO,label,alternatives,SOUND_CATALOG,soundById,Piano:FakePiano,document,
+  const context = vm.createContext({Session,STORAGE_KEY,TEMPO,retimeBoundary,label,alternatives,SOUND_CATALOG,soundById,Piano:FakePiano,document,
     window:{addEventListener(){}},localStorage:{getItem(){return null;},setItem(){}},console,
     setTimeout:(fn,ms)=>{timers.set(++id,{fn,ms,type:'timeout'});return id;},clearTimeout:i=>timers.delete(i),
     setInterval:(fn,ms)=>{timers.set(++id,{fn,ms,type:'interval'});return id;},clearInterval:i=>timers.delete(i),
@@ -198,4 +198,37 @@ test('changing PRESETS during pending Play preserves the requested loop start', 
   assert.equal(h.run('playing'),true);assert.equal(h.run('launching'),false);
   assert.equal(h.run('session.soundId'),'local:4');assert.equal(h.notes.length,1);
   h.run('stop()');assert.equal(h.notes.length,0);
+});
+
+test('SELECT tempo is bounded, restored and independent of chord Undo',()=>{
+ const s=new Session(),chords=s.names();
+ assert.equal(s.bpm,84);s.tempo(1);assert.equal(s.bpm,85);
+ s.vary(1);s.tempo(5);s.undo();assert.deepEqual(s.names(),chords);assert.equal(s.bpm,90);
+ assert.equal(new Session(s.snapshot()).bpm,90);
+ for(const invalid of [0,NaN,Infinity,84.5,'100',161,47])assert.equal(new Session({bpm:invalid}).bpm,84);
+ s.tempo(32767);assert.equal(s.bpm,160);s.tempo(-32768);assert.equal(s.bpm,48);
+});
+test('live tempo retimes the pending boundary without retriggering or losing transport',async()=>{
+ const h=harness();h.elements.get('play').listeners.click();await h.resolve();
+ h.clock(.5);const before=h.run('nextTime');h.run('chooseTempo(16)');
+ assert.equal(h.run('session.bpm'),100);assert.equal(h.notes.length,1);
+ assert.equal(h.run('playing'),true);assert.ok(Math.abs(h.run('nextTime')-(.5+(before-.5)*84/100))<1e-9);
+ h.clock(h.run('nextTime')-.01);h.run('schedule()');assert.equal(h.notes.length,2);
+ assert.equal(h.elements.get('tempo-display').textContent,'100 BPM');
+ assert.equal(retimeBoundary(2,1,80,160,1.05),1.05+(2-1.05)/2);
+ assert.equal(retimeBoundary(.9,1,80,160),1,'overdue audio never bursts');
+ h.elements.get('play').listeners.click();assert.equal(h.notes.length,0);
+});
+
+test('accelerated DX7 chords cannot be cut off by the previous chord sharing a pitch',()=>{
+ const timers=[],messages=[];
+ const environment={setTimeout:(fn,ms)=>{timers.push({fn,ms});return timers.length;},clearTimeout(){}};
+ const p=new Piano(environment);p.soundId='dx7:aquazone:1';p.dxReady=p.soundId;
+ p.context={currentTime:0};p.dxNode={port:{postMessage:m=>messages.push(m)}};
+ p.chord([60],0,1.2,0);p.chord([60],.8,1,1);
+ timers.sort((a,b)=>a.ms-b.ms);
+ timers[0].fn();timers[1].fn();
+ assert.deepEqual(messages.map(m=>m.type),['noteOn','noteOff','noteOn']);
+ timers[2].fn();assert.equal(messages.length,3,'old release must not end the newly retriggered note');
+ timers[3].fn();assert.equal(messages.at(-1).type,'noteOff');assert.equal(p.dxOwners.size,0);
 });

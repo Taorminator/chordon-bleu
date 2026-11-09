@@ -3,11 +3,18 @@ import { Q, label, voiceNotes, alternatives } from './minimal-harmony.mjs';
 
 export const STORAGE_KEY = 'chordon-bleu.minimal.v1';
 export const TEMPO = 84;
+export const MIN_TEMPO=48, MAX_TEMPO=160;
+// Keep the remaining musical phase; never move a boundary before queued audio.
+export function retimeBoundary(boundary,now,oldBpm,newBpm,committedAt=now){
+  const anchor=Math.max(now,committedAt);
+  return anchor+Math.max(0,boundary-anchor)*oldBpm/newBpm;
+}
 const copy = value => JSON.parse(JSON.stringify(value));
 const INITIAL = [{ root: 0, quality: 'maj7' }, { root: 9, quality: 'm7' }, { root: 5, quality: 'maj7' }, { root: 7, quality: 'dom7' }];
 
 export class Session {
   constructor(saved) {
+    this.bpm=Number.isInteger(saved?.bpm)&&saved.bpm>=MIN_TEMPO&&saved.bpm<=MAX_TEMPO?saved.bpm:TEMPO;
     this.soundId = soundById(saved?.soundId||DEFAULT_SOUND).id;
     this.steps = copy(INITIAL);
     this.selected = 0;
@@ -42,7 +49,13 @@ export class Session {
     this.deck = null;
     return true;
   }
-  snapshot() { return { version: 1, soundId:this.soundId, steps: copy(this.steps) }; }
+  tempo(turn){
+    if(!Number.isInteger(turn)||!turn)return false;
+    const next=Math.max(MIN_TEMPO,Math.min(MAX_TEMPO,this.bpm+turn));
+    if(next===this.bpm)return false;
+    this.bpm=next;return true;
+  }
+  snapshot() { return { version: 1, bpm:this.bpm, soundId:this.soundId, steps: copy(this.steps) }; }
   names() { return this.steps.map(label); }
   voices() {
     let previous;

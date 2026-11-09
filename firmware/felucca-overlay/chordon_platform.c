@@ -78,7 +78,7 @@ static void chordon_init(void) {
     cb_voice_init(&cbh_voices,v);
     cbh_last_ms=fm1_ms;cbh_last_draw=0;cbh_dirty=1;cbh_ram_saved=0;
     cbh_disk_restore(&cbh_device);
-    cbh_sound_load(cbh_device.sound);
+    cbh_sound_load(cbh_device.sound);song.g[G_BPM]=cbh_device.bpm;
     cbh_save_pending=0;cbh_edit_ms=fm1_ms;
 }
 /* Own input surface, using Felucca's hardware-calibrated matrix and encoders. */
@@ -112,7 +112,13 @@ static void chordon_input(void) {
     s=panel_enc(EN_PRESET);
     if(s){cbh_panic(0);if(s>16)s=16;if(s< -16)s=-16;cbh_dirty=1;}
     if(s){cbh_sound_load((uint16_t)(((int)cbh_sound+s+(int)CB_SOUND_COUNT)%(int)CB_SOUND_COUNT));cbh_audition();cbh_save_pending=1;cbh_edit_ms=now;}
-    (void)panel_enc(EN_SELECT);(void)panel_enc(EN_ALGO);
+    s=panel_enc(EN_SELECT);
+    if(s){
+        if(s>16)s=16;if(s< -16)s=-16;
+        cb_minimal_tempo(&cbh_device,(int16_t)s);song.g[G_BPM]=cbh_device.bpm;
+        cbh_dirty=1;cbh_save_pending=1;cbh_edit_ms=now;
+    }
+    (void)panel_enc(EN_ALGO);
     for(uint32_t i=1;i<4;i++)(void)panel_enc(EN_K1+i);
     panel_moved=0;
     if(dt){

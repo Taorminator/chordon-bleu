@@ -35,7 +35,9 @@ replace('    autosave_poll();','    /* CHORDON owns only its application state. 
 replace('    ui_leds();\n    ui_draw();','    chordon_leds();\n    chordon_draw();')
 s=s.replace('ui_input();','chordon_input();').replace('kb_boot_hold = 0;', 'kb_boot_hold = 1;').replace('    boot_leds();','    boot_leds(); fm1_led_anim_stop(); chordon_leds();')
 # The emulator runs the same adapter; exports expose state only for regression tests.
-s+='''\nEXPORT uint32_t cb_web_selected(void){return cbh_device.selected;}
+s+='''\nEXPORT uint32_t cb_web_bpm(void){return cbh_device.bpm;}
+EXPORT uint32_t cb_web_active(void){return cbh_device.active;}
+EXPORT uint32_t cb_web_selected(void){return cbh_device.selected;}
 EXPORT uint32_t cb_web_playing(void){return cbh_device.playing;}
 EXPORT uint32_t cb_web_sound(void){return cbh_sound;}
 EXPORT uint32_t cb_web_chord(uint32_t n){return n<4?cbh_device.loop.steps[n].root|((uint32_t)cbh_device.loop.steps[n].quality<<8):0xffffffffu;}
@@ -54,13 +56,13 @@ html=(u/'web/emu/index.html').read_text().replace('<title>Felucca</title>','<tit
 html=html.replace('@VERSION@','CHORDON BLEU').replace('@PREVIEW@',' · native preview')
 html=html.replace('<nav><a href="../installer/">Install</a><a href="../editor/">Editor</a><a href="https://github.com/hugelton/Felucca">Source</a></nav>','<nav><a href="https://github.com/Taorminator/chordon-bleu">CHORDON source</a> · Native emulator, no device installer.</nav>')
 html=html.replace('Felucca, the multi-engine synth firmware for the FM-1, running in your browser: the same code the instrument runs.','CHORDON BLEU: the native four-chord application and Felucca DSP running in a simulated FM1.')
-html=html.replace('<main>','<main><p>First four white keys: chords · K1: variation · EDIT: Undo · PRESETS: sound · PLAY: loop. Native preview; hardware verification pending.</p>')
+html=html.replace('<main>','<main><p>SELECT: tempo · First four white keys: chords · K1: variation · EDIT: Undo · PRESETS: sound · PLAY: loop. Native preview; hardware verification pending.</p>')
 html=html.replace('const [wasm] = await Promise.all([','const canWorklet=!!ac.audioWorklet;\n    const [wasm, fallback] = await Promise.all([')
 html=html.replace('ac.audioWorklet.addModule("worklet.js")','canWorklet ? ac.audioWorklet.addModule("worklet.js") : import("./worklet.js")')
 html=html.replace('node = new AudioWorkletNode(ac, "felucca", { numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [2] });','node = canWorklet ? new AudioWorkletNode(ac, "felucca", { numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [2] }) : fallback.createFallback(ac);')
 html=html.replace('    midiOn();','    /* No automatic MIDI permission request in this minimal preview. */')
 a=html.index('<p class="keys">');b=html.index('</p>',a)+4
-html=html[:a]+'<p class="keys">Four white keys · K1 changes one chord · EDIT undoes · PRESETS chooses the sound · PLAY loops. Drag or scroll a knob to turn it.</p>'+html[b:]
+html=html[:a]+'<p class="keys">SELECT: tempo · Four white keys · K1 changes one chord · EDIT undoes · PRESETS chooses the sound · PLAY loops. Drag or scroll a knob to turn it.</p>'+html[b:]
 # A separate namespace must never load another firmware emulator's saved sectors.
 html=html.replace('felucca-flash','chordon-native-flash').replace('felucca-emu','chordon-native-emu')
 (out/'index.html').write_text(html)

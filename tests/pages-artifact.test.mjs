@@ -16,7 +16,7 @@ read('minimal.css');
 read('core/fm1-surface.mjs');
 assert.ok(html.includes('./core/fm1-surface.mjs'));
 assert.equal((html.match(/class="encoder"/g)||[]).length,4,'Four right-side encoders');
-assert.equal((html.match(/class="physical-knob unused"/g)||[]).length,6,'Six unused encoders stay dark');
+assert.equal((html.match(/class="physical-knob unused"/g)||[]).length,5,'Five unused encoders stay dark');
 const visited = new Set();
 function visit(relative) {
   if (visited.has(relative)) return;
@@ -32,6 +32,8 @@ assert.ok(visited.has('assets/dx7/aquanode-presets.js'));
 assert.ok(visited.has('vendor/opendx7/dx7-patch.js'));
 read('vendor/opendx7/dx7-processor.js');
 assert.ok(html.includes('id="preset"'));
+assert.match(html,/id="tempo"[^>]*role="slider"/);
+assert.ok(html.includes('id="tempo-display"'));
 const classic = read('classic.html');
 assert.ok(classic.includes('src="./core/browser-bass-bootstrap.js"'));
 assert.ok(classic.includes('chordon-bass-ready'));
